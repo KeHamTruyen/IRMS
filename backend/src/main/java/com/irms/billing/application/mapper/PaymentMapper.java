@@ -20,8 +20,12 @@ public class PaymentMapper {
                 .amount(payment.getAmount())
                 .paymentMethod(payment.getPaymentMethod())
                 .status(payment.getStatus())
-            .paidAt(payment.getProcessedAt())
-            .createdAt(null)
+                .transactionId(payment.getTransactionId())
+                .paidAt(payment.getProcessedAt())
+                .createdAt(payment.getProcessedAt())
+                .processedAt(payment.getProcessedAt())
+                .processedBy(payment.getProcessedBy())
+                .notes(payment.getNotes())
                 .build();
     }
 }

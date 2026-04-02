@@ -28,6 +28,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
+import java.util.List;
 
 /**
  * Billing service implementation - 100% SOLID Compliant
@@ -57,6 +58,19 @@ public class BillingServiceImpl implements IBillingService {
     
     @Value("${app.service-charge-rate}")
     private BigDecimal serviceChargeRate;
+
+    @Override
+    @Transactional(readOnly = true)
+    public List<Bill> getAllBills() {
+        return billRepository.findAll();
+    }
+
+    @Override
+    @Transactional(readOnly = true)
+    public Bill getBillById(Long billId) {
+        return billRepository.findById(billId)
+                .orElseThrow(() -> new ResourceNotFoundException("Bill", billId));
+    }
     
     @Override
     @Transactional

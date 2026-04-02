@@ -1,61 +1,111 @@
-import React, { useState } from 'react';
-import { useRestaurant } from '../../store/RestaurantContext';
-import { KitchenTicket, OrderStatus } from '../../types';
-import { Clock, CheckCircle, AlertCircle, ChefHat } from 'lucide-react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { KitchenTicket } from '../../types';
+import { kitchenService } from '../../services/kitchen.service';
+import { Clock, CheckCircle, AlertCircle, ChefHat, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const KitchenDashboard: React.FC = () => {
-  const { kitchenTickets, updateKitchenTicket, updateOrderItemStatus } = useRestaurant();
+  const [tickets, setTickets] = useState<KitchenTicket[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
   const [selectedTicket, setSelectedTicket] = useState<string | null>(null);
 
-  const pendingTickets = kitchenTickets.filter(t => t.status === 'pending');
-  const preparingTickets = kitchenTickets.filter(t => t.status === 'preparing');
-  const readyTickets = kitchenTickets.filter(t => t.status === 'ready');
-
-  const handleStartCooking = (ticketId: string) => {
-    updateKitchenTicket(ticketId, 'preparing');
-    toast.success('Started preparing order');
+  const loadTickets = async () => {
+    try {
+      const data = await kitchenService.getActiveOrders();
+      setTickets(data);
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || 'Failed to load kitchen orders';
+      toast.error(message);
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
   };
 
-  const handleMarkItemReady = (ticketId: string, itemId: string, orderId: string) => {
-    updateOrderItemStatus(orderId, itemId, 'ready');
-    toast.success('Item marked as ready');
+  useEffect(() => {
+    void loadTickets();
+  }, []);
+
+  const pendingTickets = useMemo(() => tickets.filter(ticket => ticket.status === 'pending'), [tickets]);
+  const preparingTickets = useMemo(() => tickets.filter(ticket => ticket.status === 'preparing'), [tickets]);
+  const readyTickets = useMemo(() => tickets.filter(ticket => ticket.status === 'ready'), [tickets]);
+
+  const refreshTickets = async () => {
+    setRefreshing(true);
+    await loadTickets();
   };
 
-  const handleMarkTicketReady = (ticketId: string) => {
-    updateKitchenTicket(ticketId, 'ready');
-    toast.success('Order ready for pickup!');
+  const completeKitchenItem = async (item: KitchenTicket['items'][number]) => {
+    if (item.status === 'pending') {
+      await kitchenService.startPreparation(item.id);
+    }
+
+    if (item.status !== 'ready' && item.status !== 'served') {
+      await kitchenService.markAsReady(item.id);
+    }
+  };
+
+  const handleStartCooking = async (ticket: KitchenTicket) => {
+    try {
+      await Promise.all(ticket.items.map(item => item.status === 'pending' ? kitchenService.startPreparation(item.id) : Promise.resolve()));
+      toast.success('Started preparing order');
+      await refreshTickets();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Unable to start cooking');
+    }
+  };
+
+  const handleMarkItemReady = async (ticket: KitchenTicket, itemId: string) => {
+    try {
+      const item = ticket.items.find(entry => entry.id === itemId);
+      if (!item) return;
+
+      await completeKitchenItem(item);
+      toast.success('Item marked as ready');
+      await refreshTickets();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Unable to update item status');
+    }
+  };
+
+  const handleMarkTicketReady = async (ticket: KitchenTicket) => {
+    try {
+      await Promise.all(ticket.items.map(item => completeKitchenItem(item)));
+      toast.success('Order ready for pickup!');
+      await refreshTickets();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Unable to complete order');
+    }
   };
 
   const getPriorityColor = (priority: string) => {
-    return priority === 'high' 
-      ? 'border-red-400 bg-red-50' 
+    return priority === 'high'
+      ? 'border-red-400 bg-red-50'
       : 'border-orange-200 bg-white';
   };
 
   const getTimeSince = (date: Date) => {
-    const minutes = Math.floor((Date.now() - date.getTime()) / 60000);
-    return minutes;
+    return Math.floor((Date.now() - date.getTime()) / 60000);
   };
 
-  const TicketCard: React.FC<{ ticket: KitchenTicket; showActions?: boolean }> = ({ 
-    ticket, 
-    showActions = true 
+  const TicketCard: React.FC<{ ticket: KitchenTicket; showActions?: boolean }> = ({
+    ticket,
+    showActions = true,
   }) => {
     const timeElapsed = getTimeSince(ticket.createdAt);
     const isUrgent = timeElapsed > 20;
 
     return (
-      <div 
+      <div
         className={`border-2 rounded-xl p-4 ${getPriorityColor(ticket.priority)} ${
           selectedTicket === ticket.id ? 'ring-2 ring-orange-500' : ''
         }`}
         onClick={() => setSelectedTicket(ticket.id)}
       >
-        {/* Header */}
         <div className="flex justify-between items-start mb-3">
           <div>
-            <h3 className="text-2xl font-bold text-gray-900">Table {ticket.tableNumber}</h3>
+            <h3 className="text-2xl font-bold text-gray-900">Table {ticket.tableNumber || ticket.orderId}</h3>
             <p className="text-sm text-gray-600">Order #{ticket.orderId.slice(-6)}</p>
           </div>
           <div className="flex flex-col items-end gap-1">
@@ -71,10 +121,9 @@ export const KitchenDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Items */}
         <div className="space-y-2 mb-4">
           {ticket.items.map(item => {
-            const isItemReady = item.status === 'ready';
+            const isItemReady = item.status === 'ready' || item.status === 'served';
             return (
               <div
                 key={item.id}
@@ -86,9 +135,7 @@ export const KitchenDashboard: React.FC = () => {
                   <button
                     onClick={(e) => {
                       e.stopPropagation();
-                      if (!isItemReady) {
-                        handleMarkItemReady(ticket.id, item.id, ticket.orderId);
-                      }
+                      void handleMarkItemReady(ticket, item.id);
                     }}
                     disabled={isItemReady}
                     className={`mt-1 ${
@@ -98,7 +145,7 @@ export const KitchenDashboard: React.FC = () => {
                     <CheckCircle className={`size-5 ${isItemReady ? 'fill-green-500' : ''}`} />
                   </button>
                 )}
-                
+
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
                     <span className="font-semibold text-gray-900">{item.quantity}x</span>
@@ -112,45 +159,40 @@ export const KitchenDashboard: React.FC = () => {
                       {item.notes}
                     </p>
                   )}
-                  <p className="text-xs text-gray-500 mt-1">
-                    Prep time: {item.menuItem.prepTime} min
-                  </p>
+                  <p className="text-xs text-gray-500 mt-1">Prep time: {item.menuItem.prepTime} min</p>
                 </div>
 
                 {isItemReady && (
-                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">
-                    Ready
-                  </span>
+                  <span className="text-xs bg-green-500 text-white px-2 py-1 rounded">Ready</span>
                 )}
               </div>
             );
           })}
         </div>
 
-        {/* Actions */}
         {showActions && (
           <div>
             {ticket.status === 'pending' && (
               <button
                 onClick={(e) => {
                   e.stopPropagation();
-                  handleStartCooking(ticket.id);
+                  void handleStartCooking(ticket);
                 }}
                 className="w-full bg-orange-500 hover:bg-orange-600 text-white py-2 rounded-lg font-medium transition-colors"
               >
                 Start Cooking
               </button>
             )}
-            
+
             {ticket.status === 'preparing' && (
               <div>
                 <div className="text-sm text-gray-600 mb-2 text-center">
-                  {ticket.items.filter(i => i.status === 'ready').length} / {ticket.items.length} items ready
+                  {ticket.items.filter(i => i.status === 'ready' || i.status === 'served').length} / {ticket.items.length} items ready
                 </div>
                 <button
                   onClick={(e) => {
                     e.stopPropagation();
-                    handleMarkTicketReady(ticket.id);
+                    void handleMarkTicketReady(ticket);
                   }}
                   className="w-full bg-green-500 hover:bg-green-600 text-white py-2 rounded-lg font-medium transition-colors"
                 >
@@ -167,7 +209,6 @@ export const KitchenDashboard: React.FC = () => {
           </div>
         )}
 
-        {/* Estimated Time */}
         <div className="mt-3 pt-3 border-t border-gray-200 flex justify-between items-center text-sm">
           <span className="text-gray-600">Est. completion:</span>
           <span className="font-medium text-gray-900">{ticket.estimatedTime} min</span>
@@ -176,19 +217,37 @@ export const KitchenDashboard: React.FC = () => {
     );
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center text-gray-600">
+          <RefreshCw className="size-8 mx-auto mb-3 animate-spin" />
+          <p>Loading kitchen display...</p>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-screen-2xl mx-auto p-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
-            <ChefHat className="size-10 text-orange-500" />
-            Kitchen Display System
-          </h1>
-          <p className="text-gray-600">Manage incoming orders and food preparation</p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
+              <ChefHat className="size-10 text-orange-500" />
+              Kitchen Display System
+            </h1>
+            <p className="text-gray-600">Manage incoming orders and food preparation</p>
+          </div>
+          <button
+            onClick={refreshTickets}
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <RefreshCw className={`size-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-8">
           <div className="bg-yellow-50 border-2 border-yellow-200 rounded-xl p-6">
             <div className="flex items-center justify-between">
@@ -221,9 +280,7 @@ export const KitchenDashboard: React.FC = () => {
           </div>
         </div>
 
-        {/* Tickets Board */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          {/* Pending */}
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-yellow-500 rounded"></span>
@@ -235,14 +292,11 @@ export const KitchenDashboard: React.FC = () => {
                   No pending orders
                 </div>
               ) : (
-                pendingTickets.map(ticket => (
-                  <TicketCard key={ticket.id} ticket={ticket} />
-                ))
+                pendingTickets.map(ticket => <TicketCard key={ticket.id} ticket={ticket} />)
               )}
             </div>
           </div>
 
-          {/* Preparing */}
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-orange-500 rounded"></span>
@@ -254,14 +308,11 @@ export const KitchenDashboard: React.FC = () => {
                   No orders in preparation
                 </div>
               ) : (
-                preparingTickets.map(ticket => (
-                  <TicketCard key={ticket.id} ticket={ticket} />
-                ))
+                preparingTickets.map(ticket => <TicketCard key={ticket.id} ticket={ticket} />)
               )}
             </div>
           </div>
 
-          {/* Ready */}
           <div>
             <h2 className="text-xl font-bold text-gray-900 mb-4 flex items-center gap-2">
               <span className="w-1 h-6 bg-green-500 rounded"></span>
@@ -273,9 +324,7 @@ export const KitchenDashboard: React.FC = () => {
                   No ready orders
                 </div>
               ) : (
-                readyTickets.map(ticket => (
-                  <TicketCard key={ticket.id} ticket={ticket} showActions={false} />
-                ))
+                readyTickets.map(ticket => <TicketCard key={ticket.id} ticket={ticket} showActions={false} />)
               )}
             </div>
           </div>

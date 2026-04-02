@@ -72,6 +72,7 @@ const mapOrder = (backendOrder: OrderResponse): Order => {
   return {
     id: backendOrder.id.toString(),
     tableId: backendOrder.tableId.toString(),
+    tableName: backendOrder.tableName,
     serverId: backendOrder.serverId.toString(),
     serverName: backendOrder.serverName,
     status: mapOrderStatus(backendOrder.status),

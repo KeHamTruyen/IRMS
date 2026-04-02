@@ -1,46 +1,54 @@
-import React, { useState } from 'react';
-import { useRestaurant } from '../../store/RestaurantContext';
-import { Table, MenuItem, OrderItem, Order } from '../../types';
+import React, { useMemo, useState } from 'react';
+import { MenuItem, Order, Table } from '../../types';
+import { orderService } from '../../services/order.service';
 import { X, Plus, Minus, ShoppingCart, Send } from 'lucide-react';
 import { toast } from 'sonner';
 
 interface TakeOrderModalProps {
   table: Table;
+  menuItems: MenuItem[];
+  existingOrder?: Order | null;
   onClose: () => void;
+  onOrderCreated: (order: Order) => void;
 }
 
-export const TakeOrderModal: React.FC<TakeOrderModalProps> = ({ table, onClose }) => {
-  const { menuItems, orders, addOrder, currentUser } = useRestaurant();
+export const TakeOrderModal: React.FC<TakeOrderModalProps> = ({
+  table,
+  menuItems,
+  existingOrder,
+  onClose,
+  onOrderCreated,
+}) => {
   const [selectedCategory, setSelectedCategory] = useState<string>('All');
+  const [orderNotes, setOrderNotes] = useState('');
+  const [isSubmitting, setIsSubmitting] = useState(false);
   const [cart, setCart] = useState<Map<string, { item: MenuItem; quantity: number; notes: string }>>(new Map());
 
-  const existingOrder = orders.find(o => o.tableId === table.id && o.status !== 'served');
+  const categories = useMemo(() => ['All', ...Array.from(new Set(menuItems.map(m => m.category)))], [menuItems]);
 
-  const categories = ['All', ...Array.from(new Set(menuItems.map(m => m.category)))];
-
-  const filteredMenu = selectedCategory === 'All' 
-    ? menuItems 
+  const filteredMenu = selectedCategory === 'All'
+    ? menuItems
     : menuItems.filter(m => m.category === selectedCategory);
 
   const addToCart = (item: MenuItem) => {
     if (!item.available) return;
-    
+
     const newCart = new Map(cart);
     const existing = newCart.get(item.id);
-    
+
     if (existing) {
       newCart.set(item.id, { ...existing, quantity: existing.quantity + 1 });
     } else {
       newCart.set(item.id, { item, quantity: 1, notes: '' });
     }
-    
+
     setCart(newCart);
   };
 
   const updateQuantity = (itemId: string, delta: number) => {
     const newCart = new Map(cart);
     const existing = newCart.get(itemId);
-    
+
     if (existing) {
       const newQuantity = existing.quantity + delta;
       if (newQuantity <= 0) {
@@ -49,18 +57,18 @@ export const TakeOrderModal: React.FC<TakeOrderModalProps> = ({ table, onClose }
         newCart.set(itemId, { ...existing, quantity: newQuantity });
       }
     }
-    
+
     setCart(newCart);
   };
 
   const updateNotes = (itemId: string, notes: string) => {
     const newCart = new Map(cart);
     const existing = newCart.get(itemId);
-    
+
     if (existing) {
       newCart.set(itemId, { ...existing, notes });
     }
-    
+
     setCart(newCart);
   };
 
@@ -72,41 +80,40 @@ export const TakeOrderModal: React.FC<TakeOrderModalProps> = ({ table, onClose }
     return total;
   };
 
-  const handleSubmitOrder = () => {
+  const handleSubmitOrder = async () => {
     if (cart.size === 0) {
       toast.error('Please add items to cart');
       return;
     }
 
-    const orderItems: OrderItem[] = Array.from(cart.values()).map(({ item, quantity, notes }) => ({
-      id: `oi${Date.now()}_${item.id}`,
-      menuItem: item,
-      quantity,
-      notes: notes || undefined,
-      status: 'pending',
-    }));
+    setIsSubmitting(true);
 
-    const newOrder: Order = {
-      id: `o${Date.now()}`,
-      tableId: table.id,
-      items: orderItems,
-      status: 'pending',
-      serverId: currentUser?.id || '1',
-      serverName: currentUser?.name || 'Server',
-      createdAt: new Date(),
-      updatedAt: new Date(),
-      totalAmount: calculateTotal(),
-    };
+    try {
+      const createdOrder = await orderService.createOrder(
+        table.id,
+        Array.from(cart.values()).map(({ item, quantity, notes }) => ({
+          menuItemId: item.id,
+          quantity,
+          notes: notes || undefined,
+        })),
+        'DINE_IN',
+        orderNotes.trim() || undefined
+      );
 
-    addOrder(newOrder);
-    toast.success(`Order placed for Table ${table.number}`);
-    onClose();
+      onOrderCreated(createdOrder);
+      toast.success(`Order placed for Table ${table.number}`);
+      onClose();
+    } catch (error: any) {
+      const message = error?.response?.data?.message || error?.message || 'Failed to create order';
+      toast.error(message);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   return (
     <div className="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div className="bg-white rounded-2xl max-w-6xl w-full max-h-[90vh] flex flex-col">
-        {/* Header */}
         <div className="px-6 py-4 border-b border-gray-200 flex items-center justify-between">
           <div>
             <h2 className="text-2xl font-bold text-gray-900">
@@ -122,11 +129,8 @@ export const TakeOrderModal: React.FC<TakeOrderModalProps> = ({ table, onClose }
           </button>
         </div>
 
-        {/* Content */}
         <div className="flex-1 overflow-hidden flex">
-          {/* Menu Section */}
           <div className="flex-1 flex flex-col overflow-hidden">
-            {/* Category Tabs */}
             <div className="px-6 py-4 border-b border-gray-200 overflow-x-auto">
               <div className="flex gap-2">
                 {categories.map(category => (
@@ -145,7 +149,6 @@ export const TakeOrderModal: React.FC<TakeOrderModalProps> = ({ table, onClose }
               </div>
             </div>
 
-            {/* Menu Items */}
             <div className="flex-1 overflow-y-auto px-6 py-4">
               <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                 {filteredMenu.map(item => (
@@ -178,7 +181,6 @@ export const TakeOrderModal: React.FC<TakeOrderModalProps> = ({ table, onClose }
             </div>
           </div>
 
-          {/* Cart Section */}
           <div className="w-96 border-l border-gray-200 flex flex-col bg-gray-50">
             <div className="px-6 py-4 border-b border-gray-200">
               <div className="flex items-center gap-2 text-gray-900">
@@ -218,7 +220,7 @@ export const TakeOrderModal: React.FC<TakeOrderModalProps> = ({ table, onClose }
                           </button>
                         </div>
                       </div>
-                      
+
                       <input
                         type="text"
                         placeholder="Special notes..."
@@ -226,7 +228,7 @@ export const TakeOrderModal: React.FC<TakeOrderModalProps> = ({ table, onClose }
                         onChange={(e) => updateNotes(itemId, e.target.value)}
                         className="w-full px-2 py-1 text-sm border border-gray-200 rounded focus:outline-none focus:ring-2 focus:ring-orange-500"
                       />
-                      
+
                       <div className="mt-2 text-right text-sm font-medium text-gray-700">
                         ${(item.price * quantity).toFixed(2)}
                       </div>
@@ -236,20 +238,29 @@ export const TakeOrderModal: React.FC<TakeOrderModalProps> = ({ table, onClose }
               )}
             </div>
 
-            {/* Cart Footer */}
-            <div className="px-6 py-4 border-t border-gray-200 bg-white">
-              <div className="flex justify-between items-center mb-4">
+            <div className="px-6 py-4 border-t border-gray-200 bg-white space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">Order notes</label>
+                <textarea
+                  value={orderNotes}
+                  onChange={(e) => setOrderNotes(e.target.value)}
+                  placeholder="Allergy notes, combo selections, or special instructions"
+                  className="w-full min-h-24 px-3 py-2 text-sm border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-orange-500"
+                />
+              </div>
+
+              <div className="flex justify-between items-center">
                 <span className="text-gray-600">Total:</span>
                 <span className="text-2xl font-bold text-gray-900">${calculateTotal().toFixed(2)}</span>
               </div>
-              
+
               <button
                 onClick={handleSubmitOrder}
-                disabled={cart.size === 0}
+                disabled={cart.size === 0 || isSubmitting}
                 className="w-full bg-orange-500 hover:bg-orange-600 disabled:bg-gray-300 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 transition-colors"
               >
                 <Send className="size-5" />
-                Send to Kitchen
+                {isSubmitting ? 'Sending...' : 'Send to Kitchen'}
               </button>
             </div>
           </div>

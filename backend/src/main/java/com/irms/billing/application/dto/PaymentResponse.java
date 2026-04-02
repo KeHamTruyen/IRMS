@@ -20,6 +20,10 @@ public class PaymentResponse {
     private BigDecimal amount;
     private PaymentMethod paymentMethod;
     private PaymentStatus status;
+    private String transactionId;
     private LocalDateTime paidAt;
     private LocalDateTime createdAt;
+    private LocalDateTime processedAt;
+    private Long processedBy;
+    private String notes;
 }

@@ -1,6 +1,7 @@
 // Kitchen Service
 import api from './api';
 import { KitchenTicket, OrderItem, MenuItem } from '../types';
+import { orderService } from './order.service';
 
 // Backend DTO
 interface KitchenOrderResponse {
@@ -31,6 +32,15 @@ const mapKitchenStatus = (backendStatus: string): KitchenTicket['status'] => {
   return statusMap[backendStatus] || 'pending';
 };
 
+const combineTicketStatus = (statuses: KitchenTicket['status'][]): KitchenTicket['status'] => {
+  if (statuses.every(status => status === 'served')) return 'served';
+  if (statuses.every(status => status === 'ready')) return 'ready';
+  if (statuses.some(status => status === 'preparing' || status === 'ready' || status === 'served')) {
+    return 'preparing';
+  }
+  return 'pending';
+};
+
 // Map priority
 const mapPriority = (priority?: number): 'low' | 'normal' | 'high' => {
   if (!priority) return 'normal';
@@ -40,15 +50,32 @@ const mapPriority = (priority?: number): 'low' | 'normal' | 'high' => {
 };
 
 // Group kitchen orders by orderId into tickets
-const groupIntoTickets = (orders: KitchenOrderResponse[]): KitchenTicket[] => {
+const groupIntoTickets = async (orders: KitchenOrderResponse[]): Promise<KitchenTicket[]> => {
   const ticketMap = new Map<number, KitchenTicket>();
+  const orderInfoMap = new Map<number, { tableName?: string }>();
+
+  await Promise.all(
+    Array.from(new Set(orders.map(order => order.orderId))).map(async (orderId) => {
+      try {
+        const order = await orderService.getOrderById(orderId.toString());
+        orderInfoMap.set(orderId, { tableName: order.tableName });
+      } catch {
+        orderInfoMap.set(orderId, {});
+      }
+    })
+  );
   
   orders.forEach(order => {
     if (!ticketMap.has(order.orderId)) {
+      const tableName = orderInfoMap.get(order.orderId)?.tableName;
+      const tableNumber = tableName
+        ? parseInt(tableName.replace(/\D/g, ''), 10) || 0
+        : 0;
+
       ticketMap.set(order.orderId, {
         id: order.orderId.toString(),
         orderId: order.orderId.toString(),
-        tableNumber: 0, // Will be set if we have table info
+        tableNumber,
         items: [],
         status: mapKitchenStatus(order.status),
         priority: mapPriority(order.priority),
@@ -77,6 +104,7 @@ const groupIntoTickets = (orders: KitchenOrderResponse[]): KitchenTicket[] => {
     
     // Update estimated time
     ticket.estimatedTime = Math.max(ticket.estimatedTime, order.estimatedPrepTime);
+    ticket.status = combineTicketStatus(ticket.items.map(item => item.status));
   });
   
   return Array.from(ticketMap.values());
@@ -99,5 +127,10 @@ export const kitchenService = {
   // Mark order as ready
   async markAsReady(kitchenOrderId: string): Promise<void> {
     await api.patch(`/kitchen/orders/${kitchenOrderId}/ready`);
+  },
+
+  // Mark order as served
+  async markAsServed(kitchenOrderId: string): Promise<void> {
+    await api.patch(`/kitchen/orders/${kitchenOrderId}/served`);
   },
 };

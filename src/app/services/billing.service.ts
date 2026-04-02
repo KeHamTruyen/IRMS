@@ -74,6 +74,8 @@ const mapPaymentStatus = (backendStatus: string): PaymentStatus => {
 
 // Map backend bill to frontend
 const mapBill = (backendBill: BillResponse): Bill => {
+  const payments = Array.isArray(backendBill.payments) ? backendBill.payments : [];
+
   return {
     id: backendBill.id.toString(),
     orderId: backendBill.orderId.toString(),
@@ -84,8 +86,8 @@ const mapBill = (backendBill: BillResponse): Bill => {
     discount: backendBill.discount,
     total: backendBill.totalAmount,
     paymentStatus: mapPaymentStatus(backendBill.status),
-    paymentMethod: backendBill.payments.length > 0 
-      ? mapPaymentMethod(backendBill.payments[0].paymentMethod)
+    paymentMethod: payments.length > 0 
+      ? mapPaymentMethod(payments[0].paymentMethod)
       : undefined,
     paidAt: backendBill.paidAt ? new Date(backendBill.paidAt) : undefined,
     createdAt: new Date(backendBill.createdAt),
@@ -104,6 +106,13 @@ export const billingService = {
   // Get bill by ID
   async getBillById(id: string): Promise<Bill> {
     const response = await api.get<BillResponse>(`/bills/${id}`);
+    const data = (response as any).data || response;
+    return mapBill(data);
+  },
+
+  // Get bill by order ID
+  async getBillByOrderId(orderId: string): Promise<Bill> {
+    const response = await api.get<BillResponse>(`/bills/order/${orderId}`);
     const data = (response as any).data || response;
     return mapBill(data);
   },

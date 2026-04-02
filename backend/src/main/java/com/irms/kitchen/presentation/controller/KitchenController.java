@@ -38,7 +38,7 @@ public class KitchenController {
         return ResponseEntity.ok(ApiResponse.success(orders));
     }
     
-    @PatchMapping("/order-items/{id}/start")
+    @PatchMapping({"/order-items/{id}/start", "/orders/{id}/start"})
     @PreAuthorize("hasAnyRole('CHEF', 'MANAGER', 'ADMIN')")
     @Operation(summary = "Start preparation for kitchen order")
     public ResponseEntity<ApiResponse<KitchenOrder>> startPreparation(@PathVariable Long id) {
@@ -49,7 +49,7 @@ public class KitchenController {
         );
     }
     
-    @PatchMapping("/order-items/{id}/ready")
+    @PatchMapping({"/order-items/{id}/ready", "/orders/{id}/ready"})
     @PreAuthorize("hasAnyRole('CHEF', 'MANAGER', 'ADMIN')")
     @Operation(summary = "Mark kitchen order as ready")
     public ResponseEntity<ApiResponse<KitchenOrder>> markAsReady(@PathVariable Long id) {
@@ -60,7 +60,7 @@ public class KitchenController {
         );
     }
     
-    @PatchMapping("/order-items/{id}/served")
+    @PatchMapping({"/order-items/{id}/served", "/orders/{id}/served"})
     @PreAuthorize("hasAnyRole('SERVER', 'MANAGER', 'ADMIN')")
     @Operation(summary = "Mark kitchen order as served")
     public ResponseEntity<ApiResponse<KitchenOrder>> markAsServed(@PathVariable Long id) {

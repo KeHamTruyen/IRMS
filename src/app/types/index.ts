@@ -35,6 +35,7 @@ export interface OrderItem {
 export interface Order {
   id: string;
   tableId: string;
+  tableName?: string;
   items: OrderItem[];
   status: OrderStatus;
   serverId: string;

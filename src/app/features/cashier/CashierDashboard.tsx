@@ -1,52 +1,110 @@
-import React, { useState } from 'react';
-import { useRestaurant } from '../../store/RestaurantContext';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Order, PaymentMethod } from '../../types';
-import { DollarSign, CreditCard, Banknote, Receipt, CheckCircle } from 'lucide-react';
+import { orderService } from '../../services/order.service';
+import { billingService } from '../../services/billing.service';
+import { DollarSign, CreditCard, Banknote, Receipt, CheckCircle, RefreshCw } from 'lucide-react';
 import { toast } from 'sonner';
 
 export const CashierDashboard: React.FC = () => {
-  const { orders, tables, updateOrderStatus } = useRestaurant();
+  const [orders, setOrders] = useState<Order[]>([]);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const unpaidOrders = orders.filter(o => o.status !== 'served');
+  const loadOrders = async () => {
+    try {
+      const data = await orderService.getOrders();
+      setOrders(data);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Failed to load cashier data');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
 
-  const handleProcessPayment = (order: Order) => {
-    updateOrderStatus(order.id, 'served');
-    toast.success(`Payment processed for Table ${tables.find(t => t.id === order.tableId)?.number}`);
-    setSelectedOrder(null);
+  useEffect(() => {
+    void loadOrders();
+  }, []);
+
+  const payableOrders = useMemo(
+    () => orders.filter(order => order.status === 'ready'),
+    [orders]
+  );
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await loadOrders();
   };
 
   const calculateSubtotal = (order: Order) => {
     return order.items.reduce((sum, item) => sum + item.menuItem.price * item.quantity, 0);
   };
 
-  const calculateTax = (subtotal: number) => {
-    return subtotal * 0.1; // 10% tax
-  };
+  const calculateTax = (subtotal: number) => subtotal * 0.1;
 
   const calculateTotal = (order: Order) => {
     const subtotal = calculateSubtotal(order);
-    const tax = calculateTax(subtotal);
-    return subtotal + tax;
+    return subtotal + calculateTax(subtotal);
   };
+
+  const ensureBillForOrder = async (order: Order) => {
+    try {
+      return await billingService.getBillByOrderId(order.id);
+    } catch {
+      return await billingService.createBill(order.id);
+    }
+  };
+
+  const handleProcessPayment = async (order: Order) => {
+    try {
+      const bill = await ensureBillForOrder(order);
+      await billingService.processPayment(bill.id, calculateTotal(order), paymentMethod);
+      toast.success(`Payment processed for Table ${order.tableName ?? order.tableId}`);
+      setSelectedOrder(null);
+      await loadOrders();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Payment failed');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center text-gray-600">
+          <RefreshCw className="size-8 mx-auto mb-3 animate-spin" />
+          <p>Loading cashier dashboard...</p>
+        </div>
+      </div>
+    );
+  }
+
+  const totalRevenue = orders.reduce((sum, order) => sum + order.totalAmount, 0);
 
   return (
     <div className="min-h-screen bg-gray-50">
       <div className="max-w-screen-2xl mx-auto p-6">
-        {/* Header */}
-        <div className="mb-6">
-          <h1 className="text-3xl font-bold text-gray-900 mb-2">Cashier Dashboard</h1>
-          <p className="text-gray-600">Process payments and manage billing</p>
+        <div className="mb-6 flex items-start justify-between gap-4">
+          <div>
+            <h1 className="text-3xl font-bold text-gray-900 mb-2">Cashier Dashboard</h1>
+            <p className="text-gray-600">Process payments and manage billing</p>
+          </div>
+          <button
+            onClick={handleRefresh}
+            className="inline-flex items-center gap-2 rounded-lg border border-gray-200 bg-white px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+          >
+            <RefreshCw className={`size-4 ${refreshing ? 'animate-spin' : ''}`} />
+            Refresh
+          </button>
         </div>
 
-        {/* Stats */}
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-8">
           <div className="bg-white rounded-xl p-6 shadow-sm border border-gray-200">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm text-gray-600 mb-1">Pending Bills</p>
-                <p className="text-3xl font-bold text-orange-600">{unpaidOrders.length}</p>
+                <p className="text-sm text-gray-600 mb-1">Payable Bills</p>
+                <p className="text-3xl font-bold text-orange-600">{payableOrders.length}</p>
               </div>
               <Receipt className="size-8 text-orange-500" />
             </div>
@@ -56,9 +114,7 @@ export const CashierDashboard: React.FC = () => {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm text-gray-600 mb-1">Today's Revenue</p>
-                <p className="text-3xl font-bold text-green-600">
-                  ${orders.reduce((sum, o) => sum + o.totalAmount, 0).toFixed(2)}
-                </p>
+                <p className="text-3xl font-bold text-green-600">${totalRevenue.toFixed(2)}</p>
               </div>
               <DollarSign className="size-8 text-green-500" />
             </div>
@@ -79,7 +135,7 @@ export const CashierDashboard: React.FC = () => {
               <div>
                 <p className="text-sm text-gray-600 mb-1">Avg. Bill</p>
                 <p className="text-3xl font-bold text-purple-600">
-                  ${orders.length > 0 ? (orders.reduce((sum, o) => sum + o.totalAmount, 0) / orders.length).toFixed(2) : '0.00'}
+                  ${orders.length > 0 ? (totalRevenue / orders.length).toFixed(2) : '0.00'}
                 </p>
               </div>
               <Receipt className="size-8 text-purple-500" />
@@ -88,21 +144,19 @@ export const CashierDashboard: React.FC = () => {
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          {/* Orders List */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
-            <h2 className="text-xl font-bold text-gray-900 mb-4">Pending Bills</h2>
-            
+            <h2 className="text-xl font-bold text-gray-900 mb-4">Ready to Pay</h2>
+
             <div className="space-y-3">
-              {unpaidOrders.length === 0 ? (
+              {payableOrders.length === 0 ? (
                 <div className="text-center py-12 text-gray-400">
                   <Receipt className="size-12 mx-auto mb-3" />
-                  <p>No pending bills</p>
+                  <p>No ready orders for billing</p>
                 </div>
               ) : (
-                unpaidOrders.map(order => {
-                  const table = tables.find(t => t.id === order.tableId);
+                payableOrders.map(order => {
                   const total = calculateTotal(order);
-                  
+
                   return (
                     <button
                       key={order.id}
@@ -115,25 +169,23 @@ export const CashierDashboard: React.FC = () => {
                     >
                       <div className="flex justify-between items-start mb-2">
                         <div>
-                          <h3 className="font-bold text-gray-900">Table {table?.number}</h3>
+                          <h3 className="font-bold text-gray-900">
+                            Table {order.tableName ?? order.tableId}
+                          </h3>
                           <p className="text-sm text-gray-600">Order #{order.id.slice(-6)}</p>
                         </div>
                         <div className="text-right">
                           <p className="text-xl font-bold text-gray-900">${total.toFixed(2)}</p>
-                          <span className={`text-xs px-2 py-1 rounded ${
-                            order.status === 'ready' 
-                              ? 'bg-green-100 text-green-700' 
-                              : 'bg-orange-100 text-orange-700'
-                          }`}>
-                            {order.status}
+                          <span className="text-xs px-2 py-1 rounded bg-green-100 text-green-700">
+                            ready
                           </span>
                         </div>
                       </div>
-                      
+
                       <div className="text-sm text-gray-600">
                         {order.items.length} items • {order.serverName}
                       </div>
-                      
+
                       <div className="text-xs text-gray-500 mt-2">
                         {new Date(order.createdAt).toLocaleTimeString()}
                       </div>
@@ -144,10 +196,9 @@ export const CashierDashboard: React.FC = () => {
             </div>
           </div>
 
-          {/* Bill Details */}
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Bill Details</h2>
-            
+
             {!selectedOrder ? (
               <div className="text-center py-12 text-gray-400">
                 <Receipt className="size-12 mx-auto mb-3" />
@@ -155,10 +206,9 @@ export const CashierDashboard: React.FC = () => {
               </div>
             ) : (
               <div>
-                {/* Bill Header */}
                 <div className="mb-6 pb-4 border-b border-gray-200">
                   <h3 className="text-2xl font-bold text-gray-900 mb-1">
-                    Table {tables.find(t => t.id === selectedOrder.tableId)?.number}
+                    Table {selectedOrder.tableName ?? selectedOrder.tableId}
                   </h3>
                   <p className="text-sm text-gray-600">Order #{selectedOrder.id.slice(-6)}</p>
                   <p className="text-sm text-gray-600">Server: {selectedOrder.serverName}</p>
@@ -167,7 +217,6 @@ export const CashierDashboard: React.FC = () => {
                   </p>
                 </div>
 
-                {/* Items */}
                 <div className="mb-6">
                   <h4 className="font-semibold text-gray-900 mb-3">Items</h4>
                   <div className="space-y-2">
@@ -189,7 +238,6 @@ export const CashierDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Totals */}
                 <div className="mb-6 pt-4 border-t border-gray-200 space-y-2">
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Subtotal</span>
@@ -205,7 +253,6 @@ export const CashierDashboard: React.FC = () => {
                   </div>
                 </div>
 
-                {/* Payment Method */}
                 <div className="mb-6">
                   <h4 className="font-semibold text-gray-900 mb-3">Payment Method</h4>
                   <div className="grid grid-cols-3 gap-3">
@@ -217,9 +264,7 @@ export const CashierDashboard: React.FC = () => {
                           : 'border-gray-200 hover:border-green-300'
                       }`}
                     >
-                      <Banknote className={`size-8 mx-auto mb-2 ${
-                        paymentMethod === 'cash' ? 'text-green-600' : 'text-gray-400'
-                      }`} />
+                      <Banknote className={`size-8 mx-auto mb-2 ${paymentMethod === 'cash' ? 'text-green-600' : 'text-gray-400'}`} />
                       <span className="text-sm font-medium text-gray-900">Cash</span>
                     </button>
 
@@ -231,9 +276,7 @@ export const CashierDashboard: React.FC = () => {
                           : 'border-gray-200 hover:border-blue-300'
                       }`}
                     >
-                      <CreditCard className={`size-8 mx-auto mb-2 ${
-                        paymentMethod === 'card' ? 'text-blue-600' : 'text-gray-400'
-                      }`} />
+                      <CreditCard className={`size-8 mx-auto mb-2 ${paymentMethod === 'card' ? 'text-blue-600' : 'text-gray-400'}`} />
                       <span className="text-sm font-medium text-gray-900">Card</span>
                     </button>
 
@@ -245,17 +288,14 @@ export const CashierDashboard: React.FC = () => {
                           : 'border-gray-200 hover:border-purple-300'
                       }`}
                     >
-                      <DollarSign className={`size-8 mx-auto mb-2 ${
-                        paymentMethod === 'transfer' ? 'text-purple-600' : 'text-gray-400'
-                      }`} />
+                      <DollarSign className={`size-8 mx-auto mb-2 ${paymentMethod === 'transfer' ? 'text-purple-600' : 'text-gray-400'}`} />
                       <span className="text-sm font-medium text-gray-900">Transfer</span>
                     </button>
                   </div>
                 </div>
 
-                {/* Action Button */}
                 <button
-                  onClick={() => handleProcessPayment(selectedOrder)}
+                  onClick={() => void handleProcessPayment(selectedOrder)}
                   className="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-lg font-bold text-lg transition-colors flex items-center justify-center gap-2"
                 >
                   <CheckCircle className="size-6" />
