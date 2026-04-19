@@ -1,8 +1,8 @@
 spring:
   datasource:
     url: jdbc:postgresql://localhost:5432/irms_dev
-    username: postgres
-    password: POSTGRES_minhdang1234
+    username: 
+    password: 
   
   jpa:
     show-sql: true
