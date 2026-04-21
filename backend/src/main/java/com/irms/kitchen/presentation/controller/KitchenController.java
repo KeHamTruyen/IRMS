@@ -1,6 +1,7 @@
 package com.irms.kitchen.presentation.controller;
 
 import com.irms.common.dto.ApiResponse;
+import com.irms.kitchen.application.dto.KitchenDisplayOrderResponse;
 import com.irms.kitchen.application.service.IKitchenService;
 import com.irms.kitchen.domain.entity.KitchenOrder;
 import com.irms.kitchen.domain.entity.KitchenOrderStatus;
@@ -36,6 +37,13 @@ public class KitchenController {
                 : kitchenService.getAllKitchenOrders();
         
         return ResponseEntity.ok(ApiResponse.success(orders));
+    }
+
+    @GetMapping("/display")
+    @PreAuthorize("hasAnyRole('CHEF', 'MANAGER', 'ADMIN')")
+    @Operation(summary = "Get kitchen display orders sorted by category")
+    public ResponseEntity<ApiResponse<List<KitchenDisplayOrderResponse>>> getKitchenDisplayOrders() {
+        return ResponseEntity.ok(ApiResponse.success(kitchenService.getKitchenDisplayOrders()));
     }
     
     @PatchMapping({"/order-items/{id}/start", "/orders/{id}/start"})
