@@ -19,6 +19,8 @@ public class CreateOrderRequest {
     
     private Long tableId;
     
+    private Long serverId;
+    
     @NotNull(message = "Order type is required")
     private OrderType orderType;
     

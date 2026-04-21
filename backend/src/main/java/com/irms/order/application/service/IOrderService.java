@@ -8,37 +8,37 @@ import java.util.List;
 
 /**
  * Order service interface (ISP, DIP)
- * Focused interface for order operations
+ * Định nghĩa các hành động nghiệp vụ cho module đặt hàng.
  */
 public interface IOrderService {
     
     /**
-     * Create a new order
+     * Tạo mới một đơn hàng từ yêu cầu của khách hàng
      */
     Order createOrder(CreateOrderRequest request);
     
     /**
-     * Get order by ID
+     * Tìm kiếm đơn hàng theo mã ID
      */
     Order getOrderById(Long id);
     
     /**
-     * Get all orders
+     * Lấy danh sách tất cả các đơn hàng trong hệ thống
      */
     List<Order> getAllOrders();
     
     /**
-     * Get orders by status
+     * Lọc danh sách đơn hàng theo trạng thái (PENDING, PAID, CANCELLED,...)
      */
     List<Order> getOrdersByStatus(OrderStatus status);
     
     /**
-     * Update order status
+     * Cập nhật trạng thái mới cho đơn hàng
      */
     Order updateOrderStatus(Long orderId, OrderStatus newStatus);
     
     /**
-     * Cancel order
+     * Hủy đơn hàng
      */
     void cancelOrder(Long orderId);
 }
