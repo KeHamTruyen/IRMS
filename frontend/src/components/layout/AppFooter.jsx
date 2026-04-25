@@ -3,7 +3,9 @@ function AppFooter({ session, dashboard }) {
     <footer className="flex flex-wrap gap-4 pt-2.5 text-sm text-[#62707f]">
       <span>Vai trò: {dashboard?.roleLabel ?? session.role}</span>
       <span>Nguồn dữ liệu: {dashboard?.sourceLabel ?? session.source}</span>
-      <span>{dashboard?.footerNote ?? 'Dữ liệu dự phòng đã bám theo cấu trúc phản hồi từ backend'}</span>
+      <span>
+        {dashboard?.footerNote ?? 'Dữ liệu dự phòng đã bám theo cấu trúc phản hồi từ backend'}
+      </span>
     </footer>
   )
 }
