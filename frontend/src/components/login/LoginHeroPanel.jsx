@@ -10,7 +10,7 @@ function LoginHeroPanel() {
         </h1>
         <p className="mt-4 max-w-[34rem] text-base leading-7 text-white/85">
           Tối giản, ổn định và sẵn sàng cho truy cập theo vai trò ở quầy quản trị, khu phục vụ,
-          bếp và thu ngân.
+          bếp, thu ngân và lễ tân.
         </p>
       </div>
 

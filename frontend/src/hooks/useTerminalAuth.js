@@ -4,11 +4,13 @@ import { EMPLOYEE_ROLES, getRoleMeta } from '../constants/roles'
 import { mockApi } from '../services/mockApi'
 
 const SESSION_STORAGE_KEY = 'irms-session'
+const DISABLED_ROLES = ['MANAGER']
 
 const readStoredSession = () => {
   try {
     const raw = window.localStorage.getItem(SESSION_STORAGE_KEY)
-    return raw ? JSON.parse(raw) : null
+    const parsed = raw ? JSON.parse(raw) : null
+    return parsed && !DISABLED_ROLES.includes(parsed.role) ? parsed : null
   } catch {
     return null
   }
@@ -47,6 +49,13 @@ export function useTerminalAuth() {
     writeStoredSession(session)
 
     if (session?.role) {
+      if (DISABLED_ROLES.includes(session.role)) {
+        setSession(null)
+        setDashboardResponse(null)
+        setLoadingDashboard(false)
+        return
+      }
+
       let cancelled = false
       window.location.hash = `/dashboard/${session.role.toLowerCase()}`
 
@@ -77,6 +86,11 @@ export function useTerminalAuth() {
   const handleAuthenticationResult = useCallback((response) => {
     if (!response.success) {
       setAuthError(response.error ?? 'Xác thực thất bại')
+      return
+    }
+
+    if (DISABLED_ROLES.includes(response.data?.role)) {
+      setAuthError('Vai trò này đã được gỡ khỏi hệ thống.')
       return
     }
 
