@@ -1,8 +1,8 @@
 {
   "meta": {
     "source": "mock-backend-fallback",
-    "version": "1.0.0",
-    "generatedAt": "2026-04-25T20:30:00+07:00"
+    "version": "3.0.0",
+    "generatedAt": "2026-04-25T21:30:00+07:00"
   },
   "demoAccess": [
     {
@@ -17,7 +17,7 @@
     },
     {
       "role": "SERVER",
-      "label": "PIN nhân viên",
+      "label": "PIN nhân viên phục vụ",
       "value": "1234"
     },
     {
@@ -31,7 +31,7 @@
       "id": 1,
       "username": "admin",
       "password": "password123",
-      "fullName": "System Administrator",
+      "fullName": "Quản trị hệ thống",
       "email": "admin@irms.com",
       "phone": "555-0001",
       "role": "ADMIN",
@@ -43,7 +43,7 @@
       "username": "manager1",
       "password": "password123",
       "pin": "2468",
-      "fullName": "John Manager",
+      "fullName": "Nguyễn Minh Quản Lý",
       "email": "manager@irms.com",
       "phone": "555-0002",
       "role": "MANAGER",
@@ -55,8 +55,8 @@
       "username": "server1",
       "password": "password123",
       "pin": "1234",
-      "fullName": "Sarah Server",
-      "email": "sarah@irms.com",
+      "fullName": "Nguyễn An Phục Vụ",
+      "email": "server@irms.com",
       "phone": "555-0003",
       "role": "SERVER",
       "isActive": true,
@@ -67,9 +67,9 @@
       "username": "chef1",
       "password": "password123",
       "pin": "2580",
-      "fullName": "Chef Gordon",
-      "email": "gordon@irms.com",
-      "phone": "555-0005",
+      "fullName": "Trần Gia Bếp",
+      "email": "chef@irms.com",
+      "phone": "555-0004",
       "role": "CHEF",
       "isActive": true,
       "authMethod": "pin"
@@ -79,9 +79,9 @@
       "username": "cashier1",
       "password": "password123",
       "pin": "4567",
-      "fullName": "Linda Cashier",
-      "email": "linda@irms.com",
-      "phone": "555-0007",
+      "fullName": "Lê Thanh Thu Ngân",
+      "email": "cashier@irms.com",
+      "phone": "555-0005",
       "role": "CASHIER",
       "isActive": true,
       "authMethod": "pin"
@@ -91,765 +91,706 @@
       "username": "host1",
       "password": "password123",
       "pin": "1357",
-      "fullName": "David Host",
-      "email": "david@irms.com",
-      "phone": "555-0008",
+      "fullName": "Phạm Hà Lễ Tân",
+      "email": "host@irms.com",
+      "phone": "555-0006",
       "role": "HOST",
       "isActive": true,
       "authMethod": "pin"
     }
   ],
   "dashboards": {
+    "SERVER": {
+      "roleLabel": "Nhân viên phục vụ",
+      "sourceLabel": "Dữ liệu dự phòng bàn, order và hóa đơn",
+      "snapshotTime": "Ảnh chụp lúc 21:30",
+      "footerNote": "Bám theo Table, MenuItem, OrderResponse, BillResponse và PaymentResponse",
+      "searchPlaceholder": "Tìm bàn hoặc món ăn...",
+      "navigation": {
+        "sideItems": [
+          {
+            "id": "tables",
+            "label": "Quản lý bàn"
+          },
+          {
+            "id": "menu",
+            "label": "Thực đơn"
+          }
+        ]
+      },
+      "tableManagement": {
+        "serviceArea": "Sảnh chính",
+        "activeTables": 12,
+        "tables": [
+          {
+            "id": 1,
+            "tableNumber": "01",
+            "capacity": 4,
+            "status": "OCCUPIED",
+            "serviceState": "SERVED",
+            "location": "Sảnh chính",
+            "currentGuests": 4,
+            "elapsedMinutes": 42,
+            "activeOrderId": 8821,
+            "reservationName": null,
+            "billingStatus": "PENDING"
+          },
+          {
+            "id": 2,
+            "tableNumber": "02",
+            "capacity": 2,
+            "status": "AVAILABLE",
+            "serviceState": "AVAILABLE",
+            "location": "Sảnh chính",
+            "currentGuests": 0,
+            "elapsedMinutes": 0,
+            "activeOrderId": null,
+            "reservationName": null,
+            "billingStatus": null
+          },
+          {
+            "id": 3,
+            "tableNumber": "03",
+            "capacity": 4,
+            "status": "RESERVED",
+            "serviceState": "RESERVED",
+            "location": "Sảnh chính",
+            "currentGuests": 0,
+            "elapsedMinutes": 0,
+            "activeOrderId": null,
+            "reservationName": "Trần Ngọc Hà",
+            "billingStatus": null
+          },
+          {
+            "id": 4,
+            "tableNumber": "04",
+            "capacity": 6,
+            "status": "OCCUPIED",
+            "serviceState": "WAITING_FOOD",
+            "location": "Sảnh chính",
+            "currentGuests": 6,
+            "elapsedMinutes": 18,
+            "activeOrderId": 8824,
+            "reservationName": null,
+            "billingStatus": "PENDING"
+          },
+          {
+            "id": 5,
+            "tableNumber": "05",
+            "capacity": 4,
+            "status": "CLEANING",
+            "serviceState": "CLEANING",
+            "location": "Sân hiên",
+            "currentGuests": 0,
+            "elapsedMinutes": 9,
+            "activeOrderId": null,
+            "reservationName": null,
+            "billingStatus": "PAID"
+          },
+          {
+            "id": 6,
+            "tableNumber": "06",
+            "capacity": 2,
+            "status": "AVAILABLE",
+            "serviceState": "AVAILABLE",
+            "location": "Sân hiên",
+            "currentGuests": 0,
+            "elapsedMinutes": 0,
+            "activeOrderId": null,
+            "reservationName": null,
+            "billingStatus": null
+          },
+          {
+            "id": 7,
+            "tableNumber": "07",
+            "capacity": 4,
+            "status": "RESERVED",
+            "serviceState": "RESERVED",
+            "location": "Phòng riêng",
+            "currentGuests": 0,
+            "elapsedMinutes": 0,
+            "activeOrderId": null,
+            "reservationName": "Nhóm Minh Khang",
+            "billingStatus": null
+          },
+          {
+            "id": 8,
+            "tableNumber": "08",
+            "capacity": 2,
+            "status": "OCCUPIED",
+            "serviceState": "WAITING_FOOD",
+            "location": "Sảnh chính",
+            "currentGuests": 2,
+            "elapsedMinutes": 15,
+            "activeOrderId": 8828,
+            "reservationName": null,
+            "billingStatus": "PENDING"
+          },
+          {
+            "id": 9,
+            "tableNumber": "09",
+            "capacity": 4,
+            "status": "AVAILABLE",
+            "serviceState": "AVAILABLE",
+            "location": "Sân hiên",
+            "currentGuests": 0,
+            "elapsedMinutes": 0,
+            "activeOrderId": null,
+            "reservationName": null,
+            "billingStatus": null
+          },
+          {
+            "id": 10,
+            "tableNumber": "10",
+            "capacity": 6,
+            "status": "OCCUPIED",
+            "serviceState": "SERVED",
+            "location": "Sảnh chính",
+            "currentGuests": 5,
+            "elapsedMinutes": 31,
+            "activeOrderId": 8830,
+            "reservationName": null,
+            "billingStatus": "PARTIALLY_PAID"
+          }
+        ],
+        "statusOptions": [
+          {
+            "id": "AVAILABLE",
+            "label": "Trống"
+          },
+          {
+            "id": "RESERVED",
+            "label": "Đã đặt trước"
+          },
+          {
+            "id": "WAITING_FOOD",
+            "label": "Đang chờ món"
+          },
+          {
+            "id": "SERVED",
+            "label": "Đã lên món"
+          },
+          {
+            "id": "CLEANING",
+            "label": "Chờ dọn"
+          }
+        ]
+      },
+      "menuCatalog": {
+        "categories": [
+          "Tất cả",
+          "Món chính",
+          "Khai vị",
+          "Tráng miệng",
+          "Nước uống"
+        ],
+        "items": [
+          {
+            "id": 101,
+            "name": "Burger bò Wagyu",
+            "category": "Món chính",
+            "price": 240000,
+            "description": "Bánh brioche, bò Wagyu, phô mai và khoai chiên.",
+            "isAvailable": true,
+            "preparationTime": 16,
+            "imageUrl": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
+            "sizeOptions": [
+              "Mặc định",
+              "Phần lớn"
+            ]
+          },
+          {
+            "id": 102,
+            "name": "Pizza nấm Truffle",
+            "category": "Món chính",
+            "price": 220000,
+            "description": "Mozzarella, nấm đùi gà và dầu nấm truffle.",
+            "isAvailable": true,
+            "preparationTime": 15,
+            "imageUrl": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80",
+            "sizeOptions": [
+              "S",
+              "M",
+              "L"
+            ]
+          },
+          {
+            "id": 103,
+            "name": "Salad vườn xanh",
+            "category": "Khai vị",
+            "price": 165000,
+            "description": "Xà lách, bơ, hạt rang và sốt chanh dây.",
+            "isAvailable": true,
+            "preparationTime": 8,
+            "imageUrl": "https://images.unsplash.com/photo-1546793665-c74683f339c1?auto=format&fit=crop&w=900&q=80",
+            "sizeOptions": [
+              "Mặc định"
+            ]
+          },
+          {
+            "id": 104,
+            "name": "Bạch tuộc nướng",
+            "category": "Món chính",
+            "price": 280000,
+            "description": "Xốt paprika khói, dầu cam chanh và khoai nghiền.",
+            "isAvailable": true,
+            "preparationTime": 18,
+            "imageUrl": "https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=900&q=80",
+            "sizeOptions": [
+              "Mặc định"
+            ]
+          },
+          {
+            "id": 105,
+            "name": "Tiramisu truyền thống",
+            "category": "Tráng miệng",
+            "price": 89000,
+            "description": "Phô mai mascarpone, cacao và espresso.",
+            "isAvailable": true,
+            "preparationTime": 4,
+            "imageUrl": "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=900&q=80",
+            "sizeOptions": [
+              "Mặc định"
+            ]
+          },
+          {
+            "id": 106,
+            "name": "Latte yến mạch đá",
+            "category": "Nước uống",
+            "price": 65000,
+            "description": "Sữa yến mạch, espresso và đá lạnh.",
+            "isAvailable": false,
+            "preparationTime": 3,
+            "imageUrl": "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=900&q=80",
+            "sizeOptions": [
+              "M",
+              "L"
+            ]
+          },
+          {
+            "id": 107,
+            "name": "Trà đào cam sả",
+            "category": "Nước uống",
+            "price": 72000,
+            "description": "Đào ngâm, cam lát và sả tươi.",
+            "isAvailable": true,
+            "preparationTime": 4,
+            "imageUrl": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=900&q=80",
+            "sizeOptions": [
+              "M",
+              "L"
+            ]
+          }
+        ]
+      },
+      "serviceConsole": {
+        "sessions": [
+          {
+            "tableId": 1,
+            "orderResponse": {
+              "id": 8821,
+              "orderNumber": "ORD-8821",
+              "tableId": 1,
+              "tableName": "Bàn 01",
+              "serverId": 3,
+              "serverName": "Nguyễn An Phục Vụ",
+              "status": "READY",
+              "orderType": "DINE_IN",
+              "items": [
+                {
+                  "id": 301,
+                  "menuItemId": 101,
+                  "menuItemName": "Burger bò Wagyu",
+                  "quantity": 1,
+                  "unitPrice": 240000,
+                  "subtotal": 240000,
+                  "specialInstructions": "Tái vừa, khoai chiên riêng",
+                  "status": "READY"
+                },
+                {
+                  "id": 302,
+                  "menuItemId": 106,
+                  "menuItemName": "Latte yến mạch đá",
+                  "quantity": 1,
+                  "unitPrice": 65000,
+                  "subtotal": 65000,
+                  "specialInstructions": "Ít đá, không đường",
+                  "status": "READY"
+                }
+              ],
+              "totalAmount": 305000,
+              "notes": "Khách dị ứng hành sống.",
+              "createdAt": "2026-04-25T20:08:00+07:00",
+              "updatedAt": "2026-04-25T20:26:00+07:00"
+            },
+            "batches": [
+              {
+                "batchNumber": 1,
+                "status": "Đã gửi bếp",
+                "items": [
+                  {
+                    "id": 301,
+                    "menuItemId": 101,
+                    "menuItemName": "Burger bò Wagyu",
+                    "quantity": 1,
+                    "unitPrice": 240000,
+                    "subtotal": 240000,
+                    "specialInstructions": "Tái vừa, khoai chiên riêng",
+                    "size": "Mặc định"
+                  },
+                  {
+                    "id": 302,
+                    "menuItemId": 106,
+                    "menuItemName": "Latte yến mạch đá",
+                    "quantity": 1,
+                    "unitPrice": 65000,
+                    "subtotal": 65000,
+                    "specialInstructions": "Ít đá, không đường",
+                    "size": "M"
+                  }
+                ]
+              }
+            ],
+            "bill": {
+              "id": 501,
+              "billNumber": "BILL-204",
+              "orderId": 8821,
+              "subtotal": 305000,
+              "tax": 30500,
+              "discount": 0,
+              "serviceCharge": 24400,
+              "totalAmount": 359900,
+              "status": "PENDING",
+              "createdAt": "2026-04-25T20:22:00+07:00",
+              "paidAt": null,
+              "payments": []
+            }
+          },
+          {
+            "tableId": 4,
+            "orderResponse": {
+              "id": 8824,
+              "orderNumber": "ORD-8824",
+              "tableId": 4,
+              "tableName": "Bàn 04",
+              "serverId": 3,
+              "serverName": "Nguyễn An Phục Vụ",
+              "status": "PREPARING",
+              "orderType": "DINE_IN",
+              "items": [
+                {
+                  "id": 401,
+                  "menuItemId": 102,
+                  "menuItemName": "Pizza nấm Truffle",
+                  "quantity": 1,
+                  "unitPrice": 220000,
+                  "subtotal": 220000,
+                  "specialInstructions": "Cắt 8 miếng",
+                  "status": "PREPARING"
+                },
+                {
+                  "id": 402,
+                  "menuItemId": 107,
+                  "menuItemName": "Trà đào cam sả",
+                  "quantity": 2,
+                  "unitPrice": 72000,
+                  "subtotal": 144000,
+                  "specialInstructions": "Ít ngọt",
+                  "status": "SERVED"
+                }
+              ],
+              "totalAmount": 364000,
+              "notes": "Khách cần lên đồ uống trước.",
+              "createdAt": "2026-04-25T20:18:00+07:00",
+              "updatedAt": "2026-04-25T20:34:00+07:00"
+            },
+            "batches": [
+              {
+                "batchNumber": 1,
+                "status": "Đã gửi bếp",
+                "items": [
+                  {
+                    "id": 401,
+                    "menuItemId": 102,
+                    "menuItemName": "Pizza nấm Truffle",
+                    "quantity": 1,
+                    "unitPrice": 220000,
+                    "subtotal": 220000,
+                    "specialInstructions": "Cắt 8 miếng",
+                    "size": "L"
+                  },
+                  {
+                    "id": 402,
+                    "menuItemId": 107,
+                    "menuItemName": "Trà đào cam sả",
+                    "quantity": 2,
+                    "unitPrice": 72000,
+                    "subtotal": 144000,
+                    "specialInstructions": "Ít ngọt",
+                    "size": "L"
+                  }
+                ]
+              }
+            ],
+            "bill": {
+              "id": 504,
+              "billNumber": "BILL-208",
+              "orderId": 8824,
+              "subtotal": 364000,
+              "tax": 36400,
+              "discount": 0,
+              "serviceCharge": 29120,
+              "totalAmount": 429520,
+              "status": "PENDING",
+              "createdAt": "2026-04-25T20:30:00+07:00",
+              "paidAt": null,
+              "payments": []
+            }
+          },
+          {
+            "tableId": 10,
+            "orderResponse": {
+              "id": 8830,
+              "orderNumber": "ORD-8830",
+              "tableId": 10,
+              "tableName": "Bàn 10",
+              "serverId": 3,
+              "serverName": "Nguyễn An Phục Vụ",
+              "status": "SERVED",
+              "orderType": "DINE_IN",
+              "items": [
+                {
+                  "id": 501,
+                  "menuItemId": 104,
+                  "menuItemName": "Bạch tuộc nướng",
+                  "quantity": 1,
+                  "unitPrice": 280000,
+                  "subtotal": 280000,
+                  "specialInstructions": "",
+                  "status": "SERVED"
+                }
+              ],
+              "totalAmount": 280000,
+              "notes": "",
+              "createdAt": "2026-04-25T19:55:00+07:00",
+              "updatedAt": "2026-04-25T20:20:00+07:00"
+            },
+            "batches": [
+              {
+                "batchNumber": 1,
+                "status": "Đã gửi bếp",
+                "items": [
+                  {
+                    "id": 501,
+                    "menuItemId": 104,
+                    "menuItemName": "Bạch tuộc nướng",
+                    "quantity": 1,
+                    "unitPrice": 280000,
+                    "subtotal": 280000,
+                    "specialInstructions": "",
+                    "size": "Mặc định"
+                  }
+                ]
+              }
+            ],
+            "bill": {
+              "id": 510,
+              "billNumber": "BILL-210",
+              "orderId": 8830,
+              "subtotal": 280000,
+              "tax": 28000,
+              "discount": 10000,
+              "serviceCharge": 22400,
+              "totalAmount": 320400,
+              "status": "PARTIALLY_PAID",
+              "createdAt": "2026-04-25T20:15:00+07:00",
+              "paidAt": null,
+              "payments": [
+                {
+                  "id": 901,
+                  "billId": 510,
+                  "amount": 150000,
+                  "paymentMethod": "CREDIT_CARD",
+                  "status": "COMPLETED",
+                  "transactionId": "TXN-8830-1",
+                  "paidAt": "2026-04-25T20:21:00+07:00",
+                  "createdAt": "2026-04-25T20:21:00+07:00",
+                  "processedAt": "2026-04-25T20:21:00+07:00",
+                  "processedBy": 5,
+                  "notes": "Khách thanh toán trước một phần"
+                }
+              ]
+            }
+          }
+        ],
+        "paymentMethods": [
+          {
+            "code": "CASH",
+            "label": "Tiền mặt",
+            "hint": "Xác nhận số tiền khách đưa và tiền thối lại"
+          },
+          {
+            "code": "CREDIT_CARD",
+            "label": "Thẻ ngân hàng",
+            "hint": "Mô phỏng giao diện quẹt thẻ hoặc chạm thẻ"
+          },
+          {
+            "code": "DIGITAL_WALLET",
+            "label": "Ví điện tử",
+            "hint": "Mô phỏng quét QR và xác nhận giao dịch"
+          }
+        ]
+      }
+    },
     "ADMIN": {
       "roleLabel": "Quản trị hệ thống",
-      "sourceLabel": "Dữ liệu dự phòng từ API phân tích",
-      "snapshotTime": "Ảnh chụp lúc 20:30",
-      "footerNote": "Bám theo /api/analytics/dashboard và dữ liệu quản trị người dùng",
+      "sourceLabel": "Dữ liệu dự phòng quản trị",
+      "snapshotTime": "Ảnh chụp lúc 21:30",
+      "footerNote": "Dashboard tạm thời giữ ở mức tối giản cho role quản trị",
       "summaryMetrics": [
         {
-          "label": "Tổng đơn hàng",
-          "value": "184",
-          "note": "Trong các ca đang hoạt động"
-        },
-        {
-          "label": "Doanh thu hôm nay",
-          "value": "$12.4k",
-          "note": "DashboardStatsResponse.todayRevenue"
-        },
-        {
-          "label": "Món chờ bếp",
-          "value": "9",
-          "note": "Hàng chờ bếp vẫn còn mở"
-        },
-        {
-          "label": "Sẵn sàng phục vụ",
-          "value": "6",
-          "note": "Đang chờ nhân viên nhận món"
+          "label": "Người dùng hoạt động",
+          "value": "24",
+          "note": "Đang đăng nhập trong ca tối"
         }
       ],
       "activity": [
         {
           "id": "admin-1",
-          "title": "Đồng bộ thực đơn hoàn tất",
-          "description": "18 món đã được làm mới từ danh mục quản trị.",
-          "time": "2 phút trước"
-        },
-        {
-          "id": "admin-2",
-          "title": "Quản lý John đã đăng nhập",
-          "description": "Đã cấp quyền truy cập cho bảng điều hành.",
-          "time": "8 phút trước"
-        },
-        {
-          "id": "admin-3",
-          "title": "Đã lưu ảnh chụp sao lưu",
-          "description": "Xuất dữ liệu hệ thống hoàn tất mà không ảnh hưởng terminal đang hoạt động.",
-          "time": "14 phút trước"
+          "title": "Đã đồng bộ danh mục món",
+          "description": "Danh mục thực đơn đã được làm mới từ dữ liệu seed.",
+          "time": "5 phút trước"
         }
       ],
       "highlights": [
         {
-          "kicker": "Hệ thống",
-          "title": "4 nhóm vận hành đang hoạt động",
-          "description": "Quản trị, quản lý, phục vụ, bếp, thu ngân và lễ tân đều có thể dùng ở chế độ dự phòng."
-        },
-        {
-          "kicker": "Lưu ý",
-          "title": "2 terminal cần rà soát thông tin đăng nhập",
-          "description": "Nên kiểm tra vòng đời mật khẩu trước khi nối API thật.",
-          "emphasis": "dark"
+          "kicker": "Tạm thời",
+          "title": "Role quản trị đang dùng dashboard rút gọn",
+          "description": "Ưu tiên triển khai sâu cho dashboard nhân viên phục vụ theo requirement."
         }
       ],
-      "collections": [
-        {
-          "type": "analytics",
-          "columns": [
-            {
-              "key": "metric",
-              "label": "Chỉ số"
-            },
-            {
-              "key": "value",
-              "label": "Giá trị"
-            },
-            {
-              "key": "backendField",
-              "label": "Trường backend"
-            }
-          ],
-          "rows": [
-            {
-              "id": 1,
-              "metric": "todayRevenue",
-              "value": "12400.00",
-              "backendField": "DashboardStatsResponse.todayRevenue"
-            },
-            {
-              "id": 2,
-              "metric": "activeOrders",
-              "value": "18",
-              "backendField": "DashboardStatsResponse.activeOrders"
-            },
-            {
-              "id": 3,
-              "metric": "occupiedTables",
-              "value": "9",
-              "backendField": "DashboardStatsResponse.occupiedTables"
-            }
-          ]
-        }
-      ],
-      "quickActions": [
-        {
-          "label": "Quản lý người dùng",
-          "description": "Kiểm tra vai trò và trạng thái kích hoạt"
-        },
-        {
-          "label": "Xem phân tích",
-          "description": "Mở dashboard thống kê hiện tại"
-        },
-        {
-          "label": "Cập nhật thực đơn",
-          "description": "Đồng bộ sản phẩm và khả dụng"
-        }
-      ]
+      "collections": [],
+      "quickActions": []
     },
     "MANAGER": {
       "roleLabel": "Quản lý",
-      "sourceLabel": "Dữ liệu dự phòng vận hành",
-      "snapshotTime": "Ảnh chụp lúc 20:30",
-      "footerNote": "Kết hợp số liệu phân tích, trạng thái bàn và tổng quan đơn hàng",
+      "sourceLabel": "Dữ liệu dự phòng quản lý",
+      "snapshotTime": "Ảnh chụp lúc 21:30",
+      "footerNote": "Dashboard tạm thời giữ ở mức tối giản cho role quản lý",
       "summaryMetrics": [
         {
-          "label": "Đơn đang xử lý",
-          "value": "18",
-          "note": "Ăn tại chỗ và mang đi"
-        },
-        {
           "label": "Doanh thu hôm nay",
-          "value": "$12.4k",
-          "note": "Ước tính theo ca hiện tại"
-        },
-        {
-          "label": "Bàn đang sử dụng",
-          "value": "9 / 12",
-          "note": "Sảnh chính và sân hiên"
-        },
-        {
-          "label": "Sẵn sàng phục vụ",
-          "value": "6",
-          "note": "Quầy nhận món đang mở"
+          "value": "12.400.000đ",
+          "note": "Tổng hợp theo ca"
         }
       ],
       "activity": [
         {
           "id": "manager-1",
-          "title": "Khung giờ cao điểm đang đến gần",
-          "description": "Dự báo cao điểm từ 19:30 đến 20:00.",
+          "title": "Sảnh chính đang đông khách",
+          "description": "Cần theo dõi thời gian phục vụ ở 4 bàn chính.",
           "time": "Hiện tại"
-        },
-        {
-          "id": "manager-2",
-          "title": "Bàn T08 quay vòng chậm",
-          "description": "Yêu cầu dọn bàn đã mở hơn 9 phút.",
-          "time": "5 phút trước"
-        },
-        {
-          "id": "manager-3",
-          "title": "Tiến độ bếp được cải thiện",
-          "description": "Thời gian chế biến trung bình giảm 2 phút trong ca này.",
-          "time": "17 phút trước"
         }
       ],
       "highlights": [
         {
-          "kicker": "Khu phục vụ",
-          "title": "Khu sân hiên vẫn còn chỗ",
-          "description": "Còn hai bàn sẵn sàng cho khách vãng lai."
-        },
-        {
-          "kicker": "Vận hành",
-          "title": "Nhân sự ổn định cho giờ cao điểm tối",
-          "description": "Ca của phục vụ, thu ngân và lễ tân đang phủ đủ đến cuối ngày.",
-          "emphasis": "dark"
+          "kicker": "Tạm thời",
+          "title": "Role quản lý đang dùng dashboard rút gọn",
+          "description": "Có thể mở rộng thêm analytics sau khi backend hoàn thiện."
         }
       ],
-      "collections": [
-        {
-          "type": "tables",
-          "columns": [
-            {
-              "key": "tableNumber",
-              "label": "Bàn"
-            },
-            {
-              "key": "capacity",
-              "label": "Sức chứa"
-            },
-            {
-              "key": "status",
-              "label": "Trạng thái"
-            },
-            {
-              "key": "location",
-              "label": "Khu vực"
-            }
-          ],
-          "rows": [
-            {
-              "id": 1,
-              "tableNumber": "T03",
-              "capacity": 4,
-              "status": "ĐANG SỬ DỤNG",
-              "location": "Sảnh chính"
-            },
-            {
-              "id": 2,
-              "tableNumber": "T08",
-              "capacity": 8,
-              "status": "ĐANG DỌN",
-              "location": "Phòng riêng"
-            },
-            {
-              "id": 3,
-              "tableNumber": "T10",
-              "capacity": 2,
-              "status": "TRỐNG",
-              "location": "Sân hiên"
-            }
-          ]
-        }
-      ],
-      "quickActions": [
-        {
-          "label": "Trạng thái khu phục vụ",
-          "description": "Kiểm tra sức chứa và tình trạng bàn"
-        },
-        {
-          "label": "Hàng chờ bếp",
-          "description": "Theo dõi các món đang chờ"
-        },
-        {
-          "label": "Tổng kết ca",
-          "description": "Tóm tắt doanh thu và hiệu suất ca"
-        }
-      ]
-    },
-    "SERVER": {
-      "roleLabel": "Nhân viên",
-      "sourceLabel": "Dữ liệu dự phòng bàn và đơn hàng",
-      "snapshotTime": "Ảnh chụp lúc 20:30",
-      "footerNote": "Bám theo /api/tables và OrderResponse",
-      "summaryMetrics": [
-        {
-          "label": "Bàn phụ trách",
-          "value": "5",
-          "note": "Khu vực đang phụ trách"
-        },
-        {
-          "label": "Đơn đang mở",
-          "value": "8",
-          "note": "Đã xác nhận hoặc đang chế biến"
-        },
-        {
-          "label": "Sẵn sàng phục vụ",
-          "value": "3",
-          "note": "Có thể nhận từ quầy ra món"
-        },
-        {
-          "label": "Giá trị đơn TB",
-          "value": "$44",
-          "note": "Theo mỗi bàn đang hoạt động"
-        }
-      ],
-      "activity": [
-        {
-          "id": "server-1",
-          "title": "Đơn ORD-109 đã sẵn sàng",
-          "description": "Bàn T05 có thể phục vụ ngay.",
-          "time": "1 phút trước"
-        },
-        {
-          "id": "server-2",
-          "title": "Lễ tân đã xếp khách vãng lai",
-          "description": "Bàn T10 đã được gán cho nhóm 2 khách.",
-          "time": "4 phút trước"
-        },
-        {
-          "id": "server-3",
-          "title": "Có yêu cầu thanh toán",
-          "description": "Bàn T03 đã yêu cầu xử lý hóa đơn.",
-          "time": "10 phút trước"
-        }
-      ],
-      "highlights": [
-        {
-          "kicker": "Phục vụ",
-          "title": "Có 3 bàn cần theo sát trong 5 phút tới",
-          "description": "Giữ nhịp chăm sóc khách trong giờ cao điểm."
-        },
-        {
-          "kicker": "Lưu ý",
-          "title": "Có ghi chú dị ứng cần xác nhận lại",
-          "description": "Kiểm tra đơn ORD-112 trước khi gửi thêm đồ uống.",
-          "emphasis": "dark"
-        }
-      ],
-      "collections": [
-        {
-          "type": "tables",
-          "columns": [
-            {
-              "key": "tableNumber",
-              "label": "Bàn"
-            },
-            {
-              "key": "status",
-              "label": "Trạng thái"
-            },
-            {
-              "key": "capacity",
-              "label": "Số ghế"
-            },
-            {
-              "key": "location",
-              "label": "Khu vực"
-            }
-          ],
-          "rows": [
-            {
-              "id": 4,
-              "tableNumber": "T03",
-              "status": "ĐANG SỬ DỤNG",
-              "capacity": 4,
-              "location": "Sảnh chính"
-            },
-            {
-              "id": 5,
-              "tableNumber": "T05",
-              "status": "ĐANG SỬ DỤNG",
-              "capacity": 4,
-              "location": "Sảnh chính"
-            },
-            {
-              "id": 6,
-              "tableNumber": "T10",
-              "status": "TRỐNG",
-              "capacity": 2,
-              "location": "Sân hiên"
-            }
-          ]
-        },
-        {
-          "type": "orders",
-          "columns": [
-            {
-              "key": "orderNumber",
-              "label": "Đơn hàng"
-            },
-            {
-              "key": "tableName",
-              "label": "Bàn"
-            },
-            {
-              "key": "status",
-              "label": "Trạng thái"
-            },
-            {
-              "key": "totalAmount",
-              "label": "Tổng tiền"
-            }
-          ],
-          "rows": [
-            {
-              "id": 101,
-              "orderNumber": "ORD-109",
-              "tableName": "T05",
-              "status": "SẴN SÀNG",
-              "totalAmount": "52.98"
-            },
-            {
-              "id": 102,
-              "orderNumber": "ORD-112",
-              "tableName": "T03",
-              "status": "ĐANG CHẾ BIẾN",
-              "totalAmount": "41.50"
-            },
-            {
-              "id": 103,
-              "orderNumber": "ORD-118",
-              "tableName": "T10",
-              "status": "ĐÃ XÁC NHẬN",
-              "totalAmount": "28.99"
-            }
-          ]
-        }
-      ],
-      "quickActions": [
-        {
-          "label": "Nhận món sẵn sàng",
-          "description": "Kiểm tra món READY để phục vụ"
-        },
-        {
-          "label": "Quản lý bàn",
-          "description": "Cập nhật trạng thái và sức chứa"
-        },
-        {
-          "label": "Gọi thanh toán",
-          "description": "Chuyển hóa đơn sang quầy thu ngân"
-        }
-      ]
+      "collections": [],
+      "quickActions": []
     },
     "CHEF": {
       "roleLabel": "Bếp",
-      "sourceLabel": "Dữ liệu dự phòng màn hình bếp",
-      "snapshotTime": "Ảnh chụp lúc 20:30",
-      "footerNote": "Bám theo KitchenDisplayOrderResponse",
+      "sourceLabel": "Dữ liệu dự phòng bếp",
+      "snapshotTime": "Ảnh chụp lúc 21:30",
+      "footerNote": "Dashboard tạm thời giữ ở mức tối giản cho role bếp",
       "summaryMetrics": [
         {
           "label": "Món chờ xử lý",
           "value": "7",
-          "note": "Đang chờ nhận vào khu chế biến"
-        },
-        {
-          "label": "Đang thực hiện",
-          "value": "5",
-          "note": "Trải trên các khu nóng và lạnh"
-        },
-        {
-          "label": "Sẵn sàng ngay",
-          "value": "3",
-          "note": "Có thể đưa ra quầy ngay"
-        },
-        {
-          "label": "Thời gian chế biến TB",
-          "value": "14m",
-          "note": "Trong giờ cao điểm tối"
+          "note": "Tại các khu chế biến"
         }
       ],
       "activity": [
         {
           "id": "chef-1",
-          "title": "Đã bắt đầu Pasta Carbonara",
-          "description": "Món #580 đã chuyển sang IN_PROGRESS.",
-          "time": "Hiện tại"
-        },
-        {
-          "id": "chef-2",
-          "title": "Salmon đang chờ nhận",
-          "description": "Một phần ăn đang chờ nhân viên nhận tại quầy ra món.",
-          "time": "3 phút trước"
-        },
-        {
-          "id": "chef-3",
-          "title": "Có ghi chú dị ứng cần chú ý",
-          "description": "Cần xác nhận thay thế nguyên liệu không chứa sữa.",
-          "time": "9 phút trước"
+          "title": "2 món đã sẵn sàng ra bàn",
+          "description": "Cần nhân viên phục vụ nhận món trong 3 phút tới.",
+          "time": "2 phút trước"
         }
       ],
       "highlights": [
         {
-          "kicker": "Bếp",
-          "title": "Khu nóng đang gần đầy tải",
-          "description": "Nên phân lại hai món để giữ nhịp ticket."
-        },
-        {
-          "kicker": "Chuẩn bị",
-          "title": "Khu lạnh vẫn còn dư công suất",
-          "description": "Có thể tận dụng để chuẩn bị salad và tráng miệng.",
-          "emphasis": "dark"
+          "kicker": "Tạm thời",
+          "title": "Role bếp đang dùng dashboard rút gọn",
+          "description": "KDS chi tiết có thể tách thành page riêng sau."
         }
       ],
-      "collections": [
-        {
-          "type": "kitchen",
-          "columns": [
-            {
-              "key": "itemName",
-              "label": "Món"
-            },
-            {
-              "key": "quantity",
-              "label": "Số lượng"
-            },
-            {
-              "key": "status",
-              "label": "Trạng thái"
-            },
-            {
-              "key": "estimatedPrepTime",
-              "label": "TG chế biến"
-            }
-          ],
-          "rows": [
-            {
-              "id": 501,
-              "itemName": "Pasta Carbonara",
-              "quantity": 2,
-              "status": "ĐANG THỰC HIỆN",
-              "estimatedPrepTime": "14 phút"
-            },
-            {
-              "id": 502,
-              "itemName": "Grilled Salmon",
-              "quantity": 1,
-              "status": "SẴN SÀNG",
-              "estimatedPrepTime": "18 phút"
-            },
-            {
-              "id": 503,
-              "itemName": "Caesar Salad",
-              "quantity": 1,
-              "status": "ĐANG CHỜ",
-              "estimatedPrepTime": "8 phút"
-            }
-          ]
-        }
-      ],
-      "quickActions": [
-        {
-          "label": "Bắt đầu món",
-          "description": "Cập nhật món sang IN_PROGRESS"
-        },
-        {
-          "label": "Đánh dấu sẵn sàng",
-          "description": "Đẩy món hoàn tất ra quầy nhận"
-        },
-        {
-          "label": "Kiểm tra ưu tiên",
-          "description": "Sắp xếp lại ticket theo mức độ gấp"
-        }
-      ]
+      "collections": [],
+      "quickActions": []
     },
     "CASHIER": {
       "roleLabel": "Thu ngân",
       "sourceLabel": "Dữ liệu dự phòng thanh toán",
-      "snapshotTime": "Ảnh chụp lúc 20:30",
-      "footerNote": "Bám theo BillResponse và PaymentResponse",
+      "snapshotTime": "Ảnh chụp lúc 21:30",
+      "footerNote": "Dashboard tạm thời giữ ở mức tối giản cho role thu ngân",
       "summaryMetrics": [
         {
-          "label": "Hóa đơn mở",
+          "label": "Hóa đơn chờ thanh toán",
           "value": "6",
-          "note": "Đang chờ thanh toán"
-        },
-        {
-          "label": "Đã thu",
-          "value": "$4.9k",
-          "note": "Thanh toán trong ca"
-        },
-        {
-          "label": "Chờ thanh toán",
-          "value": "2",
-          "note": "Đang xử lý thẻ"
-        },
-        {
-          "label": "Hóa đơn đã chốt",
-          "value": "21",
-          "note": "Hoàn tất trong hôm nay"
+          "note": "Trong ca tối"
         }
       ],
       "activity": [
         {
           "id": "cashier-1",
-          "title": "Có yêu cầu hóa đơn B-204",
-          "description": "Đã nhận bàn giao thanh toán từ bàn T03.",
-          "time": "2 phút trước"
-        },
-        {
-          "id": "cashier-2",
-          "title": "Thanh toán thẻ đã được duyệt",
-          "description": "Giao dịch cho đơn ORD-109 đã hoàn tất.",
-          "time": "6 phút trước"
+          "title": "Có 2 hóa đơn chờ xử lý",
+          "description": "Ưu tiên bàn đã yêu cầu tách hóa đơn.",
+          "time": "4 phút trước"
         }
       ],
       "highlights": [
         {
-          "kicker": "Thanh toán",
-          "title": "Tổng tiền mặt và thẻ đang cân bằng",
-          "description": "Chưa cần điều chỉnh thủ công trong ca này."
-        },
-        {
-          "kicker": "Theo dõi",
-          "title": "Có hai hóa đơn chờ quá 10 phút",
-          "description": "Nên kiểm tra lại với đội phục vụ trước khi hàng chờ tăng lên.",
-          "emphasis": "dark"
+          "kicker": "Tạm thời",
+          "title": "Role thu ngân đang dùng dashboard rút gọn",
+          "description": "Có thể tách riêng màn hình thanh toán đầy đủ sau."
         }
       ],
-      "collections": [
-        {
-          "type": "bills",
-          "columns": [
-            {
-              "key": "billNumber",
-              "label": "Hóa đơn"
-            },
-            {
-              "key": "orderId",
-              "label": "Đơn hàng"
-            },
-            {
-              "key": "status",
-              "label": "Trạng thái"
-            },
-            {
-              "key": "totalAmount",
-              "label": "Tổng tiền"
-            }
-          ],
-          "rows": [
-            {
-              "id": 301,
-              "billNumber": "B-204",
-              "orderId": "ORD-112",
-              "status": "ĐANG CHỜ",
-              "totalAmount": "41.50"
-            },
-            {
-              "id": 302,
-              "billNumber": "B-205",
-              "orderId": "ORD-118",
-              "status": "ĐÃ THANH TOÁN",
-              "totalAmount": "28.99"
-            },
-            {
-              "id": 303,
-              "billNumber": "B-206",
-              "orderId": "ORD-121",
-              "status": "THANH TOÁN MỘT PHẦN",
-              "totalAmount": "63.75"
-            }
-          ]
-        }
-      ],
-      "quickActions": [
-        {
-          "label": "Mở hóa đơn",
-          "description": "Xem các hóa đơn đang chờ xử lý"
-        },
-        {
-          "label": "Xử lý thanh toán",
-          "description": "Cập nhật thẻ, tiền mặt, ví điện tử"
-        },
-        {
-          "label": "Đối chiếu ca",
-          "description": "Tổng hợp giao dịch trong ngày"
-        }
-      ]
+      "collections": [],
+      "quickActions": []
     },
     "HOST": {
       "roleLabel": "Lễ tân",
       "sourceLabel": "Dữ liệu dự phòng lễ tân",
-      "snapshotTime": "Ảnh chụp lúc 20:30",
-      "footerNote": "Bám theo tình trạng bàn và luồng hàng chờ đón khách",
+      "snapshotTime": "Ảnh chụp lúc 21:30",
+      "footerNote": "Dashboard tạm thời giữ ở mức tối giản cho role lễ tân",
       "summaryMetrics": [
         {
-          "label": "Nhóm khách chờ",
-          "value": "4",
-          "note": "Hàng chờ phía trước"
-        },
-        {
-          "label": "Bàn trống",
-          "value": "3",
-          "note": "Sẵn sàng xếp khách"
-        },
-        {
-          "label": "Đã đặt trước",
-          "value": "2",
-          "note": "Sẽ đến trong 20 phút tới"
-        },
-        {
-          "label": "Vòng quay bàn",
-          "value": "23m",
-          "note": "Thời gian dọn bàn trung bình"
+          "label": "Khách đang chờ",
+          "value": "4 nhóm",
+          "note": "Ở khu vực đón khách"
         }
       ],
       "activity": [
         {
           "id": "host-1",
-          "title": "Đã thêm khách vãng lai vào hàng chờ",
-          "description": "Nhóm 4 khách đang chờ chỗ ở sảnh chính.",
-          "time": "1 phút trước"
-        },
-        {
-          "id": "host-2",
-          "title": "Bàn sân hiên đã sẵn sàng",
-          "description": "Bàn T10 có thể xếp khách ngay.",
-          "time": "5 phút trước"
+          "title": "Có 2 lượt đặt bàn sắp đến",
+          "description": "Cần giữ bàn 05 và bàn 07 theo khung giờ đã hẹn.",
+          "time": "7 phút trước"
         }
       ],
       "highlights": [
         {
-          "kicker": "Luồng khách",
-          "title": "Đợt xếp khách tiếp theo còn dưới 6 phút",
-          "description": "Vòng quay bàn ở sân hiên đang giúp giảm áp lực hàng chờ."
-        },
-        {
-          "kicker": "Lưu ý",
-          "title": "Có một khách đặt trước đến sớm",
-          "description": "Giữ bàn T08 nếu phòng riêng kịp chuẩn bị đúng giờ.",
-          "emphasis": "dark"
+          "kicker": "Tạm thời",
+          "title": "Role lễ tân đang dùng dashboard rút gọn",
+          "description": "Có thể mở rộng thêm sơ đồ chờ và đặt chỗ sau."
         }
       ],
-      "collections": [
-        {
-          "type": "reservations",
-          "columns": [
-            {
-              "key": "guestName",
-              "label": "Khách"
-            },
-            {
-              "key": "partySize",
-              "label": "Số khách"
-            },
-            {
-              "key": "status",
-              "label": "Trạng thái"
-            },
-            {
-              "key": "eta",
-              "label": "Dự kiến đến"
-            }
-          ],
-          "rows": [
-            {
-              "id": 701,
-              "guestName": "Gia đình Trần",
-              "partySize": 4,
-              "status": "ĐANG CHỜ",
-              "eta": "Ngay bây giờ"
-            },
-            {
-              "id": 702,
-              "guestName": "Mai Nguyễn",
-              "partySize": 2,
-              "status": "ĐÃ ĐẶT",
-              "eta": "12 phút"
-            },
-            {
-              "id": 703,
-              "guestName": "Nhóm khách doanh nghiệp",
-              "partySize": 8,
-              "status": "ĐÃ XẾP BÀN",
-              "eta": "Hoàn tất"
-            }
-          ]
-        }
-      ],
-      "quickActions": [
-        {
-          "label": "Sắp xếp chỗ ngồi",
-          "description": "Gán bàn phù hợp cho khách mới"
-        },
-        {
-          "label": "Cập nhật hàng đợi",
-          "description": "Theo dõi khách vãng lai và đặt trước"
-        },
-        {
-          "label": "Trạng thái bàn",
-          "description": "Phối hợp với khu phục vụ và dọn bàn"
-        }
-      ]
+      "collections": [],
+      "quickActions": []
     }
   }
 }

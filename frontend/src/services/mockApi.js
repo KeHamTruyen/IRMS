@@ -43,7 +43,7 @@ export const mockApi = {
         item.role === 'ADMIN' &&
         item.username === payload.username &&
         item.password === payload.password &&
-        item.isActive,
+        item.isActive
     )
 
     if (!user) {
@@ -61,7 +61,7 @@ export const mockApi = {
         item.role === payload.role &&
         item.pin === payload.pin &&
         item.authMethod === 'pin' &&
-        item.isActive,
+        item.isActive
     )
 
     if (!user) {

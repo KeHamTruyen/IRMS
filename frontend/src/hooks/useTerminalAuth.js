@@ -88,7 +88,7 @@ export function useTerminalAuth() {
 
   const submitPinLogin = useCallback(async () => {
     if (pin.length !== 4) {
-      setAuthError('Vui long nhap du 4 chu so PIN.')
+      setAuthError('Vui lòng nhập đủ 4 chữ số PIN.')
       return
     }
 
@@ -115,7 +115,7 @@ export function useTerminalAuth() {
       setIsSubmitting(false)
       handleAuthenticationResult(response)
     },
-    [adminForm, handleAuthenticationResult],
+    [adminForm, handleAuthenticationResult]
   )
 
   const appendPinDigit = useCallback((digit) => {
@@ -162,10 +162,13 @@ export function useTerminalAuth() {
 
   const dashboardConfig = useMemo(
     () => DASHBOARD_CONFIG[session?.role] ?? DASHBOARD_CONFIG.SERVER,
-    [session?.role],
+    [session?.role]
   )
 
-  const roleMeta = useMemo(() => getRoleMeta(session?.role ?? selectedEmployeeRole), [selectedEmployeeRole, session?.role])
+  const roleMeta = useMemo(
+    () => getRoleMeta(session?.role ?? selectedEmployeeRole),
+    [selectedEmployeeRole, session?.role]
+  )
 
   return {
     authMode,

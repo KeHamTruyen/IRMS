@@ -1,6 +1,6 @@
 function DashboardHeader({ session, roleMeta }) {
   return (
-    <header className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
+    <header className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
       <label className="flex-1">
         <input
           type="search"
@@ -10,7 +10,7 @@ function DashboardHeader({ session, roleMeta }) {
         />
       </label>
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+      <div className="grid grid-cols-2 gap-3">
         <div className="min-w-[128px] rounded-[18px] border border-[#d8e0e7] bg-white px-3.5 py-2.5">
           <strong>{roleMeta.title}</strong>
           <span className="block text-sm text-[#62707f]">{session.username}</span>

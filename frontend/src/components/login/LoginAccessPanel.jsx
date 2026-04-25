@@ -35,7 +35,7 @@ function AuthModeSwitcher({ authMode, onSelectAuthMode }) {
 function EmployeeRoleSelector({ roles, selectedRole, onSelectRole }) {
   return (
     <div
-      className="grid grid-cols-1 gap-2 sm:grid-cols-2 xl:grid-cols-3"
+      className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3"
       role="tablist"
       aria-label="Chọn vai trò nhân viên"
     >
@@ -159,7 +159,7 @@ function DemoAccessList({ demoAccess }) {
       {demoAccess.map((item) => (
         <div
           key={`${item.role}-${item.label}`}
-          className="flex flex-col gap-1 rounded-xl border border-[#e7edf2] bg-[#fbfcfd] px-3.5 py-3 sm:flex-row sm:items-center sm:justify-between sm:gap-3"
+          className="flex flex-col gap-1 rounded-xl border border-[#e7edf2] bg-[#fbfcfd] px-3.5 py-3 md:flex-row md:items-center md:justify-between md:gap-3"
         >
           <strong>{item.label}</strong>
           <span className="text-sm text-[#62707f]">{item.value}</span>
@@ -188,7 +188,7 @@ function LoginAccessPanel({
   onResetPin,
 }) {
   return (
-    <section className="flex flex-col gap-5 bg-white p-10 max-lg:p-6">
+    <section className="flex flex-col gap-5 bg-white p-8 md:p-7 lg:p-10">
       <header>
         <span className="inline-block text-xs font-bold uppercase tracking-normal text-[#0d9488]">
           Kiểm soát truy cập

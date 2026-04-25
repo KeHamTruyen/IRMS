@@ -1,6 +1,6 @@
 function DashboardSidebar({ session, navItems, roleMeta, onSignOut }) {
   return (
-    <aside className="flex flex-col gap-6 border-b border-[#d8e0e7] bg-[#fbfcfd] px-[22px] py-7 lg:border-b-0 lg:border-r">
+    <aside className="flex flex-col gap-6 border-b border-[#d8e0e7] bg-[#fbfcfd] px-[22px] py-7 md:border-b-0 md:border-r">
       <div className="rounded-[18px] border border-[#d8e0e7] bg-white p-[18px]">
         <span className="inline-block text-xs font-bold uppercase tracking-normal text-[#0d9488]">
           IRMS
@@ -27,7 +27,7 @@ function DashboardSidebar({ session, navItems, roleMeta, onSignOut }) {
 
       <button
         type="button"
-        className="rounded-[14px] border border-[#d8e0e7] bg-white px-[18px] py-3 font-bold text-[#16202a] transition hover:border-[#0d9488]/40 lg:mt-auto"
+        className="rounded-[14px] border border-[#d8e0e7] bg-white px-[18px] py-3 font-bold text-[#16202a] transition hover:border-[#0d9488]/40 md:mt-auto"
         onClick={onSignOut}
       >
         Đăng xuất
