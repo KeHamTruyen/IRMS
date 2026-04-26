@@ -2,7 +2,7 @@ function ServerSidebar({ items, activeSection, onChangeSection, onSignOut }) {
   return (
     <aside className="flex flex-col border-b border-[#e7edf2] bg-white md:border-b-0 md:border-r">
       <div className="border-b border-[#eef2f7] px-5 py-6 lg:px-6 lg:py-7">
-        <h2 className="text-3xl font-bold text-[#16202a]">IRMS Pro</h2>
+        <h2 className="text-3xl font-bold text-[#16202a]">IRMS System</h2>
         <p className="mt-2 text-xs font-semibold uppercase tracking-[0.14em] text-[#94a3b8]">
           Vận hành phục vụ
         </p>
@@ -32,7 +32,7 @@ function ServerSidebar({ items, activeSection, onChangeSection, onSignOut }) {
         <button
           type="button"
           onClick={onSignOut}
-          className="w-full rounded-2xl border border-[#d8e0e7] px-4 py-3 text-left text-sm font-semibold text-[#62707f] transition hover:border-[#0d9488]/40"
+          className="w-full rounded-2xl border border-[#d8e0e7] px-4 py-3 text-center text-sm font-semibold text-[#62707f] transition hover:border-[#0d9488]/40"
         >
           Đăng xuất
         </button>

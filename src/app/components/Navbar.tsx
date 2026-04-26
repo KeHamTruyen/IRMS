@@ -51,7 +51,7 @@ export const Navbar: React.FC = () => {
   return (
     <>
       <nav className="bg-white border-b border-gray-200 px-6 py-3">
-        <div className="flex items-center justify-between max-w-screen-2xl mx-auto">
+        <div className="flex items-center justify-between max-w-7xl mx-auto">
           <div className="flex items-center gap-6">
             <Link to={`/${currentUser.role}`} className="flex items-center gap-2">
               <ChefHat className="size-8 text-orange-500" />

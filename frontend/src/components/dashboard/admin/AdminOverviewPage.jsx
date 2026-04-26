@@ -1,4 +1,4 @@
-import { formatDateTime, getStatusBadgeClass } from './utils'
+import { getStatusBadgeClass } from './utils'
 
 function SummaryCard({ item }) {
   return (
@@ -28,12 +28,12 @@ function AdminOverviewPage({ overview }) {
       <section className="rounded-[28px] border border-[#e7edf2] bg-white p-6">
         <div className="flex flex-col gap-3 md:flex-row md:items-end md:justify-between">
           <div>
-            <p className="text-sm font-semibold text-[#0d9488]">Tổng quan điều hành</p>
+            <p className="text-sm font-semibold text-[#0d9488]">Tổng quan</p>
             <h1 className="mt-2 text-[2rem] font-bold leading-tight text-[#16202a]">
-              Theo dõi vận hành và cấu hình toàn hệ thống
+              Theo dõi tổng quan
             </h1>
             <p className="mt-2 max-w-3xl text-sm leading-6 text-[#62707f]">
-              Dữ liệu đang được dựng từ các khối backend mock hiện tại để mô phỏng bức tranh quản trị tập trung.
+              Trang tổng quan các thống kê cốt lõi.
             </p>
           </div>
         </div>
@@ -45,30 +45,11 @@ function AdminOverviewPage({ overview }) {
         </div>
       </section>
 
-      <section className="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
-        <div className="space-y-5">
-          <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-1">
-            {overview.alerts.map((item) => (
-              <AlertCard key={item.id} item={item} />
-            ))}
-          </section>
-
-          <section className="rounded-[28px] border border-[#e7edf2] bg-white p-6">
-            <h2 className="text-xl font-semibold text-[#16202a]">Nhật ký gần đây</h2>
-            <div className="mt-4 space-y-4">
-              {overview.auditPreview.map((log) => (
-                <article key={log.id} className="rounded-2xl bg-[#f8fafc] p-4">
-                  <div className="text-sm font-medium text-[#16202a]">{log.action}</div>
-                  <div className="mt-1 text-sm text-[#62707f]">
-                    {log.actor} • {log.module}
-                  </div>
-                  <div className="mt-2 text-xs text-[#94a3b8]">{formatDateTime(log.occurredAt)}</div>
-                </article>
-              ))}
-            </div>
-          </section>
-        </div>
-      </section>
+      <div className="mt-4 grid gap-4 md:grid-cols-2">
+        {overview.alerts.map((item) => (
+          <AlertCard key={item.id} item={item} />
+        ))}
+      </div>
     </div>
   )
 }

@@ -34,9 +34,11 @@ const buildAdminDashboard = () => {
   const chefDashboard = dashboards.CHEF ?? {}
   const menuCatalog = serverDashboard.menuCatalog ?? { categories: [], items: [] }
   const menuManagement = chefDashboard.menuManagement ?? { items: [] }
+  const tableManagement = serverDashboard.tableManagement ?? { tables: [] }
   const kitchenDisplay = chefDashboard.kitchenDisplay ?? { orders: [] }
   const inventoryManagement = chefDashboard.inventoryManagement ?? { items: [] }
   const serviceSessions = serverDashboard.serviceConsole?.sessions ?? []
+  const serverTables = tableManagement.tables ?? []
 
   const menuItems = menuCatalog.items.map((item) => {
     const kitchenMeta = menuManagement.items.find((menuItem) => menuItem.id === item.id)
@@ -81,6 +83,30 @@ const buildAdminDashboard = () => {
     (item) => Number(item.quantity || 0) <= Number(item.threshold || 0)
   ).length
   const activeStaff = users.filter((user) => user.isActive).length
+  const tableSummary = {
+    total: serverTables.length,
+    available: serverTables.filter((table) => table.serviceState === 'AVAILABLE').length,
+    reserved: serverTables.filter((table) => table.serviceState === 'RESERVED').length,
+    waitingFood: serverTables.filter((table) => table.serviceState === 'WAITING_FOOD').length,
+    served: serverTables.filter((table) => table.serviceState === 'SERVED').length,
+    cleaning: serverTables.filter((table) => table.serviceState === 'CLEANING').length,
+  }
+
+  const centralizedOrders = [...kitchenDisplay.orders]
+    .map((order) => {
+      const pendingItems = order.items.filter((item) => item.status !== 'COMPLETED').length
+      const completedItems = order.items.filter((item) => item.status === 'COMPLETED').length
+
+      return {
+        ...order,
+        status: pendingItems > 0 ? 'WAITING' : 'COMPLETED',
+        pendingItems,
+        completedItems,
+        stations: [...new Set(order.items.map((item) => item.station))],
+      }
+    })
+    .sort((left, right) => Number(right.elapsedMinutes || 0) - Number(left.elapsedMinutes || 0))
+
   const peakHours = [
     { label: '11:00 - 12:00', orders: 18, revenue: 4680000 },
     { label: '12:00 - 13:00', orders: 24, revenue: 6320000 },
@@ -92,10 +118,11 @@ const buildAdminDashboard = () => {
     ...(dashboards.ADMIN ?? {}),
     roleLabel: dashboards.ADMIN?.roleLabel ?? 'Quản trị hệ thống',
     sourceLabel:
-      dashboards.ADMIN?.sourceLabel ?? 'Dữ liệu dự phòng quản trị được ghép từ mock backend hiện tại',
+      dashboards.ADMIN?.sourceLabel ??
+      'Dữ liệu dự phòng quản trị được ghép từ mock backend hiện tại',
     snapshotTime: dashboards.ADMIN?.snapshotTime ?? 'Ảnh chụp lúc 21:30',
     footerNote:
-      'Dữ liệu trang quản trị đang dùng fallback theo cấu trúc users, menuCatalog, menuManagement, inventoryManagement và serviceConsole.',
+      'Dữ liệu trang quản trị đang dùng fallback theo cấu trúc users, menuCatalog, menuManagement, inventoryManagement, serviceConsole, tableManagement và kitchenDisplay.',
     searchPlaceholder: 'Tìm báo cáo, món ăn hoặc thao tác...',
     navigation: {
       sideItems: [
@@ -119,16 +146,16 @@ const buildAdminDashboard = () => {
           note: 'Đếm từ danh sách người dùng đang kích hoạt',
         },
         {
-          id: 'alerts',
-          label: 'Cảnh báo cần xử lý',
-          value: `${delayedItems + lowStockItems}`,
-          note: 'Gồm món chậm và nguyên liệu dưới ngưỡng',
+          id: 'availableTables',
+          label: 'Bàn đang trống',
+          value: `${tableSummary.available}`,
+          note: `${tableSummary.reserved} bàn đặt trước, ${tableSummary.cleaning} bàn cần dọn`,
         },
         {
-          id: 'menu',
-          label: 'Món đang kinh doanh',
-          value: `${menuItems.filter((item) => item.isAvailable).length}/${menuItems.length}`,
-          note: 'Đồng bộ giữa thực đơn phục vụ và bếp',
+          id: 'waitingOrders',
+          label: 'Đơn đang chờ',
+          value: `${centralizedOrders.filter((order) => order.status === 'WAITING').length}`,
+          note: `${delayedItems} món chờ hoàn tất từ luồng chef`,
         },
       ],
       alerts: [
@@ -141,32 +168,8 @@ const buildAdminDashboard = () => {
         {
           id: 'kitchen',
           title: 'Khu bếp có đơn đang chờ',
-          description: `${delayedItems} món đang ở trạng thái chờ hoàn tất từ dữ liệu KDS.`,
+          description: `${centralizedOrders.filter((order) => order.status === 'WAITING').length} đơn đang cần theo dõi từ phía bếp.`,
           tone: 'neutral',
-        },
-      ],
-      roleAccess: users.map((user) => ({
-        id: user.id,
-        fullName: user.fullName,
-        role: user.role,
-        email: user.email,
-        authMethod: user.authMethod,
-        isActive: user.isActive,
-      })),
-      auditPreview: [
-        {
-          id: 'audit-1',
-          actor: 'Quản trị hệ thống',
-          action: 'Cập nhật giá Pizza nấm Truffle',
-          module: 'Pricing',
-          occurredAt: '2026-04-25T20:55:00+07:00',
-        },
-        {
-          id: 'audit-2',
-          actor: 'Nguyễn Minh Quản Lý',
-          action: 'Hủy đơn ORD-8824',
-          module: 'Order',
-          occurredAt: '2026-04-25T20:40:00+07:00',
         },
       ],
     },
@@ -175,7 +178,12 @@ const buildAdminDashboard = () => {
       salesMetrics: [
         { id: 'revenue', label: 'Hiệu suất doanh thu', value: formatCurrency(totalRevenue), change: '+8,4%' },
         { id: 'orders', label: 'Đơn đã phục vụ', value: `${serviceSessions.length}`, change: '+5,2%' },
-        { id: 'ticket', label: 'Giá trị hóa đơn TB', value: formatCurrency(totalRevenue / Math.max(serviceSessions.length, 1)), change: '+3,1%' },
+        {
+          id: 'ticket',
+          label: 'Giá trị hóa đơn TB',
+          value: formatCurrency(totalRevenue / Math.max(serviceSessions.length, 1)),
+          change: '+3,1%',
+        },
       ],
       revenueTrend: [
         { day: 'Th 2', current: 4200000, previous: 3800000 },
@@ -212,6 +220,23 @@ const buildAdminDashboard = () => {
     centralizedManagement: {
       menuCategories: menuCatalog.categories.filter((item) => item !== 'Tất cả'),
       menuItems,
+      staffRoles: ['ADMIN', 'MANAGER', 'SERVER', 'CHEF', 'CASHIER', 'HOST'],
+      staffMembers: users.map((user) => ({
+        id: user.id,
+        username: user.username,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        role: user.role,
+        isActive: user.isActive,
+        authMethod: user.authMethod,
+      })),
+      inventoryCategories: (inventoryManagement.categories ?? []).filter((item) => item !== 'Tất cả'),
+      inventoryItems: inventoryManagement.items ?? [],
+      tableLocations: [...new Set(serverTables.map((table) => table.location))],
+      tableStatusOptions: ['AVAILABLE', 'RESERVED', 'WAITING_FOOD', 'SERVED', 'CLEANING'],
+      tables: serverTables,
+      orders: centralizedOrders,
       pricingRules: [
         {
           id: 'price-1',

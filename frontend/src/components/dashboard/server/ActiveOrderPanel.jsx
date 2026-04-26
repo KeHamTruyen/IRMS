@@ -109,12 +109,12 @@ function ActiveOrderPanel({
   return (
     <aside className="flex h-full min-h-0 flex-col border-l border-[#e7edf2] bg-white">
       <div className="border-b border-[#eef2f7] p-5">
-        <div className="flex items-start justify-between gap-4">
+        <div className="flex items-start justify-between gap-2">
           <div>
             <span className="rounded-full bg-[#2d7871] px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-white">
               Hóa đơn
             </span>
-            <h3 className="mt-4 text-[1.9rem] font-bold text-[#16202a]">Bàn {selectedTable.tableNumber}</h3>
+            <h3 className="mt-2 text-[1.9rem] font-bold text-[#16202a]">Bàn {selectedTable.tableNumber}</h3>
             <p className="mt-1 text-sm text-[#94a3b8]">
               Trạng thái: {mapServiceStateLabel(selectedTable.serviceState)}
             </p>
@@ -186,9 +186,6 @@ function ActiveOrderPanel({
           >
             Đặt món
           </button>
-          <p className="mt-3 text-xs text-[#94a3b8]">
-            Mỗi lần gửi món sẽ được tách thành một lần gọi món riêng để theo dõi ở hóa đơn.
-          </p>
         </div>
       ) : null}
     </aside>

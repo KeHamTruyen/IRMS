@@ -55,11 +55,11 @@ function MenuStatusView({ menuManagement, onToggleAvailability }) {
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#0d9488]">
-              Quản lý món ăn
+              Quản lý thực đơn
             </p>
-            <h2 className="mt-2 text-[2rem] font-bold text-[#16202a]">Điều chỉnh trạng thái trên menu</h2>
+            <h2 className="mt-2 text-[2rem] font-bold text-[#16202a]">Điều chỉnh thực đơn</h2>
             <p className="mt-2 text-sm text-[#62707f]">
-              Cập nhật từng món giữa hai trạng thái Tạm hết và Đang phục vụ theo tình hình bếp.
+              Cập nhật trạng thái món ăn theo tình hình bếp.
             </p>
           </div>
 

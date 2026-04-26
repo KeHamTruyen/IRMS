@@ -19,7 +19,7 @@ function GenericDashboard({ session, dashboard, dashboardConfig, roleMeta, loadi
   const welcomeName = session.fullName?.split(' ')[0] ?? session.username
 
   return (
-    <main className="grid min-h-screen grid-cols-1 bg-[#f8fafc] md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[270px_minmax(0,1fr)]">
+    <main className="grid min-h-screen content-start grid-cols-1 bg-[#f8fafc] md:grid-cols-[220px_minmax(0,1fr)] lg:grid-cols-[270px_minmax(0,1fr)]">
       <DashboardSidebar
         session={session}
         navItems={dashboardConfig.nav}

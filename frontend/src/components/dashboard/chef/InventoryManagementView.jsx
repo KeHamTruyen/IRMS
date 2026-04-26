@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useMemo, useState } from 'react'
 import { formatQuantity, mapInventoryStatusLabel } from './utils'
 
 const inventoryTone = {
@@ -14,7 +14,7 @@ function SummaryCard({ label, value, note, tone = 'default' }) {
       : 'border-[#e7edf2] bg-white'
 
   return (
-    <article className={`rounded-[24px] border p-5 ${toneClass}`}>
+    <article className={`rounded-[24px] border p-5 ${toneClass} text-center`}>
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#94a3b8]">{label}</p>
       <div className="mt-3 text-[2rem] font-bold text-[#16202a]">{value}</div>
       <p className="mt-2 text-sm text-[#62707f]">{note}</p>
@@ -173,18 +173,13 @@ function InventoryManagementView({ inventoryManagement, onChangeQuantity, onChan
     return inventoryManagement.items.filter((item) => item.category === activeCategory)
   }, [activeCategory, inventoryManagement.items])
 
-  useEffect(() => {
-    if (!items.length) {
-      setSelectedItemId(null)
-      return
-    }
+  const selectedVisibleItemId = useMemo(() => {
+    if (!items.length) return null
 
-    if (!items.some((item) => item.id === selectedItemId)) {
-      setSelectedItemId(items[0].id)
-    }
+    return items.some((item) => item.id === selectedItemId) ? selectedItemId : items[0].id
   }, [items, selectedItemId])
 
-  const selectedItem = items.find((item) => item.id === selectedItemId) ?? items[0] ?? null
+  const selectedItem = items.find((item) => item.id === selectedVisibleItemId) ?? null
   const outOfStockCount = inventoryManagement.items.filter((item) => item.quantity <= 0).length
   const restockingCount = inventoryManagement.items.filter((item) => item.status === 'RESTOCKING').length
 
@@ -198,7 +193,7 @@ function InventoryManagementView({ inventoryManagement, onChangeQuantity, onChan
             </p>
             <h2 className="mt-2 text-[2rem] font-bold text-[#16202a]">Danh sách nguyên liệu</h2>
             <p className="mt-2 text-sm text-[#62707f]">
-              Theo dõi tồn kho theo dạng bảng, chọn từng nguyên liệu để điều chỉnh nhanh số lượng và trạng thái.
+              Theo dõi và quản lý tồn kho nguyên liệu.
             </p>
           </div>
 
@@ -223,27 +218,26 @@ function InventoryManagementView({ inventoryManagement, onChangeQuantity, onChan
 
       <section className="grid content-start gap-4 lg:grid-cols-[minmax(0,1.7fr)_320px] xl:grid-cols-[minmax(0,1.9fr)_340px]">
         <div className="space-y-4">
-          <div className="grid gap-4 md:grid-cols-3">
-            <SummaryCard
-              label="Tổng nguyên liệu"
-              value={inventoryManagement.items.length}
-              note="Đang theo dõi trong ca"
-            />
+          <div className="grid gap-5 md:grid-cols-2">
             <SummaryCard
               label="Cần nhập"
               value={restockingCount}
-              note="Nguyên liệu dưới mức an toàn"
+              note="Số lượng dưới mức an toàn"
               tone="alert"
             />
             <SummaryCard
               label="Đã hết"
               value={outOfStockCount}
-              note="Cần xử lý ngay"
+              note="Cần nhập hàng ngay"
               tone="alert"
             />
           </div>
 
-          <InventoryTable items={items} selectedItemId={selectedItemId} onSelectItem={setSelectedItemId} />
+          <InventoryTable
+            items={items}
+            selectedItemId={selectedVisibleItemId}
+            onSelectItem={setSelectedItemId}
+          />
         </div>
 
         {selectedItem ? (

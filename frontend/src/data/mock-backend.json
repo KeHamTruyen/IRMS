@@ -764,6 +764,97 @@
             "activeOrderId": 8831,
             "reservationName": null,
             "billingStatus": "PENDING"
+          },
+          {
+            "id": 12,
+            "tableNumber": "12",
+            "capacity": 2,
+            "status": "OCCUPIED",
+            "serviceState": "WAITING_FOOD",
+            "location": "Sảnh chính",
+            "currentGuests": 2,
+            "elapsedMinutes": 9,
+            "activeOrderId": 8832,
+            "reservationName": null,
+            "billingStatus": "PENDING"
+          },
+          {
+            "id": 14,
+            "tableNumber": "14",
+            "capacity": 4,
+            "status": "OCCUPIED",
+            "serviceState": "WAITING_FOOD",
+            "location": "Sân hiên",
+            "currentGuests": 3,
+            "elapsedMinutes": 14,
+            "activeOrderId": 8834,
+            "reservationName": null,
+            "billingStatus": "PENDING"
+          },
+          {
+            "id": 15,
+            "tableNumber": "15",
+            "capacity": 6,
+            "status": "OCCUPIED",
+            "serviceState": "WAITING_FOOD",
+            "location": "Sảnh chính",
+            "currentGuests": 5,
+            "elapsedMinutes": 22,
+            "activeOrderId": 8835,
+            "reservationName": null,
+            "billingStatus": "PENDING"
+          },
+          {
+            "id": 16,
+            "tableNumber": "16",
+            "capacity": 2,
+            "status": "OCCUPIED",
+            "serviceState": "WAITING_FOOD",
+            "location": "Sân hiên",
+            "currentGuests": 2,
+            "elapsedMinutes": 7,
+            "activeOrderId": 8836,
+            "reservationName": null,
+            "billingStatus": "PENDING"
+          },
+          {
+            "id": 18,
+            "tableNumber": "18",
+            "capacity": 4,
+            "status": "OCCUPIED",
+            "serviceState": "WAITING_FOOD",
+            "location": "Phòng riêng",
+            "currentGuests": 4,
+            "elapsedMinutes": 17,
+            "activeOrderId": 8838,
+            "reservationName": null,
+            "billingStatus": "PENDING"
+          },
+          {
+            "id": 19,
+            "tableNumber": "19",
+            "capacity": 2,
+            "status": "OCCUPIED",
+            "serviceState": "WAITING_FOOD",
+            "location": "Sảnh chính",
+            "currentGuests": 1,
+            "elapsedMinutes": 6,
+            "activeOrderId": 8839,
+            "reservationName": null,
+            "billingStatus": "PENDING"
+          },
+          {
+            "id": 21,
+            "tableNumber": "21",
+            "capacity": 6,
+            "status": "OCCUPIED",
+            "serviceState": "WAITING_FOOD",
+            "location": "Sảnh chính",
+            "currentGuests": 6,
+            "elapsedMinutes": 19,
+            "activeOrderId": 8841,
+            "reservationName": null,
+            "billingStatus": "PENDING"
           }
         ],
         "orders": [
@@ -848,6 +939,211 @@
                 "station": "Tráng miệng",
                 "note": "",
                 "status": "COMPLETED"
+              }
+            ]
+          },
+          {
+            "tableId": 12,
+            "tableNumber": "12",
+            "orderId": 8832,
+            "orderNumber": "ORD-8832",
+            "orderType": "Tại bàn",
+            "elapsedMinutes": 9,
+            "items": [
+              {
+                "id": "k-1201",
+                "menuItemId": 103,
+                "name": "Salad vườn xanh",
+                "quantity": 2,
+                "station": "Ra món lạnh",
+                "note": "Sốt để riêng",
+                "status": "WAITING"
+              },
+              {
+                "id": "k-1202",
+                "menuItemId": 106,
+                "name": "Latte yến mạch đá",
+                "quantity": 2,
+                "station": "Quầy lạnh",
+                "note": "Không đường",
+                "status": "WAITING"
+              }
+            ]
+          },
+          {
+            "tableId": 14,
+            "tableNumber": "14",
+            "orderId": 8834,
+            "orderNumber": "ORD-8834",
+            "orderType": "Tại bàn",
+            "elapsedMinutes": 14,
+            "items": [
+              {
+                "id": "k-1401",
+                "menuItemId": 102,
+                "name": "Pizza nấm Truffle",
+                "quantity": 1,
+                "station": "Lò nướng",
+                "note": "Không ớt",
+                "status": "WAITING"
+              },
+              {
+                "id": "k-1402",
+                "menuItemId": 105,
+                "name": "Tiramisu truyền thống",
+                "quantity": 1,
+                "station": "Tráng miệng",
+                "note": "",
+                "status": "WAITING"
+              }
+            ]
+          },
+          {
+            "tableId": 15,
+            "tableNumber": "15",
+            "orderId": 8835,
+            "orderNumber": "ORD-8835",
+            "orderType": "Tại bàn",
+            "elapsedMinutes": 22,
+            "items": [
+              {
+                "id": "k-1501",
+                "menuItemId": 101,
+                "name": "Burger bò Wagyu",
+                "quantity": 3,
+                "station": "Bếp nóng",
+                "note": "1 phần không sốt",
+                "status": "WAITING"
+              },
+              {
+                "id": "k-1502",
+                "menuItemId": 107,
+                "name": "Trà đào cam sả",
+                "quantity": 3,
+                "station": "Quầy lạnh",
+                "note": "Ít đá",
+                "status": "WAITING"
+              }
+            ]
+          },
+          {
+            "tableId": 16,
+            "tableNumber": "16",
+            "orderId": 8836,
+            "orderNumber": "ORD-8836",
+            "orderType": "Tại bàn",
+            "elapsedMinutes": 7,
+            "items": [
+              {
+                "id": "k-1601",
+                "menuItemId": 104,
+                "name": "Bạch tuộc nướng",
+                "quantity": 1,
+                "station": "Bếp nóng",
+                "note": "Ưu tiên lên món",
+                "status": "WAITING"
+              },
+              {
+                "id": "k-1602",
+                "menuItemId": 103,
+                "name": "Salad vườn xanh",
+                "quantity": 1,
+                "station": "Ra món lạnh",
+                "note": "",
+                "status": "WAITING"
+              }
+            ]
+          },
+          {
+            "tableId": 18,
+            "tableNumber": "18",
+            "orderId": 8838,
+            "orderNumber": "ORD-8838",
+            "orderType": "Tại bàn",
+            "elapsedMinutes": 17,
+            "items": [
+              {
+                "id": "k-1801",
+                "menuItemId": 102,
+                "name": "Pizza nấm Truffle",
+                "quantity": 2,
+                "station": "Lò nướng",
+                "note": "Một đế mỏng",
+                "status": "WAITING"
+              },
+              {
+                "id": "k-1802",
+                "menuItemId": 106,
+                "name": "Latte yến mạch đá",
+                "quantity": 1,
+                "station": "Quầy lạnh",
+                "note": "",
+                "status": "COMPLETED"
+              }
+            ]
+          },
+          {
+            "tableId": 19,
+            "tableNumber": "19",
+            "orderId": 8839,
+            "orderNumber": "ORD-8839",
+            "orderType": "Tại bàn",
+            "elapsedMinutes": 6,
+            "items": [
+              {
+                "id": "k-1901",
+                "menuItemId": 107,
+                "name": "Trà đào cam sả",
+                "quantity": 1,
+                "station": "Quầy lạnh",
+                "note": "Không topping",
+                "status": "WAITING"
+              },
+              {
+                "id": "k-1902",
+                "menuItemId": 105,
+                "name": "Tiramisu truyền thống",
+                "quantity": 1,
+                "station": "Tráng miệng",
+                "note": "",
+                "status": "WAITING"
+              }
+            ]
+          },
+          {
+            "tableId": 21,
+            "tableNumber": "21",
+            "orderId": 8841,
+            "orderNumber": "ORD-8841",
+            "orderType": "Tại bàn",
+            "elapsedMinutes": 19,
+            "items": [
+              {
+                "id": "k-2101",
+                "menuItemId": 101,
+                "name": "Burger bò Wagyu",
+                "quantity": 2,
+                "station": "Bếp nóng",
+                "note": "Bánh nướng giòn",
+                "status": "WAITING"
+              },
+              {
+                "id": "k-2102",
+                "menuItemId": 104,
+                "name": "Bạch tuộc nướng",
+                "quantity": 2,
+                "station": "Bếp nóng",
+                "note": "",
+                "status": "WAITING"
+              },
+              {
+                "id": "k-2103",
+                "menuItemId": 103,
+                "name": "Salad vườn xanh",
+                "quantity": 1,
+                "station": "Ra món lạnh",
+                "note": "Lên sau món nóng",
+                "status": "WAITING"
               }
             ]
           }

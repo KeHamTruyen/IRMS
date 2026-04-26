@@ -156,7 +156,7 @@ function OrderingWorkspace({ menuCatalog, draftSelections, onDraftChange, onAddI
       <div className="rounded-[28px] border border-[#e7edf2] bg-white p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h3 className="text-[1.6rem] font-bold text-[#16202a]">Đặt món và quản lý thực đơn</h3>
+            <h3 className="text-[1.6rem] font-bold text-[#16202a]">Đặt món</h3>
             <p className="mt-2 text-sm text-[#62707f]">
               Chọn món, số lượng, kích cỡ và ghi chú rồi thêm vào lần đặt món đang thao tác.
             </p>
@@ -181,7 +181,7 @@ function OrderingWorkspace({ menuCatalog, draftSelections, onDraftChange, onAddI
         </div>
 
         <div className="mt-6 max-h-[calc(100vh-22rem)] overflow-y-auto pr-2">
-          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid gap-4 md:grid-cols-2 xl:grid-cols-2">
             {items.map((item) => (
               <MenuOrderCard
                 key={item.id}
@@ -210,7 +210,7 @@ function PaymentWorkspace({
   return (
     <section className="rounded-[28px] border border-[#e7edf2] bg-white p-6">
       <div>
-        <h3 className="text-[1.6rem] font-bold text-[#16202a]">Thanh toán và hóa đơn</h3>
+        <h3 className="text-[1.6rem] font-bold text-[#16202a]">Thanh toán</h3>
         <p className="mt-2 text-sm text-[#62707f]">
           Kiểm tra tổng tiền, chọn hình thức thanh toán và xác nhận giao dịch cho bàn hiện tại.
         </p>
@@ -242,7 +242,7 @@ function PaymentWorkspace({
               <span>{formatCurrency(bill.tax)}</span>
             </div>
             <div className="flex justify-between">
-              <span>Phí phục vụ</span>
+              <span>Khác</span>
               <span>{formatCurrency(bill.serviceCharge)}</span>
             </div>
             <div className="flex justify-between">
@@ -306,6 +306,7 @@ function TableManagementView({
   const metrics = countTableMetrics(tableManagement.tables)
   const canOrder =
     selectedTable.serviceState === 'AVAILABLE' ||
+    selectedTable.serviceState === 'RESERVED' ||
     selectedTable.serviceState === 'WAITING_FOOD' ||
     selectedTable.serviceState === 'SERVED'
   const canPay = Boolean(selectedSession)
@@ -314,16 +315,16 @@ function TableManagementView({
   return (
     <section className="space-y-5">
       <section className="rounded-[28px] border border-[#e7edf2] bg-white p-6">
-        <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+        <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
-            <h2 className="text-[2rem] font-bold text-[#16202a]">Danh sách bàn</h2>
-            <p className="mt-2 text-sm text-[#62707f]">
+            <h2 className="text-2xl font-bold text-[#16202a]">Danh sách bàn</h2>
+            {/* <p className="mt-2 text-sm text-[#62707f]">
               Khu vực: {tableManagement.serviceArea} • {metrics.activeTables} bàn đang theo dõi
-            </p>
+            </p> */}
           </div>
 
           <div className="flex flex-wrap gap-2">
-            <MetricChip label="bàn trống" value={metrics.emptyTables} tone={metricTone.empty} />
+            <MetricChip label="trống" value={metrics.emptyTables} tone={metricTone.empty} />
             <MetricChip label="đã đặt trước" value={metrics.reservedTables} tone={metricTone.reserved} />
             <MetricChip label="cần dọn" value={metrics.cleaningTables} tone={metricTone.cleaning} />
           </div>
@@ -348,7 +349,7 @@ function TableManagementView({
           <div>
             <h3 className="text-[1.5rem] font-bold text-[#16202a]">Bàn {selectedTable.tableNumber}</h3>
             <p className="mt-2 text-sm text-[#62707f]">
-              Trạng thái hiện tại được cập nhật theo order, phục vụ và thanh toán.
+              Cập nhật trạng thái bàn
             </p>
           </div>
 
@@ -379,7 +380,7 @@ function TableManagementView({
                 : 'border border-[#d8e0e7] bg-white text-[#516072]'
             } disabled:cursor-not-allowed disabled:opacity-50`}
           >
-            Đặt món và thực đơn
+            Đặt món
           </button>
           <button
             type="button"
@@ -391,7 +392,7 @@ function TableManagementView({
                 : 'border border-[#d8e0e7] bg-white text-[#516072]'
             } disabled:cursor-not-allowed disabled:opacity-50`}
           >
-            Thanh toán và hóa đơn
+            Thanh toán
           </button>
         </div>
       </section>

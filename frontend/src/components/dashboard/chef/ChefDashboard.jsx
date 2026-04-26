@@ -1,12 +1,11 @@
-import { useEffect, useMemo, useState } from 'react'
-import AppFooter from '../../layout/AppFooter'
+import { useMemo, useState } from 'react'
 import ChefHeader from './ChefHeader'
 import ChefSidebar from './ChefSidebar'
 import InventoryManagementView from './InventoryManagementView'
 import KitchenOrdersView from './KitchenOrdersView'
 import MenuStatusView from './MenuStatusView'
 
-function ChefDashboard({ session, dashboard, onSignOut }) {
+function ChefDashboard({ dashboard, onSignOut }) {
   const [activeSection, setActiveSection] = useState(dashboard.navigation.sideItems[0]?.id ?? 'orders')
   const [kitchenDisplay, setKitchenDisplay] = useState(dashboard.kitchenDisplay)
   const [inventoryManagement, setInventoryManagement] = useState(dashboard.inventoryManagement)
@@ -25,15 +24,12 @@ function ChefDashboard({ session, dashboard, onSignOut }) {
     [kitchenDisplay.orders, kitchenDisplay.tables]
   )
 
-  useEffect(() => {
-    if (!waitingTables.length) {
-      setSelectedTableId(null)
-      return
-    }
+  const selectedWaitingTableId = useMemo(() => {
+    if (!waitingTables.length) return null
 
-    if (!waitingTables.some((table) => table.id === selectedTableId)) {
-      setSelectedTableId(waitingTables[0].id)
-    }
+    return waitingTables.some((table) => table.id === selectedTableId)
+      ? selectedTableId
+      : waitingTables[0].id
   }, [selectedTableId, waitingTables])
 
   const visibleKitchenDisplay = useMemo(
@@ -112,8 +108,8 @@ function ChefDashboard({ session, dashboard, onSignOut }) {
   }
 
   return (
-    <main className="min-h-screen bg-[#f8fafc]">
-      <div className="mx-auto grid min-h-screen max-w-[1500px] items-start overflow-hidden border border-[#d8e0e7] bg-white md:grid-cols-[220px_minmax(0,1fr)]">
+    <main className="max-h-screen bg-[#f8fafc]">
+      <div className="mx-auto grid min-h-screen max-w-7xl content-start items-start overflow-hidden border border-[#d8e0e7] bg-white md:grid-cols-[220px_minmax(0,1fr)]">
         <div className="md:col-span-2">
           <ChefHeader />
         </div>
@@ -125,11 +121,11 @@ function ChefDashboard({ session, dashboard, onSignOut }) {
           onSignOut={onSignOut}
         />
 
-        <section className="min-w-0 self-start space-y-5 bg-[#f8fafc] p-5 lg:p-6">
+        <section className="min-w-0 max-h-full self-start space-y-5 bg-[#f8fafc] p-5 lg:p-6">
           {activeSection === 'orders' ? (
             <KitchenOrdersView
               kitchenDisplay={visibleKitchenDisplay}
-              selectedTableId={selectedTableId}
+              selectedTableId={selectedWaitingTableId}
               onSelectTable={setSelectedTableId}
               onCompleteItem={handleCompleteItem}
             />
@@ -149,8 +145,6 @@ function ChefDashboard({ session, dashboard, onSignOut }) {
               onToggleAvailability={handleToggleMenuAvailability}
             />
           ) : null}
-
-          <AppFooter session={session} dashboard={dashboard} />
         </section>
       </div>
     </main>

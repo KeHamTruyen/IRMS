@@ -130,12 +130,9 @@ function KitchenOrdersView({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
           <div>
             <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#0d9488]">
-              Quản lý món theo bàn
+              Quản lý đơn theo bàn
             </p>
-            <h2 className="mt-2 text-[2rem] font-bold text-[#16202a]">Khu bếp đang chờ chế biến</h2>
-            <p className="mt-2 text-sm text-[#62707f]">
-              Chỉ hiển thị các bàn đang chờ món. Hoàn thành từng món mà không làm thay đổi trạng thái bàn.
-            </p>
+            <h2 className="mt-2 text-[2rem] font-bold text-[#16202a]">Các món đang chờ chế biến</h2>
           </div>
         </div>
 

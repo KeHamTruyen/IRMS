@@ -1,38 +1,17 @@
-import { getInitials } from './utils'
+import { IoRestaurant } from "react-icons/io5";
 
 function AdminHeader({ session, placeholder }) {
   return (
-    <header className="grid grid-cols-1 gap-4 border-b border-[#e7edf2] bg-white px-4 py-4 md:grid-cols-[minmax(0,1fr)_auto] md:px-6 lg:px-7">
-      <div className="flex min-w-0 flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
-        <div>
-          <div className="text-lg font-semibold text-[#16202a]">IRMS Pro</div>
-          <p className="mt-1 text-sm text-[#62707f]">Bảng quản trị vận hành nhà hàng</p>
+    <header className="border-b border-[#e7edf2] bg-white px-5 py-4 md:px-6">
+      <div className="flex items-center gap-3">
+        <div className="grid h-11 w-11 place-items-center rounded-2xl bg-[#2d7871] text-2xl font-bold text-white">
+          <IoRestaurant />
         </div>
-
-        <input
-          type="search"
-          className="min-h-11 w-full rounded-2xl border border-[#d8e0e7] bg-[#f8fafc] px-4 text-sm text-[#16202a] outline-none transition placeholder:text-[#94a3b8] focus:border-[#0d9488] focus:ring-2 focus:ring-[#0d9488]/10 lg:max-w-[360px]"
-          placeholder={placeholder}
-          aria-label="Tìm kiếm trong trang quản trị"
-        />
-      </div>
-
-      <div className="flex items-center justify-between gap-3 md:justify-end">
-        <button
-          type="button"
-          className="rounded-2xl border border-[#d8e0e7] bg-white px-3 py-2 text-sm font-medium text-[#516072]"
-        >
-          30 ngày gần đây
-        </button>
-
-        <div className="flex items-center gap-3 rounded-2xl border border-[#e7edf2] bg-[#fbfcfd] px-3 py-2">
-          <div className="grid h-10 w-10 place-items-center rounded-full bg-[#1f2937] text-sm font-semibold text-white">
-            {getInitials(session.fullName || session.username)}
-          </div>
-          <div className="min-w-0">
-            <div className="truncate text-sm font-semibold text-[#16202a]">{session.fullName}</div>
-            <div className="text-xs text-[#62707f]">Tài khoản quản trị</div>
-          </div>
+        <div>
+          <div className="text-2xl font-bold text-[#2d7871] items-start">IRMS</div>
+          <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#94a3b8]">
+            Quản trị hệ thống
+          </p>
         </div>
       </div>
     </header>

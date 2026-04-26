@@ -1,5 +1,4 @@
 import { useMemo, useState } from 'react'
-import AppFooter from '../../layout/AppFooter'
 import ActiveOrderPanel from './ActiveOrderPanel'
 import MenuCatalogView from './MenuCatalogView'
 import ServerHeader from './ServerHeader'
@@ -475,7 +474,7 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
   return (
     <main className="min-h-screen bg-[#f8fafc]">
       <div
-        className={`mx-auto grid min-h-screen max-w-[1500px] overflow-hidden border border-[#d8e0e7] bg-white ${
+        className={`mx-auto grid min-h-screen max-w-7xl content-start overflow-hidden border border-[#d8e0e7] bg-white ${
           showOrderPanel
             ? 'md:grid-cols-[180px_minmax(0,1fr)_320px] lg:grid-cols-[220px_minmax(0,1fr)_390px]'
             : 'md:grid-cols-[180px_minmax(0,1fr)] lg:grid-cols-[220px_minmax(0,1fr)]'
@@ -512,8 +511,6 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
           ) : (
             <MenuCatalogView menuCatalog={dashboard.menuCatalog} />
           )}
-
-          <AppFooter session={session} dashboard={dashboard} />
         </section>
 
         {showOrderPanel ? (
