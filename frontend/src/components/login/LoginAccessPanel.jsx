@@ -1,5 +1,5 @@
 const modeButtonClass =
-  'min-h-[46px] rounded-xl border border-transparent bg-white px-4 text-sm font-semibold text-[#16202a] transition'
+  'min-h-[46px] rounded-xl border border-transparent px-4 text-sm font-semibold transition'
 
 const inputClass =
   'min-h-[60px] rounded-[14px] border border-[#d8e0e7] bg-white px-4 text-[#16202a] outline-none transition placeholder:text-[#94a3b8] focus:border-[#0d9488] focus:ring-2 focus:ring-[#0d9488]/10'
@@ -16,14 +16,14 @@ function AuthModeSwitcher({ authMode, onSelectAuthMode }) {
     >
       <button
         type="button"
-        className={`${modeButtonClass} ${authMode === 'employee' ? 'bg-[#0d9488] text-white' : ''}`}
+        className={`${modeButtonClass} ${authMode === 'employee' ? 'bg-[#0d9488] text-white' : 'bg-white text-[#16202a]'}`}
         onClick={() => onSelectAuthMode('employee')}
       >
         Nhân viên
       </button>
       <button
         type="button"
-        className={`${modeButtonClass} ${authMode === 'admin' ? 'bg-[#0d9488] text-white' : ''}`}
+        className={`${modeButtonClass} ${authMode === 'admin' ? 'bg-[#0d9488] text-white' : 'bg-white text-[#16202a]'}`}
         onClick={() => onSelectAuthMode('admin')}
       >
         Quản trị
@@ -145,7 +145,7 @@ function AdminCredentialsForm({
         className="min-h-[52px] rounded-[14px] bg-[#0d9488] px-[18px] font-bold text-white transition hover:bg-[#0b7f76]"
         disabled={isSubmitting}
       >
-        {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập quản trị'}
+        {isSubmitting ? 'Đang đăng nhập...' : 'Đăng nhập'}
       </button>
     </form>
   )
@@ -190,11 +190,8 @@ function LoginAccessPanel({
   return (
     <section className="flex flex-col gap-5 bg-white p-8 md:p-7 lg:p-10">
       <header>
-        <span className="inline-block text-xs font-bold uppercase tracking-normal text-[#0d9488]">
-          Kiểm soát truy cập
-        </span>
         <h2 className="mt-2 text-[clamp(2rem,2.4vw,2.75rem)] leading-[1.05] tracking-normal text-[#16202a]">
-          Chào mừng quay lại
+          Chào mừng quay lại!
         </h2>
         <p className="mt-2 text-base leading-7 text-[#62707f]">
           Chọn hình thức đăng nhập phù hợp với vai trò của bạn.
@@ -230,14 +227,14 @@ function LoginAccessPanel({
             isSubmitting={isSubmitting}
           />
 
-          <button
+          {/* <button
             type="button"
             className="min-h-[52px] rounded-[14px] bg-[#0d9488] px-[18px] font-bold text-white transition hover:bg-[#0b7f76]"
             onClick={onSubmitPinLogin}
             disabled={isSubmitting}
           >
             {isSubmitting ? 'Đang xác thực...' : 'Mở dashboard'}
-          </button>
+          </button> */}
         </div>
       ) : (
         <div className="flex flex-col gap-4">
