@@ -1,7 +1,11 @@
 spring:
+  config:
+    # Load local environment file for mvn spring-boot:run (non-Docker workflow).
+    import: optional:file:.env[.properties]
+
   application:
     name: irms-backend
-  
+
   datasource:
     url: jdbc:postgresql://${DB_HOST:localhost}:${DB_PORT:5432}/${DB_NAME:irms_db}
     username: ${DB_USERNAME:irms_user}
@@ -11,7 +15,7 @@ spring:
       maximum-pool-size: 10
       minimum-idle: 5
       connection-timeout: 30000
-  
+
   jpa:
     hibernate:
       ddl-auto: validate
@@ -22,20 +26,21 @@ spring:
         dialect: org.hibernate.dialect.PostgreSQLDialect
         jdbc:
           time_zone: UTC
-  
+
   flyway:
-    enabled: true
-    baseline-on-migrate: true
+    enabled: ${FLYWAY_ENABLED:true}
+    baseline-on-migrate: ${FLYWAY_BASELINE_ON_MIGRATE:true}
+    baseline-version: ${FLYWAY_BASELINE_VERSION:1}
     locations: classpath:db/migration
     validate-on-migrate: true
-  
+
   jackson:
     serialization:
       write-dates-as-timestamps: false
     time-zone: UTC
 
 server:
-  port: 8080
+  port: ${SERVER_PORT:8080}
   error:
     include-message: always
     include-binding-errors: always
@@ -43,8 +48,8 @@ server:
 # JWT Configuration
 jwt:
   secret: ${JWT_SECRET:irms-secret-key-change-this-in-production-minimum-256-bits}
-  expiration: 86400000  # 24 hours in milliseconds
-  refresh-expiration: 604800000  # 7 days
+  expiration: 86400000 # 24 hours in milliseconds
+  refresh-expiration: 604800000 # 7 days
 
 # CORS Configuration
 cors:
@@ -56,8 +61,8 @@ cors:
 
 # Application Configuration
 app:
-  tax-rate: 0.10  # 10% tax
-  service-charge-rate: 0.05  # 5% service charge
+  tax-rate: 0.10 # 10% tax
+  service-charge-rate: 0.05 # 5% service charge
 
 logging:
   level:
