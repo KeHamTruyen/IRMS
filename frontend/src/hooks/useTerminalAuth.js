@@ -1,44 +1,24 @@
 import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DASHBOARD_CONFIG } from '../constants/dashboard'
 import { EMPLOYEE_ROLES, getRoleMeta } from '../constants/roles'
+import { authApi } from '../services/authApi'
 import { mockApi } from '../services/mockApi'
-
-const SESSION_STORAGE_KEY = 'irms-session'
-const DISABLED_ROLES = ['MANAGER']
-
-const readStoredSession = () => {
-  try {
-    const raw = window.localStorage.getItem(SESSION_STORAGE_KEY)
-    const parsed = raw ? JSON.parse(raw) : null
-    return parsed && !DISABLED_ROLES.includes(parsed.role) ? parsed : null
-  } catch {
-    return null
-  }
-}
-
-const writeStoredSession = (session) => {
-  if (!session) {
-    window.localStorage.removeItem(SESSION_STORAGE_KEY)
-    return
-  }
-
-  window.localStorage.setItem(SESSION_STORAGE_KEY, JSON.stringify(session))
-}
 
 export function useTerminalAuth() {
   const [authMode, setAuthMode] = useState('employee')
   const [selectedEmployeeRole, setSelectedEmployeeRole] = useState('SERVER')
   const [pin, setPin] = useState('')
   const [adminForm, setAdminForm] = useState({
-    username: 'admin',
-    password: 'password123',
+    username: '',
+    password: '',
   })
   const [authError, setAuthError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
-  const [session, setSession] = useState(() => readStoredSession())
+  const [session, setSession] = useState(() => authApi.getStoredSession())
   const [dashboardResponse, setDashboardResponse] = useState(null)
-  const [loadingDashboard, setLoadingDashboard] = useState(() => Boolean(readStoredSession()))
-  const [demoAccess, setDemoAccess] = useState([])
+  const [loadingDashboard, setLoadingDashboard] = useState(() =>
+    Boolean(authApi.getStoredSession())
+  )
 
   const loadDashboard = useCallback(async (role) => {
     if (!role) return null
@@ -46,16 +26,9 @@ export function useTerminalAuth() {
   }, [])
 
   useEffect(() => {
-    writeStoredSession(session)
+    authApi.persistSession(session)
 
     if (session?.role) {
-      if (DISABLED_ROLES.includes(session.role)) {
-        setSession(null)
-        setDashboardResponse(null)
-        setLoadingDashboard(false)
-        return
-      }
-
       let cancelled = false
       window.location.hash = `/dashboard/${session.role.toLowerCase()}`
 
@@ -75,29 +48,11 @@ export function useTerminalAuth() {
     window.location.hash = '/login'
   }, [loadDashboard, session])
 
-  useEffect(() => {
-    mockApi.getDemoAccess().then((response) => {
-      if (response.success) {
-        setDemoAccess(response.data ?? [])
-      }
-    })
-  }, [])
-
-  const handleAuthenticationResult = useCallback((response) => {
-    if (!response.success) {
-      setAuthError(response.error ?? 'Xác thực thất bại')
-      return
-    }
-
-    if (DISABLED_ROLES.includes(response.data?.role)) {
-      setAuthError('Vai trò này đã được gỡ khỏi hệ thống.')
-      return
-    }
-
+  const handleAuthenticationSuccess = useCallback((nextSession) => {
     setAuthError('')
     setLoadingDashboard(true)
     setPin('')
-    setSession(response.data)
+    setSession(nextSession)
   }, [])
 
   const submitPinLogin = useCallback(async () => {
@@ -107,13 +62,19 @@ export function useTerminalAuth() {
     }
 
     setIsSubmitting(true)
-    const response = await mockApi.loginWithPin({
-      role: selectedEmployeeRole,
-      pin,
-    })
-    setIsSubmitting(false)
-    handleAuthenticationResult(response)
-  }, [handleAuthenticationResult, pin, selectedEmployeeRole])
+
+    try {
+      const nextSession = await authApi.loginWithPin({
+        role: selectedEmployeeRole,
+        pin,
+      })
+      handleAuthenticationSuccess(nextSession)
+    } catch (error) {
+      setAuthError(error.message ?? 'Xác thực thất bại')
+    } finally {
+      setIsSubmitting(false)
+    }
+  }, [handleAuthenticationSuccess, pin, selectedEmployeeRole])
 
   const submitAdminLogin = useCallback(
     async (event) => {
@@ -125,11 +86,17 @@ export function useTerminalAuth() {
       }
 
       setIsSubmitting(true)
-      const response = await mockApi.loginAdmin(adminForm)
-      setIsSubmitting(false)
-      handleAuthenticationResult(response)
+
+      try {
+        const nextSession = await authApi.loginAdmin(adminForm)
+        handleAuthenticationSuccess(nextSession)
+      } catch (error) {
+        setAuthError(error.message ?? 'Xác thực thất bại')
+      } finally {
+        setIsSubmitting(false)
+      }
     },
-    [adminForm, handleAuthenticationResult]
+    [adminForm, handleAuthenticationSuccess]
   )
 
   const appendPinDigit = useCallback((digit) => {
@@ -166,7 +133,8 @@ export function useTerminalAuth() {
     setPin('')
   }, [])
 
-  const signOut = useCallback(() => {
+  const signOut = useCallback(async () => {
+    await authApi.logout()
     setSession(null)
     setAuthError('')
     setPin('')
@@ -197,7 +165,6 @@ export function useTerminalAuth() {
     dashboardConfig,
     roleMeta,
     loadingDashboard,
-    demoAccess,
     onSelectAuthMode: handleSelectAuthMode,
     onSelectEmployeeRole: handleSelectEmployeeRole,
     onAppendPin: appendPinDigit,

@@ -12,7 +12,7 @@ function AuthModeSwitcher({ authMode, onSelectAuthMode }) {
     <div
       className="grid grid-cols-2 gap-2 rounded-[14px] bg-[#f3f6f8] p-1.5"
       role="tablist"
-      aria-label="Chế độ xác thực"
+      aria-label="Authentication mode"
     >
       <button
         type="button"
@@ -26,7 +26,7 @@ function AuthModeSwitcher({ authMode, onSelectAuthMode }) {
         className={`${modeButtonClass} ${authMode === 'admin' ? 'bg-[#0d9488] text-white' : 'bg-white text-[#16202a]'}`}
         onClick={() => onSelectAuthMode('admin')}
       >
-        Quản trị
+        Quản trị viên
       </button>
     </div>
   )
@@ -34,11 +34,7 @@ function AuthModeSwitcher({ authMode, onSelectAuthMode }) {
 
 function EmployeeRoleSelector({ roles, selectedRole, onSelectRole }) {
   return (
-    <div
-      className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3"
-      role="tablist"
-      aria-label="Chọn vai trò nhân viên"
-    >
+    <div className="grid grid-cols-1 gap-2 md:grid-cols-2 xl:grid-cols-3" role="tablist">
       {roles.map((role) => (
         <button
           key={role.id}
@@ -60,13 +56,13 @@ function EmployeeRoleSelector({ roles, selectedRole, onSelectRole }) {
 
 function PinDisplay({ pin }) {
   return (
-    <div className="grid grid-cols-4 gap-2.5" aria-label="Hiển thị mã PIN">
+    <div className="grid grid-cols-4 gap-2.5" aria-label="PIN display">
       {[0, 1, 2, 3].map((slot) => (
         <div
           key={slot}
           className="grid min-h-[60px] place-items-center rounded-[14px] border border-[#d8e0e7] bg-white text-[2rem] text-[#16202a]"
         >
-          {pin[slot] ? '•' : ''}
+          {pin[slot] ? '*' : ''}
         </div>
       ))}
     </div>
@@ -75,7 +71,7 @@ function PinDisplay({ pin }) {
 
 function PinPad({ onAppendPin, onRemoveLastPinDigit, onSubmitPinLogin, isSubmitting }) {
   return (
-    <div className="grid grid-cols-3 gap-2.5" aria-label="Bàn phím mã PIN">
+    <div className="grid grid-cols-3 gap-2.5" aria-label="PIN keypad">
       {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((digit) => (
         <button
           key={digit}
@@ -135,7 +131,7 @@ function AdminCredentialsForm({
           className={inputClass}
           value={adminForm.password}
           onChange={(event) => onUpdateAdminField('password', event.target.value)}
-          placeholder="password123"
+          placeholder="password"
           autoComplete="current-password"
         />
       </label>
@@ -151,24 +147,6 @@ function AdminCredentialsForm({
   )
 }
 
-function DemoAccessList({ demoAccess }) {
-  if (!demoAccess.length) return null
-
-  return (
-    <div className="grid gap-2.5 pt-1">
-      {demoAccess.map((item) => (
-        <div
-          key={`${item.role}-${item.label}`}
-          className="flex flex-col gap-1 rounded-xl border border-[#e7edf2] bg-[#fbfcfd] px-3.5 py-3 md:flex-row md:items-center md:justify-between md:gap-3"
-        >
-          <strong>{item.label}</strong>
-          <span className="text-sm text-[#62707f]">{item.value}</span>
-        </div>
-      ))}
-    </div>
-  )
-}
-
 function LoginAccessPanel({
   authMode,
   selectedEmployeeRole,
@@ -177,7 +155,6 @@ function LoginAccessPanel({
   adminForm,
   authError,
   isSubmitting,
-  demoAccess,
   onSelectAuthMode,
   onSelectEmployeeRole,
   onAppendPin,
@@ -193,9 +170,6 @@ function LoginAccessPanel({
         <h2 className="mt-2 text-[clamp(2rem,2.4vw,2.75rem)] leading-[1.05] tracking-normal text-[#16202a]">
           Chào mừng quay lại!
         </h2>
-        <p className="mt-2 text-base leading-7 text-[#62707f]">
-          Chọn hình thức đăng nhập phù hợp với vai trò của bạn.
-        </p>
       </header>
 
       <AuthModeSwitcher authMode={authMode} onSelectAuthMode={onSelectAuthMode} />
@@ -226,15 +200,6 @@ function LoginAccessPanel({
             onSubmitPinLogin={onSubmitPinLogin}
             isSubmitting={isSubmitting}
           />
-
-          {/* <button
-            type="button"
-            className="min-h-[52px] rounded-[14px] bg-[#0d9488] px-[18px] font-bold text-white transition hover:bg-[#0b7f76]"
-            onClick={onSubmitPinLogin}
-            disabled={isSubmitting}
-          >
-            {isSubmitting ? 'Đang xác thực...' : 'Mở dashboard'}
-          </button> */}
         </div>
       ) : (
         <div className="flex flex-col gap-4">
@@ -250,8 +215,6 @@ function LoginAccessPanel({
       <p className={`min-h-6 text-sm ${authError ? 'text-[#b85438]' : 'text-transparent'}`}>
         {authError || ' '}
       </p>
-
-      <DemoAccessList demoAccess={demoAccess} />
     </section>
   )
 }

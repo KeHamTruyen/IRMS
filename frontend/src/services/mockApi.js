@@ -20,7 +20,6 @@ const buildError = (error, message) => ({
 
 const users = mockBackend.users ?? []
 const dashboards = mockBackend.dashboards ?? {}
-const disabledRoles = ['MANAGER']
 
 const formatCurrency = (value) =>
   new Intl.NumberFormat('vi-VN', {
@@ -306,66 +305,9 @@ const buildAdminDashboard = () => {
   }
 }
 
-const sanitizeSession = (user) => ({
-  token: `mock-token-${user.username}`,
-  username: user.username,
-  fullName: user.fullName,
-  role: user.role,
-  userId: user.id,
-  source: mockBackend.meta?.source ?? 'mock-fallback',
-  profile: {
-    email: user.email,
-    phone: user.phone,
-  },
-})
-
 export const mockApi = {
-  async loginAdmin(payload) {
-    await wait()
-
-    const user = users.find(
-      (item) =>
-        item.role === 'ADMIN' &&
-        item.username === payload.username &&
-        item.password === payload.password &&
-        item.isActive
-    )
-
-    if (!user) {
-      return buildError('Sai tên đăng nhập hoặc mật khẩu', 'Xác thực thất bại')
-    }
-
-    return buildResponse(sanitizeSession(user), 'Đăng nhập thành công')
-  },
-
-  async loginWithPin(payload) {
-    await wait()
-
-    if (disabledRoles.includes(payload.role)) {
-      return buildError('Vai trò này không còn được hỗ trợ đăng nhập', 'Xác thực thất bại')
-    }
-
-    const user = users.find(
-      (item) =>
-        item.role === payload.role &&
-        item.pin === payload.pin &&
-        item.authMethod === 'pin' &&
-        item.isActive
-    )
-
-    if (!user) {
-      return buildError('Sai mã PIN hoặc không đúng vai trò', 'Xác thực thất bại')
-    }
-
-    return buildResponse(sanitizeSession(user), 'Đăng nhập thành công')
-  },
-
   async getDashboard(role) {
     await wait(180)
-
-    if (disabledRoles.includes(role)) {
-      return buildError(`Dashboard cho vai trò ${role} đã bị gỡ`, 'Thiếu dữ liệu dự phòng')
-    }
 
     const dashboard = role === 'ADMIN' ? buildAdminDashboard() : dashboards[role]
 
@@ -374,13 +316,5 @@ export const mockApi = {
     }
 
     return buildResponse(dashboard, 'Đã tải dashboard')
-  },
-
-  async getDemoAccess() {
-    await wait(80)
-    return buildResponse(
-      (mockBackend.demoAccess ?? []).filter((item) => !disabledRoles.includes(item.role)),
-      'Đã tải thông tin đăng nhập mẫu'
-    )
   },
 }

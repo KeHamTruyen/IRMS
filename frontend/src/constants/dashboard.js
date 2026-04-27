@@ -4,6 +4,9 @@ export const DASHBOARD_CONFIG = {
   [APP_ROLES.ADMIN]: {
     nav: ['Tổng quan', 'Người dùng', 'Phân tích', 'Hệ thống'],
   },
+  [APP_ROLES.MANAGER]: {
+    nav: ['Tổng quan', 'Doanh thu', 'Ca làm', 'Hiệu suất'],
+  },
   [APP_ROLES.SERVER]: {
     nav: ['Tổng quan', 'Bàn', 'Đơn hàng', 'Hàng chờ'],
   },
