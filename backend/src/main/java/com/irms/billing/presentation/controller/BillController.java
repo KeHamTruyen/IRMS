@@ -56,7 +56,7 @@ public class BillController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('CASHIER', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SERVER', 'CASHIER', 'MANAGER', 'ADMIN')")
     @Operation(summary = "Generate bill from order")
     public ResponseEntity<ApiResponse<BillResponse>> createBill(@Valid @RequestBody CreateBillRequest request) {
         Bill bill = billingService.createBill(request);
@@ -68,7 +68,7 @@ public class BillController {
     }
     
     @PostMapping("/order/{orderId}")
-    @PreAuthorize("hasAnyRole('CASHIER', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SERVER', 'CASHIER', 'MANAGER', 'ADMIN')")
     @Operation(summary = "Generate bill from order")
     public ResponseEntity<ApiResponse<BillResponse>> createBill(
             @PathVariable Long orderId,
@@ -101,7 +101,7 @@ public class BillController {
     }
     
     @PostMapping("/payments")
-    @PreAuthorize("hasAnyRole('CASHIER', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('SERVER', 'CASHIER', 'MANAGER', 'ADMIN')")
     @Operation(summary = "Process payment for bill")
         public ResponseEntity<ApiResponse<BillResponse>> processPayment(
             @Valid @RequestBody ProcessPaymentRequest request) {
@@ -119,7 +119,7 @@ public class BillController {
     }
 
         @PostMapping("/{billId}/payments")
-        @PreAuthorize("hasAnyRole('CASHIER', 'MANAGER', 'ADMIN')")
+        @PreAuthorize("hasAnyRole('SERVER', 'CASHIER', 'MANAGER', 'ADMIN')")
         @Operation(summary = "Process payment for bill by ID")
         public ResponseEntity<ApiResponse<BillResponse>> processPaymentByBillId(
             @PathVariable Long billId,

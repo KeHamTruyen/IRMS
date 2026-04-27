@@ -1,5 +1,12 @@
 import { useMemo, useState } from 'react'
-import { countTableMetrics, formatCurrency, mapServiceStateLabel } from './utils'
+import {
+  countTableMetrics,
+  formatCurrency,
+  mapBillStatusLabel,
+  mapCategoryLabel,
+  mapLocationLabel,
+  mapServiceStateLabel,
+} from './utils'
 
 const statusTone = {
   AVAILABLE: 'border-[#d8e0e7] bg-white text-[#0d9488]',
@@ -16,11 +23,7 @@ const metricTone = {
 }
 
 function MetricChip({ label, value, tone }) {
-  return (
-    <div className={`rounded-full px-4 py-2 text-sm font-semibold ${tone}`}>
-      {value} {label}
-    </div>
-  )
+  return <div className={`rounded-full px-4 py-2 text-sm font-semibold ${tone}`}>{value} {label}</div>
 }
 
 function TableCard({ table, isSelected, onSelect }) {
@@ -47,7 +50,7 @@ function TableCard({ table, isSelected, onSelect }) {
           {table.currentGuests > 0 ? `${table.currentGuests} khách` : `${table.capacity} ghế`}
         </p>
         <p className="text-xs text-[#94a3b8]">
-          {table.reservationName ? `Giữ bàn: ${table.reservationName}` : table.location}
+          {table.reservationName ? `Giữ bàn: ${table.reservationName}` : mapLocationLabel(table.location)}
         </p>
       </div>
     </button>
@@ -62,13 +65,15 @@ function MenuOrderCard({ item, draftItem, onDraftChange, onAddItem, disabled }) 
   const isDisabled = disabled || isUnavailable
 
   return (
-    <article
-      className={`overflow-hidden rounded-[22px] border border-[#e7edf2] bg-white ${
-        isUnavailable ? 'opacity-70' : ''
-      }`}
-    >
-      <div className="relative">
-        <img src={item.imageUrl} alt={item.name} className="h-40 w-full object-cover" />
+    <article className={`overflow-hidden rounded-[22px] border border-[#e7edf2] bg-white ${isUnavailable ? 'opacity-70' : ''}`}>
+      <div className="relative h-40 bg-[#eef2f7]">
+        {item.imageUrl ? (
+          <img src={item.imageUrl} alt={item.name} className="h-40 w-full object-cover" />
+        ) : (
+          <div className="grid h-full place-items-center px-4 text-center text-sm font-semibold text-[#62707f]">
+            {item.name}
+          </div>
+        )}
         {isUnavailable ? (
           <span className="absolute left-4 top-4 rounded-full bg-[#fff4f1] px-3 py-1 text-xs font-semibold text-[#c36d4b]">
             Tạm hết
@@ -115,9 +120,7 @@ function MenuOrderCard({ item, draftItem, onDraftChange, onAddItem, disabled }) 
           disabled={isDisabled}
         >
           {item.sizeOptions.map((option) => (
-            <option key={option} value={option}>
-              {option}
-            </option>
+            <option key={option} value={option}>{option}</option>
           ))}
         </select>
 
@@ -174,7 +177,7 @@ function OrderingWorkspace({ menuCatalog, draftSelections, onDraftChange, onAddI
                     : 'border-[#d8e0e7] bg-white text-[#62707f]'
                 }`}
               >
-                {category}
+                {category === 'Tất cả' ? category : mapCategoryLabel(category)}
               </button>
             ))}
           </div>
@@ -206,7 +209,17 @@ function PaymentWorkspace({
   onSelectPaymentMethod,
   onConfirmPayment,
   canPay,
+  isBusy,
 }) {
+  if (!bill) {
+    return (
+      <section className="rounded-[28px] border border-[#e7edf2] bg-white p-6">
+        <h3 className="text-[1.6rem] font-bold text-[#16202a]">Thanh toán</h3>
+        <p className="mt-2 text-sm text-[#62707f]">Hãy gửi món và đánh dấu đã phục vụ trước khi tạo hóa đơn.</p>
+      </section>
+    )
+  }
+
   return (
     <section className="rounded-[28px] border border-[#e7edf2] bg-white p-6">
       <div>
@@ -224,31 +237,15 @@ function PaymentWorkspace({
               <h4 className="mt-1 text-xl font-bold text-[#16202a]">{bill.billNumber}</h4>
             </div>
             <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#2d7871]">
-              {bill.status === 'PAID'
-                ? 'Đã thanh toán'
-                : bill.status === 'PARTIALLY_PAID'
-                  ? 'Thanh toán một phần'
-                  : 'Chờ thanh toán'}
+              {mapBillStatusLabel(bill.status)}
             </span>
           </div>
 
           <div className="mt-6 space-y-3 text-sm text-[#62707f]">
-            <div className="flex justify-between">
-              <span>Tạm tính</span>
-              <span>{formatCurrency(bill.subtotal)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Thuế</span>
-              <span>{formatCurrency(bill.tax)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Khác</span>
-              <span>{formatCurrency(bill.serviceCharge)}</span>
-            </div>
-            <div className="flex justify-between">
-              <span>Giảm giá</span>
-              <span>- {formatCurrency(bill.discount)}</span>
-            </div>
+            <div className="flex justify-between"><span>Tạm tính</span><span>{formatCurrency(bill.subtotal)}</span></div>
+            <div className="flex justify-between"><span>Thuế</span><span>{formatCurrency(bill.tax)}</span></div>
+            <div className="flex justify-between"><span>Phí dịch vụ</span><span>{formatCurrency(bill.serviceCharge)}</span></div>
+            <div className="flex justify-between"><span>Giảm giá</span><span>- {formatCurrency(bill.discount)}</span></div>
             <div className="flex justify-between border-t border-[#e7edf2] pt-3 text-base font-bold text-[#16202a]">
               <span>Tổng thanh toán</span>
               <span>{formatCurrency(bill.totalAmount)}</span>
@@ -261,7 +258,7 @@ function PaymentWorkspace({
             <button
               key={method.code}
               type="button"
-              disabled={!canPay || bill.status === 'PAID'}
+              disabled={!canPay || bill.status === 'PAID' || isBusy}
               onClick={() => onSelectPaymentMethod(method.code)}
               className={`w-full rounded-[22px] border px-4 py-4 text-left transition ${
                 selectedPaymentMethod === method.code
@@ -276,11 +273,11 @@ function PaymentWorkspace({
 
           <button
             type="button"
-            disabled={!canPay || !selectedPaymentMethod || bill.status === 'PAID'}
+            disabled={!canPay || !selectedPaymentMethod || bill.status === 'PAID' || isBusy}
             onClick={onConfirmPayment}
             className="w-full rounded-2xl bg-[#1e293b] px-4 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Xác nhận thanh toán
+            {isBusy ? 'Đang xử lý...' : 'Xác nhận thanh toán'}
           </button>
         </div>
       </div>
@@ -302,6 +299,7 @@ function TableManagementView({
   onConfirmPayment,
   selectedSession,
   draftSelections,
+  isBusy,
 }) {
   const metrics = countTableMetrics(tableManagement.tables)
   const canOrder =
@@ -309,7 +307,7 @@ function TableManagementView({
     selectedTable.serviceState === 'RESERVED' ||
     selectedTable.serviceState === 'WAITING_FOOD' ||
     selectedTable.serviceState === 'SERVED'
-  const canPay = Boolean(selectedSession)
+  const canPay = Boolean(selectedSession?.bill?.id)
   const canMarkServed = selectedTable.serviceState === 'WAITING_FOOD'
 
   return (
@@ -318,9 +316,6 @@ function TableManagementView({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h2 className="text-2xl font-bold text-[#16202a]">Danh sách bàn</h2>
-            {/* <p className="mt-2 text-sm text-[#62707f]">
-              Khu vực: {tableManagement.serviceArea} • {metrics.activeTables} bàn đang theo dõi
-            </p> */}
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -348,9 +343,7 @@ function TableManagementView({
         <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <h3 className="text-[1.5rem] font-bold text-[#16202a]">Bàn {selectedTable.tableNumber}</h3>
-            <p className="mt-2 text-sm text-[#62707f]">
-              Cập nhật trạng thái bàn
-            </p>
+            <p className="mt-2 text-sm text-[#62707f]">Cập nhật trạng thái bàn</p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -361,7 +354,8 @@ function TableManagementView({
               <button
                 type="button"
                 onClick={onMarkTableServed}
-                className="rounded-full bg-[#eef9f7] px-5 py-3 text-sm font-semibold text-[#0d9488] transition hover:bg-[#dff5f1]"
+                disabled={isBusy}
+                className="rounded-full bg-[#eef9f7] px-5 py-3 text-sm font-semibold text-[#0d9488] transition hover:bg-[#dff5f1] disabled:cursor-not-allowed disabled:opacity-50"
               >
                 Đã phục vụ
               </button>
@@ -405,6 +399,7 @@ function TableManagementView({
           onSelectPaymentMethod={onSelectPaymentMethod}
           onConfirmPayment={onConfirmPayment}
           canPay={canPay}
+          isBusy={isBusy}
         />
       ) : (
         <OrderingWorkspace
@@ -412,7 +407,7 @@ function TableManagementView({
           draftSelections={draftSelections}
           onDraftChange={onDraftChange}
           onAddItem={onAddItem}
-          canOrder={canOrder}
+          canOrder={canOrder && !isBusy}
         />
       )}
     </section>

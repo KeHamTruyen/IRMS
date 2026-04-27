@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { api } from '../../../services/api'
 import ActiveOrderPanel from './ActiveOrderPanel'
 import MenuCatalogView from './MenuCatalogView'
 import ServerHeader from './ServerHeader'
@@ -16,36 +17,19 @@ import {
 
 const createEmptyDraft = () => ({})
 
-const buildBillTotals = (bill, subtotal) => {
-  const tax = Math.round(subtotal * 0.1)
-  const serviceCharge = Math.round(subtotal * 0.08)
+const fallbackPaymentMethods = [
+  { code: 'CASH', label: 'Tiền mặt', hint: 'Thu tiền trực tiếp tại bàn.' },
+  { code: 'CREDIT_CARD', label: 'Thẻ ngân hàng', hint: 'Xử lý qua cổng thanh toán thẻ.' },
+  { code: 'DIGITAL_WALLET', label: 'Ví điện tử', hint: 'Momo, ZaloPay, VNPay hoặc ví tương tự.' },
+  { code: 'BANK_TRANSFER', label: 'Chuyển khoản', hint: 'Đối chiếu giao dịch ngân hàng.' },
+]
 
-  return {
-    ...bill,
-    subtotal,
-    tax,
-    serviceCharge,
-    totalAmount: subtotal + tax + serviceCharge - Number(bill.discount || 0),
-  }
-}
+const fallbackSideItems = [
+  { id: 'tables', label: 'Quản lý bàn' },
+  { id: 'menu', label: 'Thực đơn' },
+]
 
-const recalculateSession = (session) => {
-  const batches = session.batches.map(normalizeBatch)
-  const items = batches.flatMap((batch) => batch.items)
-  const subtotal = items.reduce((sum, item) => sum + Number(item.subtotal || 0), 0)
-
-  return {
-    ...session,
-    batches,
-    orderResponse: {
-      ...session.orderResponse,
-      items,
-      totalAmount: subtotal,
-      updatedAt: new Date().toISOString(),
-    },
-    bill: buildBillTotals(session.bill, subtotal),
-  }
-}
+const statusRank = ['PENDING', 'CONFIRMED', 'PREPARING', 'READY', 'SERVED']
 
 const createDraftBatch = (batchNumber, items = []) => ({
   batchNumber,
@@ -55,25 +39,68 @@ const createDraftBatch = (batchNumber, items = []) => ({
   items,
 })
 
-const normalizeSession = (session, paymentMethods) =>
-  recalculateSession({
-    ...session,
-    batches: (session.batches ?? []).map(normalizeBatch),
-    paymentMethods,
-    selectedPaymentMethod: session.selectedPaymentMethod ?? '',
-  })
+const normalizeMenuItem = (item) => ({
+  ...item,
+  price: Number(item.price || 0),
+  description: item.description ?? '',
+  preparationTime: item.preparationTime ?? 0,
+  imageUrl: item.imageUrl ?? '',
+  sizeOptions: item.sizeOptions?.length ? item.sizeOptions : ['Tiêu chuẩn'],
+  isAvailable: item.isAvailable ?? true,
+})
 
-const createSessionFromTable = (table, serverSession, paymentMethods, orderId) => {
-  const now = Date.now()
+const mapOrderItem = (item) => ({
+  ...item,
+  unitPrice: Number(item.unitPrice || 0),
+  subtotal: Number(item.subtotal || 0),
+  size: 'Tiêu chuẩn',
+  status: item.status ?? 'PENDING',
+})
 
-  return normalizeSession(
-    {
-      tableId: table.id,
-      orderResponse: {
+const normalizeBill = (bill) => {
+  if (!bill) return null
+
+  return {
+    ...bill,
+    subtotal: Number(bill.subtotal || 0),
+    tax: Number(bill.tax || 0),
+    discount: Number(bill.discount || 0),
+    serviceCharge: Number(bill.serviceCharge || 0),
+    totalAmount: Number(bill.totalAmount || 0),
+    payments: bill.payments ?? [],
+  }
+}
+
+const createSessionFromOrder = (order, bill, paymentMethods) => ({
+  tableId: order.tableId,
+  orderResponse: {
+    ...order,
+    totalAmount: Number(order.totalAmount || 0),
+    items: (order.items ?? []).map(mapOrderItem),
+  },
+  batches: [
+    normalizeBatch({
+      batchNumber: 1,
+      status: SUBMITTED_BATCH_STATUS,
+      batchNote: order.notes ?? '',
+      items: (order.items ?? []).map(mapOrderItem),
+    }),
+  ],
+  bill: normalizeBill(bill),
+  paymentMethods,
+  selectedPaymentMethod: '',
+})
+
+const mergeDraftIntoSession = (session, selectedTable, serverSession, paymentMethods, draftBatch) => {
+  const orderId = Date.now()
+  const baseSession =
+    session ??
+    createSessionFromOrder(
+      {
         id: orderId,
-        orderNumber: `ORD-${table.id}${String(now).slice(-4)}`,
-        tableId: table.id,
-        tableName: `Bàn ${table.tableNumber}`,
+        orderNumber: `Nháp-${selectedTable.tableNumber}`,
+        tableId: selectedTable.id,
+        tableName: `Bàn ${selectedTable.tableNumber}`,
         serverId: serverSession.userId,
         serverName: serverSession.fullName,
         status: 'PENDING',
@@ -84,36 +111,99 @@ const createSessionFromTable = (table, serverSession, paymentMethods, orderId) =
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
       },
-      batches: [],
-      bill: {
-        id: now + 1,
-        billNumber: `BILL-${table.id}${String(now).slice(-3)}`,
-        orderId,
-        subtotal: 0,
-        tax: 0,
-        discount: 0,
-        serviceCharge: 0,
-        totalAmount: 0,
-        status: 'PENDING',
-        createdAt: new Date().toISOString(),
-        paidAt: null,
-        payments: [],
-      },
-    },
-    paymentMethods
-  )
+      null,
+      paymentMethods
+    )
+
+  return {
+    ...baseSession,
+    batches: [...baseSession.batches.filter((batch) => batch.items.length), draftBatch],
+  }
+}
+
+const getNextStatuses = (currentStatus, targetStatus) => {
+  const currentIndex = statusRank.indexOf(currentStatus)
+  const targetIndex = statusRank.indexOf(targetStatus)
+
+  if (currentIndex === -1 || targetIndex === -1 || currentIndex >= targetIndex) return []
+  return statusRank.slice(currentIndex + 1, targetIndex + 1)
 }
 
 function ServerDashboard({ session, dashboard, onSignOut }) {
-  const paymentMethods = dashboard.serviceConsole.paymentMethods
+  const paymentMethods = dashboard?.serviceConsole?.paymentMethods ?? fallbackPaymentMethods
   const [activeSection, setActiveSection] = useState('tables')
-  const [tables, setTables] = useState(dashboard.tableManagement.tables)
-  const [selectedTableId, setSelectedTableId] = useState(dashboard.tableManagement.tables[0]?.id)
+  const [tables, setTables] = useState([])
+  const [menuCatalog, setMenuCatalog] = useState({ categories: ['Tất cả'], items: [] })
+  const [selectedTableId, setSelectedTableId] = useState(null)
   const [activeAction, setActiveAction] = useState('ordering')
   const [draftSelections, setDraftSelections] = useState(createEmptyDraft)
-  const [sessions, setSessions] = useState(() =>
-    dashboard.serviceConsole.sessions.map((item) => normalizeSession(item, paymentMethods))
-  )
+  const [sessions, setSessions] = useState([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isBusy, setIsBusy] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+
+  const loadServerData = useCallback(async () => {
+    setIsLoading(true)
+    setErrorMessage('')
+
+    try {
+      const [tableRows, menuRows, orderRows, billRows] = await Promise.all([
+        api.get('/tables'),
+        api.get('/menu-items'),
+        api.get('/orders'),
+        api.get('/bills'),
+      ])
+
+      const normalizedMenuItems = (menuRows ?? []).map(normalizeMenuItem)
+      const categories = ['Tất cả', ...new Set(normalizedMenuItems.map((item) => item.category).filter(Boolean))]
+      const activeOrders = (orderRows ?? [])
+        .filter((order) => order.tableId && order.status !== 'COMPLETED' && order.status !== 'CANCELLED')
+        .sort((left, right) => new Date(right.updatedAt ?? right.createdAt) - new Date(left.updatedAt ?? left.createdAt))
+
+      const latestOrderByTable = new Map()
+      activeOrders.forEach((order) => {
+        if (!latestOrderByTable.has(order.tableId)) latestOrderByTable.set(order.tableId, order)
+      })
+
+      const billByOrder = new Map((billRows ?? []).map((bill) => [bill.orderId, bill]))
+      const nextSessions = [...latestOrderByTable.values()].map((order) =>
+        createSessionFromOrder(order, billByOrder.get(order.id), paymentMethods)
+      )
+
+      const nextTables = (tableRows ?? []).map((table) => {
+        const order = latestOrderByTable.get(table.id)
+        const bill = order ? billByOrder.get(order.id) : null
+        const tableSession = order ? createSessionFromOrder(order, bill, paymentMethods) : null
+        const baseTable = {
+          ...table,
+          serviceState: table.status === 'OCCUPIED' ? 'WAITING_FOOD' : table.status,
+          currentGuests: table.status === 'OCCUPIED' ? table.capacity : 0,
+          activeOrderId: order?.id ?? null,
+          billingStatus: bill?.status ?? null,
+          reservationName: null,
+          elapsedMinutes: 0,
+        }
+
+        return {
+          ...baseTable,
+          serviceState: deriveServiceState(baseTable, tableSession),
+        }
+      })
+
+      setMenuCatalog({ categories, items: normalizedMenuItems })
+      setTables(nextTables)
+      setSessions(nextSessions)
+      setSelectedTableId((current) => current ?? nextTables[0]?.id ?? null)
+    } catch (error) {
+      setErrorMessage(error.message ?? 'Không thể tải dữ liệu phục vụ.')
+    } finally {
+      setIsLoading(false)
+    }
+  }, [paymentMethods])
+
+  useEffect(() => {
+    void Promise.resolve().then(loadServerData)
+  }, [loadServerData])
 
   const selectedTable = useMemo(
     () => tables.find((table) => table.id === selectedTableId) ?? tables[0],
@@ -125,12 +215,7 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
     [sessions, selectedTable?.id]
   )
 
-  const canOrder =
-    selectedTable &&
-    selectedTable.serviceState !== 'RESERVED' &&
-    selectedTable.serviceState !== 'CLEANING'
-
-  const canPay = Boolean(selectedSession)
+  const canOrder = selectedTable && selectedTable.serviceState !== 'CLEANING'
 
   const updateSelectedTable = (nextSession, overrides = {}) => {
     setTables((current) =>
@@ -156,6 +241,7 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
   const handleSelectTable = (tableId) => {
     setSelectedTableId(tableId)
     setActiveSection('tables')
+    setErrorMessage('')
   }
 
   const handleDraftChange = (menuItemId, nextPatch) => {
@@ -169,60 +255,37 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
   }
 
   const handleAddItem = (menuItemId) => {
-    const menuItem = dashboard.menuCatalog.items.find((item) => item.id === menuItemId)
+    const menuItem = menuCatalog.items.find((item) => item.id === menuItemId)
     const draft = draftSelections[menuItemId]
 
     if (!menuItem || !draft?.quantity || !selectedTable) return
 
-    const createdOrderId = Date.now()
-    let nextSession = null
+    const nextItem = {
+      id: Date.now() + menuItemId,
+      menuItemId: menuItem.id,
+      menuItemName: menuItem.name,
+      quantity: draft.quantity,
+      unitPrice: menuItem.price,
+      subtotal: menuItem.price * draft.quantity,
+      specialInstructions: draft.note ?? '',
+      size: draft.size ?? menuItem.sizeOptions[0],
+      status: 'DRAFT',
+    }
 
+    let nextSession = null
     setSessions((current) => {
       const existing = current.find((item) => item.tableId === selectedTable.id)
-      const nextItem = {
-        id: createdOrderId + menuItemId,
-        menuItemId: menuItem.id,
-        menuItemName: menuItem.name,
-        quantity: draft.quantity,
-        unitPrice: menuItem.price,
-        subtotal: menuItem.price * draft.quantity,
-        specialInstructions: draft.note ?? '',
-        size: draft.size ?? menuItem.sizeOptions[0],
-        status: 'DRAFT',
-      }
+      const lastBatch = existing?.batches?.[existing.batches.length - 1]
+      const draftBatch =
+        lastBatch?.status === DRAFT_BATCH_STATUS
+          ? normalizeBatch({ ...lastBatch, items: [...lastBatch.items, nextItem] })
+          : createDraftBatch((existing?.batches?.length ?? 0) + 1, [nextItem])
 
-      if (!existing) {
-        nextSession = recalculateSession({
-          ...createSessionFromTable(selectedTable, session, paymentMethods, createdOrderId),
-          batches: [createDraftBatch(1, [nextItem])],
-        })
+      nextSession = mergeDraftIntoSession(existing, selectedTable, session, paymentMethods, draftBatch)
 
-        return [...current, nextSession]
-      }
-
-      return current.map((item) => {
-        if (item.tableId !== selectedTable.id) return item
-
-        const lastBatch = item.batches[item.batches.length - 1]
-        const shouldAppendToDraft = lastBatch?.status === DRAFT_BATCH_STATUS
-        const nextBatches = shouldAppendToDraft
-          ? item.batches.map((batch, index) =>
-              index === item.batches.length - 1
-                ? normalizeBatch({
-                    ...batch,
-                    items: [...batch.items, nextItem],
-                  })
-                : batch
-            )
-          : [...item.batches, createDraftBatch(item.batches.length + 1, [nextItem])]
-
-        nextSession = recalculateSession({
-          ...item,
-          batches: nextBatches,
-        })
-
-        return nextSession
-      })
+      return existing
+        ? current.map((item) => (item.tableId === selectedTable.id ? nextSession : item))
+        : [...current, nextSession]
     })
 
     updateSelectedTable(nextSession, {
@@ -230,7 +293,6 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
       status: 'OCCUPIED',
       billingStatus: nextSession?.bill?.status ?? 'PENDING',
       currentGuests: selectedTable.currentGuests || selectedTable.capacity,
-      elapsedMinutes: selectedTable.elapsedMinutes || 0,
       reservationName: null,
     })
 
@@ -275,10 +337,10 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
           return []
         }
 
-        nextSession = recalculateSession({
+        nextSession = {
           ...item,
           batches: nextBatches,
-        })
+        }
 
         return [nextSession]
       })
@@ -291,13 +353,12 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
         activeOrderId: null,
         billingStatus: null,
         currentGuests: 0,
-        elapsedMinutes: 0,
       })
       return
     }
 
     updateSelectedTable(nextSession, {
-      billingStatus: nextSession.bill.status,
+      billingStatus: nextSession.bill?.status ?? 'PENDING',
     })
   }
 
@@ -311,7 +372,7 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
 
         if (!lastBatch || lastBatch.status !== DRAFT_BATCH_STATUS) return item
 
-        return recalculateSession({
+        return {
           ...item,
           batches: item.batches.map((batch, index) =>
             index === lastBatchIndex
@@ -321,90 +382,84 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
                 })
               : batch
           ),
-        })
+        }
       })
     )
   }
 
-  const handleSubmitOrder = () => {
-    let nextSession = null
-    let submittedOrderId = null
+  const transitionOrderTo = async (order, targetStatus) => {
+    let currentOrder = order
+    const nextStatuses = getNextStatuses(order.status, targetStatus)
 
-    setSessions((current) =>
-      current.map((item) => {
-        if (item.tableId !== selectedTable.id) return item
+    for (const status of nextStatuses) {
+      currentOrder = await api.patch(`/orders/${currentOrder.id}/status?status=${status}`)
+    }
 
-        const lastBatchIndex = item.batches.length - 1
-        const lastBatch = item.batches[lastBatchIndex]
-
-        if (!lastBatch || !lastBatch.items.length || lastBatch.status !== DRAFT_BATCH_STATUS) return item
-
-        submittedOrderId = item.orderResponse.id
-        nextSession = recalculateSession({
-          ...item,
-          batches: item.batches.map((batch, index) =>
-            index === lastBatchIndex
-              ? normalizeBatch({
-                  ...batch,
-                  status: SUBMITTED_BATCH_STATUS,
-                  items: batch.items.map((draftItem) => ({
-                    ...draftItem,
-                    status: 'PENDING',
-                  })),
-                })
-              : batch
-          ),
-          orderResponse: {
-            ...item.orderResponse,
-            status: 'CONFIRMED',
-          },
-        })
-
-        return nextSession
-      })
-    )
-
-    updateSelectedTable(nextSession ?? selectedSession, {
-      serviceState: 'WAITING_FOOD',
-      status: 'OCCUPIED',
-      activeOrderId: submittedOrderId ?? selectedTable.activeOrderId,
-      billingStatus: 'PENDING',
-    })
+    return currentOrder
   }
 
-  const handleMarkTableServed = () => {
-    let servedSession = selectedSession
+  const handleSubmitOrder = async () => {
+    const draftBatch =
+      selectedSession?.batches?.length &&
+      selectedSession.batches[selectedSession.batches.length - 1]?.status === DRAFT_BATCH_STATUS
+        ? selectedSession.batches[selectedSession.batches.length - 1]
+        : null
 
-    setSessions((current) =>
-      current.map((item) => {
-        if (item.tableId !== selectedTable.id) return item
+    if (!draftBatch?.items?.length || !selectedTable) return
 
-        servedSession = recalculateSession({
-          ...item,
-          batches: item.batches.map((batch) =>
-            normalizeBatch({
-              ...batch,
-              items: batch.items.map((row) => ({
-                ...row,
-                status: row.status === 'DRAFT' ? row.status : 'SERVED',
-              })),
-            })
-          ),
-          orderResponse: {
-            ...item.orderResponse,
-            status: 'SERVED',
-          },
-        })
+    setIsBusy(true)
+    setErrorMessage('')
 
-        return servedSession
+    try {
+      const order = await api.post('/orders', {
+        tableId: selectedTable.id,
+        serverId: session.userId,
+        orderType: 'DINE_IN',
+        notes: draftBatch.batchNote,
+        items: draftBatch.items.map((item) => ({
+          menuItemId: item.menuItemId,
+          quantity: item.quantity,
+          unitPrice: item.unitPrice,
+          specialInstructions: item.specialInstructions,
+        })),
       })
-    )
 
-    updateSelectedTable(servedSession, {
-      serviceState: 'SERVED',
-      status: 'OCCUPIED',
-      billingStatus: servedSession?.bill?.status ?? 'PENDING',
-    })
+      await transitionOrderTo(order, 'PREPARING')
+      await loadServerData()
+    } catch (error) {
+      setErrorMessage(error.message ?? 'Không thể gửi order.')
+    } finally {
+      setIsBusy(false)
+    }
+  }
+
+  const getOrCreateBill = async (order) => {
+    try {
+      return await api.get(`/bills/order/${order.id}`)
+    } catch {
+      return api.post(`/bills/order/${order.id}`, {
+        orderId: order.id,
+        discount: 0,
+      })
+    }
+  }
+
+  const handleMarkTableServed = async () => {
+    if (!selectedSession?.orderResponse) return
+
+    setIsBusy(true)
+    setErrorMessage('')
+
+    try {
+      const servedOrder = await transitionOrderTo(selectedSession.orderResponse, 'SERVED')
+      await getOrCreateBill(servedOrder)
+      await loadServerData()
+      setActiveAction('payment')
+    } catch (error) {
+      setErrorMessage(error.message ?? 'Không thể cập nhật trạng thái đã phục vụ.')
+    } finally {
+      setIsBusy(false)
+    }
   }
 
   const handleSelectPaymentMethod = (methodCode) => {
@@ -420,56 +475,54 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
     )
   }
 
-  const handleConfirmPayment = () => {
+  const handleConfirmPayment = async () => {
     const sessionItem = sessions.find((item) => item.tableId === selectedTable.id)
 
-    if (!sessionItem?.selectedPaymentMethod) return
+    if (!sessionItem?.selectedPaymentMethod || !sessionItem?.bill?.id) return
 
-    let paidSession = null
+    setIsBusy(true)
+    setErrorMessage('')
 
-    setSessions((current) =>
-      current.map((item) => {
-        if (item.tableId !== selectedTable.id) return item
+    try {
+      const order = sessionItem.orderResponse
+      const bill = sessionItem.bill
+      const servedOrder = order.status === 'SERVED' ? order : await transitionOrderTo(order, 'SERVED')
 
-        paidSession = {
-          ...item,
-          bill: {
-            ...item.bill,
-            status: 'PAID',
-            paidAt: new Date().toISOString(),
-            payments: [
-              ...item.bill.payments,
-              {
-                id: Date.now(),
-                billId: item.bill.id,
-                amount: item.bill.totalAmount,
-                paymentMethod: item.selectedPaymentMethod,
-                status: 'COMPLETED',
-                transactionId: `TXN-${item.bill.id}`,
-                paidAt: new Date().toISOString(),
-                createdAt: new Date().toISOString(),
-                processedAt: new Date().toISOString(),
-                processedBy: session.userId,
-                notes: `Thanh toán bằng ${mapPaymentMethodLabel(item.selectedPaymentMethod)}`,
-              },
-            ],
-          },
-        }
-
-        return paidSession
+      await api.post(`/bills/${bill.id}/payments`, {
+        billId: bill.id,
+        amount: bill.totalAmount,
+        paymentMethod: sessionItem.selectedPaymentMethod,
+        transactionId: `TXN-${bill.id}-${Date.now()}`,
+        notes: `Thanh toán bằng ${mapPaymentMethodLabel(sessionItem.selectedPaymentMethod)}`,
       })
-    )
 
-    updateSelectedTable(paidSession, {
-      serviceState: 'CLEANING',
-      status: 'CLEANING',
-      billingStatus: 'PAID',
-      currentGuests: 0,
-    })
-    setActiveAction('payment')
+      await api.patch(`/tables/${servedOrder.tableId}/status?status=CLEANING`)
+      await loadServerData()
+      setActiveAction('payment')
+    } catch (error) {
+      setErrorMessage(error.message ?? 'Không thể xác nhận thanh toán.')
+    } finally {
+      setIsBusy(false)
+    }
   }
 
   const showOrderPanel = activeSection === 'tables'
+
+  if (isLoading && !tables.length) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#f8fafc] text-sm font-semibold text-[#516072]">
+        Đang tải dữ liệu phục vụ...
+      </main>
+    )
+  }
+
+  if (!selectedTable) {
+    return (
+      <main className="grid min-h-screen place-items-center bg-[#f8fafc] text-sm font-semibold text-[#516072]">
+        Chưa có bàn phục vụ trong hệ thống.
+      </main>
+    )
+  }
 
   return (
     <main className="min-h-screen bg-[#f8fafc]">
@@ -481,21 +534,27 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
         }`}
       >
         <div className={showOrderPanel ? 'md:col-span-3' : 'md:col-span-2'}>
-          <ServerHeader placeholder={dashboard.searchPlaceholder} />
+          <ServerHeader />
         </div>
 
         <ServerSidebar
-          items={dashboard.navigation.sideItems}
+          items={dashboard?.navigation?.sideItems ?? fallbackSideItems}
           activeSection={activeSection}
           onChangeSection={setActiveSection}
           onSignOut={onSignOut}
         />
 
         <section className="min-w-0 space-y-5 bg-[#f8fafc] p-5 lg:p-6">
+          {errorMessage ? (
+            <div className="rounded-2xl border border-[#f0d2cb] bg-[#fff6f4] px-4 py-3 text-sm font-semibold text-[#c36d4b]">
+              {errorMessage}
+            </div>
+          ) : null}
+
           {activeSection === 'tables' ? (
             <TableManagementView
-              tableManagement={{ ...dashboard.tableManagement, tables }}
-              menuCatalog={dashboard.menuCatalog}
+              tableManagement={{ ...(dashboard?.tableManagement ?? {}), tables }}
+              menuCatalog={menuCatalog}
               selectedTable={selectedTable}
               activeAction={activeAction}
               onSetActiveAction={setActiveAction}
@@ -507,9 +566,10 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
               onConfirmPayment={handleConfirmPayment}
               selectedSession={selectedSession}
               draftSelections={draftSelections}
+              isBusy={isBusy}
             />
           ) : (
-            <MenuCatalogView menuCatalog={dashboard.menuCatalog} />
+            <MenuCatalogView menuCatalog={menuCatalog} />
           )}
         </section>
 
@@ -522,7 +582,7 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
             onDraftBatchNoteChange={handleDraftBatchNoteChange}
             onSubmitOrder={handleSubmitOrder}
             canOrder={canOrder}
-            canPay={canPay}
+            isBusy={isBusy}
           />
         ) : null}
       </div>

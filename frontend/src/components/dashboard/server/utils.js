@@ -25,16 +25,83 @@ export const mapServiceStateLabel = (serviceState) => {
   }
 }
 
+export const mapCategoryLabel = (category) => {
+  switch (category) {
+    case 'Appetizer':
+      return 'Khai vị'
+    case 'Main Course':
+      return 'Món chính'
+    case 'Dessert':
+      return 'Tráng miệng'
+    case 'Beverage':
+      return 'Đồ uống'
+    default:
+      return category
+  }
+}
+
+export const mapLocationLabel = (location) => {
+  switch (location) {
+    case 'Main Hall':
+      return 'Sảnh chính'
+    case 'Private Room':
+      return 'Phòng riêng'
+    case 'Terrace':
+      return 'Khu sân vườn'
+    default:
+      return location
+  }
+}
+
 export const mapPaymentMethodLabel = (code) => {
   switch (code) {
     case 'CASH':
       return 'Tiền mặt'
     case 'CREDIT_CARD':
       return 'Thẻ ngân hàng'
+    case 'DEBIT_CARD':
+      return 'Thẻ ghi nợ'
     case 'DIGITAL_WALLET':
       return 'Ví điện tử'
+    case 'BANK_TRANSFER':
+      return 'Chuyển khoản'
     default:
       return code
+  }
+}
+
+export const mapBillStatusLabel = (status) => {
+  switch (status) {
+    case 'PAID':
+      return 'Đã thanh toán'
+    case 'PARTIALLY_PAID':
+      return 'Thanh toán một phần'
+    case 'CANCELLED':
+      return 'Đã hủy'
+    case 'REFUNDED':
+      return 'Đã hoàn tiền'
+    case 'PENDING':
+    default:
+      return 'Chờ thanh toán'
+  }
+}
+
+export const mapOrderItemStatusLabel = (status) => {
+  switch (status) {
+    case 'PENDING':
+      return 'Chờ bếp'
+    case 'PREPARING':
+      return 'Đang chế biến'
+    case 'READY':
+      return 'Sẵn sàng phục vụ'
+    case 'SERVED':
+      return 'Đã phục vụ'
+    case 'CANCELLED':
+      return 'Đã hủy'
+    case 'DRAFT':
+      return 'Món nháp'
+    default:
+      return status
   }
 }
 

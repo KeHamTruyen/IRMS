@@ -7,22 +7,22 @@
   "demoAccess": [
     {
       "role": "ADMIN",
-      "label": "Quản trị",
+      "label": "Quáº£n trá»‹",
       "value": "admin / password123"
     },
     {
       "role": "MANAGER",
-      "label": "PIN quản lý",
+      "label": "PIN quáº£n lÃ½",
       "value": "2468"
     },
     {
       "role": "SERVER",
-      "label": "PIN nhân viên phục vụ",
+      "label": "PIN nhÃ¢n viÃªn phá»¥c vá»¥",
       "value": "1234"
     },
     {
       "role": "CHEF",
-      "label": "PIN bếp",
+      "label": "PIN báº¿p",
       "value": "2580"
     }
   ],
@@ -31,7 +31,7 @@
       "id": 1,
       "username": "admin",
       "password": "password123",
-      "fullName": "Quản trị hệ thống",
+      "fullName": "Quáº£n trá»‹ há»‡ thá»‘ng",
       "email": "admin@irms.com",
       "phone": "555-0001",
       "role": "ADMIN",
@@ -43,7 +43,7 @@
       "username": "manager1",
       "password": "password123",
       "pin": "2468",
-      "fullName": "Nguyễn Minh Quản Lý",
+      "fullName": "Nguyá»…n Minh Quáº£n LÃ½",
       "email": "manager@irms.com",
       "phone": "555-0002",
       "role": "MANAGER",
@@ -55,7 +55,7 @@
       "username": "server1",
       "password": "password123",
       "pin": "1234",
-      "fullName": "Nguyễn An Phục Vụ",
+      "fullName": "Nguyá»…n An Phá»¥c Vá»¥",
       "email": "server@irms.com",
       "phone": "555-0003",
       "role": "SERVER",
@@ -67,7 +67,7 @@
       "username": "chef1",
       "password": "password123",
       "pin": "2580",
-      "fullName": "Trần Gia Bếp",
+      "fullName": "Tráº§n Gia Báº¿p",
       "email": "chef@irms.com",
       "phone": "555-0004",
       "role": "CHEF",
@@ -79,7 +79,7 @@
       "username": "cashier1",
       "password": "password123",
       "pin": "4567",
-      "fullName": "Lê Thanh Thu Ngân",
+      "fullName": "LÃª Thanh Thu NgÃ¢n",
       "email": "cashier@irms.com",
       "phone": "555-0005",
       "role": "CASHIER",
@@ -91,7 +91,7 @@
       "username": "host1",
       "password": "password123",
       "pin": "1357",
-      "fullName": "Phạm Hà Lễ Tân",
+      "fullName": "Pháº¡m HÃ  Lá»… TÃ¢n",
       "email": "host@irms.com",
       "phone": "555-0006",
       "role": "HOST",
@@ -102,9 +102,9 @@
   "dashboards": {
     "SERVER": {
       "roleLabel": "Nhân viên phục vụ",
-      "sourceLabel": "Dữ liệu dự phòng bàn, order và hóa đơn",
-      "snapshotTime": "Ảnh chụp lúc 21:30",
-      "footerNote": "Bám theo Table, MenuItem, OrderResponse, BillResponse và PaymentResponse",
+      "sourceLabel": "Dữ liệu được tải trực tiếp từ backend",
+      "snapshotTime": "Đồng bộ theo thời gian thực",
+      "footerNote": "Page phục vụ dùng API /tables, /menu-items, /orders và /bills.",
       "searchPlaceholder": "Tìm bàn hoặc món ăn...",
       "navigation": {
         "sideItems": [
@@ -118,511 +118,7 @@
           }
         ]
       },
-      "tableManagement": {
-        "serviceArea": "Sảnh chính",
-        "activeTables": 12,
-        "tables": [
-          {
-            "id": 1,
-            "tableNumber": "01",
-            "capacity": 4,
-            "status": "OCCUPIED",
-            "serviceState": "SERVED",
-            "location": "Sảnh chính",
-            "currentGuests": 4,
-            "elapsedMinutes": 42,
-            "activeOrderId": 8821,
-            "reservationName": null,
-            "billingStatus": "PENDING"
-          },
-          {
-            "id": 2,
-            "tableNumber": "02",
-            "capacity": 2,
-            "status": "AVAILABLE",
-            "serviceState": "AVAILABLE",
-            "location": "Sảnh chính",
-            "currentGuests": 0,
-            "elapsedMinutes": 0,
-            "activeOrderId": null,
-            "reservationName": null,
-            "billingStatus": null
-          },
-          {
-            "id": 3,
-            "tableNumber": "03",
-            "capacity": 4,
-            "status": "RESERVED",
-            "serviceState": "RESERVED",
-            "location": "Sảnh chính",
-            "currentGuests": 0,
-            "elapsedMinutes": 0,
-            "activeOrderId": null,
-            "reservationName": "Trần Ngọc Hà",
-            "billingStatus": null
-          },
-          {
-            "id": 4,
-            "tableNumber": "04",
-            "capacity": 6,
-            "status": "OCCUPIED",
-            "serviceState": "WAITING_FOOD",
-            "location": "Sảnh chính",
-            "currentGuests": 6,
-            "elapsedMinutes": 18,
-            "activeOrderId": 8824,
-            "reservationName": null,
-            "billingStatus": "PENDING"
-          },
-          {
-            "id": 5,
-            "tableNumber": "05",
-            "capacity": 4,
-            "status": "CLEANING",
-            "serviceState": "CLEANING",
-            "location": "Sân hiên",
-            "currentGuests": 0,
-            "elapsedMinutes": 9,
-            "activeOrderId": null,
-            "reservationName": null,
-            "billingStatus": "PAID"
-          },
-          {
-            "id": 6,
-            "tableNumber": "06",
-            "capacity": 2,
-            "status": "AVAILABLE",
-            "serviceState": "AVAILABLE",
-            "location": "Sân hiên",
-            "currentGuests": 0,
-            "elapsedMinutes": 0,
-            "activeOrderId": null,
-            "reservationName": null,
-            "billingStatus": null
-          },
-          {
-            "id": 7,
-            "tableNumber": "07",
-            "capacity": 4,
-            "status": "RESERVED",
-            "serviceState": "RESERVED",
-            "location": "Phòng riêng",
-            "currentGuests": 0,
-            "elapsedMinutes": 0,
-            "activeOrderId": null,
-            "reservationName": "Nhóm Minh Khang",
-            "billingStatus": null
-          },
-          {
-            "id": 8,
-            "tableNumber": "08",
-            "capacity": 2,
-            "status": "OCCUPIED",
-            "serviceState": "WAITING_FOOD",
-            "location": "Sảnh chính",
-            "currentGuests": 2,
-            "elapsedMinutes": 15,
-            "activeOrderId": 8828,
-            "reservationName": null,
-            "billingStatus": "PENDING"
-          },
-          {
-            "id": 9,
-            "tableNumber": "09",
-            "capacity": 4,
-            "status": "AVAILABLE",
-            "serviceState": "AVAILABLE",
-            "location": "Sân hiên",
-            "currentGuests": 0,
-            "elapsedMinutes": 0,
-            "activeOrderId": null,
-            "reservationName": null,
-            "billingStatus": null
-          },
-          {
-            "id": 10,
-            "tableNumber": "10",
-            "capacity": 6,
-            "status": "OCCUPIED",
-            "serviceState": "SERVED",
-            "location": "Sảnh chính",
-            "currentGuests": 5,
-            "elapsedMinutes": 31,
-            "activeOrderId": 8830,
-            "reservationName": null,
-            "billingStatus": "PARTIALLY_PAID"
-          }
-        ],
-        "statusOptions": [
-          {
-            "id": "AVAILABLE",
-            "label": "Trống"
-          },
-          {
-            "id": "RESERVED",
-            "label": "Đã đặt trước"
-          },
-          {
-            "id": "WAITING_FOOD",
-            "label": "Đang chờ món"
-          },
-          {
-            "id": "SERVED",
-            "label": "Đã lên món"
-          },
-          {
-            "id": "CLEANING",
-            "label": "Chờ dọn"
-          }
-        ]
-      },
-      "menuCatalog": {
-        "categories": [
-          "Tất cả",
-          "Món chính",
-          "Khai vị",
-          "Tráng miệng",
-          "Nước uống"
-        ],
-        "items": [
-          {
-            "id": 101,
-            "name": "Burger bò Wagyu",
-            "category": "Món chính",
-            "price": 240000,
-            "description": "Bánh brioche, bò Wagyu, phô mai và khoai chiên.",
-            "isAvailable": true,
-            "preparationTime": 16,
-            "imageUrl": "https://images.unsplash.com/photo-1568901346375-23c9450c58cd?auto=format&fit=crop&w=900&q=80",
-            "sizeOptions": [
-              "Mặc định",
-              "Phần lớn"
-            ]
-          },
-          {
-            "id": 102,
-            "name": "Pizza nấm Truffle",
-            "category": "Món chính",
-            "price": 220000,
-            "description": "Mozzarella, nấm đùi gà và dầu nấm truffle.",
-            "isAvailable": true,
-            "preparationTime": 15,
-            "imageUrl": "https://images.unsplash.com/photo-1513104890138-7c749659a591?auto=format&fit=crop&w=900&q=80",
-            "sizeOptions": [
-              "S",
-              "M",
-              "L"
-            ]
-          },
-          {
-            "id": 103,
-            "name": "Salad vườn xanh",
-            "category": "Khai vị",
-            "price": 165000,
-            "description": "Xà lách, bơ, hạt rang và sốt chanh dây.",
-            "isAvailable": true,
-            "preparationTime": 8,
-            "imageUrl": "https://images.unsplash.com/photo-1546793665-c74683f339c1?auto=format&fit=crop&w=900&q=80",
-            "sizeOptions": [
-              "Mặc định"
-            ]
-          },
-          {
-            "id": 104,
-            "name": "Bạch tuộc nướng",
-            "category": "Món chính",
-            "price": 280000,
-            "description": "Xốt paprika khói, dầu cam chanh và khoai nghiền.",
-            "isAvailable": true,
-            "preparationTime": 18,
-            "imageUrl": "https://images.unsplash.com/photo-1559847844-5315695dadae?auto=format&fit=crop&w=900&q=80",
-            "sizeOptions": [
-              "Mặc định"
-            ]
-          },
-          {
-            "id": 105,
-            "name": "Tiramisu truyền thống",
-            "category": "Tráng miệng",
-            "price": 89000,
-            "description": "Phô mai mascarpone, cacao và espresso.",
-            "isAvailable": true,
-            "preparationTime": 4,
-            "imageUrl": "https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=900&q=80",
-            "sizeOptions": [
-              "Mặc định"
-            ]
-          },
-          {
-            "id": 106,
-            "name": "Latte yến mạch đá",
-            "category": "Nước uống",
-            "price": 65000,
-            "description": "Sữa yến mạch, espresso và đá lạnh.",
-            "isAvailable": false,
-            "preparationTime": 3,
-            "imageUrl": "https://images.unsplash.com/photo-1517701604599-bb29b565090c?auto=format&fit=crop&w=900&q=80",
-            "sizeOptions": [
-              "M",
-              "L"
-            ]
-          },
-          {
-            "id": 107,
-            "name": "Trà đào cam sả",
-            "category": "Nước uống",
-            "price": 72000,
-            "description": "Đào ngâm, cam lát và sả tươi.",
-            "isAvailable": true,
-            "preparationTime": 4,
-            "imageUrl": "https://images.unsplash.com/photo-1499636136210-6f4ee915583e?auto=format&fit=crop&w=900&q=80",
-            "sizeOptions": [
-              "M",
-              "L"
-            ]
-          }
-        ]
-      },
       "serviceConsole": {
-        "sessions": [
-          {
-            "tableId": 1,
-            "orderResponse": {
-              "id": 8821,
-              "orderNumber": "ORD-8821",
-              "tableId": 1,
-              "tableName": "Bàn 01",
-              "serverId": 3,
-              "serverName": "Nguyễn An Phục Vụ",
-              "status": "READY",
-              "orderType": "DINE_IN",
-              "items": [
-                {
-                  "id": 301,
-                  "menuItemId": 101,
-                  "menuItemName": "Burger bò Wagyu",
-                  "quantity": 1,
-                  "unitPrice": 240000,
-                  "subtotal": 240000,
-                  "specialInstructions": "Tái vừa, khoai chiên riêng",
-                  "status": "READY"
-                },
-                {
-                  "id": 302,
-                  "menuItemId": 106,
-                  "menuItemName": "Latte yến mạch đá",
-                  "quantity": 1,
-                  "unitPrice": 65000,
-                  "subtotal": 65000,
-                  "specialInstructions": "Ít đá, không đường",
-                  "status": "READY"
-                }
-              ],
-              "totalAmount": 305000,
-              "notes": "Khách dị ứng hành sống.",
-              "createdAt": "2026-04-25T20:08:00+07:00",
-              "updatedAt": "2026-04-25T20:26:00+07:00"
-            },
-            "batches": [
-              {
-                "batchNumber": 1,
-                "status": "Đã gửi bếp",
-                "items": [
-                  {
-                    "id": 301,
-                    "menuItemId": 101,
-                    "menuItemName": "Burger bò Wagyu",
-                    "quantity": 1,
-                    "unitPrice": 240000,
-                    "subtotal": 240000,
-                    "specialInstructions": "Tái vừa, khoai chiên riêng",
-                    "size": "Mặc định"
-                  },
-                  {
-                    "id": 302,
-                    "menuItemId": 106,
-                    "menuItemName": "Latte yến mạch đá",
-                    "quantity": 1,
-                    "unitPrice": 65000,
-                    "subtotal": 65000,
-                    "specialInstructions": "Ít đá, không đường",
-                    "size": "M"
-                  }
-                ]
-              }
-            ],
-            "bill": {
-              "id": 501,
-              "billNumber": "BILL-204",
-              "orderId": 8821,
-              "subtotal": 305000,
-              "tax": 30500,
-              "discount": 0,
-              "serviceCharge": 24400,
-              "totalAmount": 359900,
-              "status": "PENDING",
-              "createdAt": "2026-04-25T20:22:00+07:00",
-              "paidAt": null,
-              "payments": []
-            }
-          },
-          {
-            "tableId": 4,
-            "orderResponse": {
-              "id": 8824,
-              "orderNumber": "ORD-8824",
-              "tableId": 4,
-              "tableName": "Bàn 04",
-              "serverId": 3,
-              "serverName": "Nguyễn An Phục Vụ",
-              "status": "PREPARING",
-              "orderType": "DINE_IN",
-              "items": [
-                {
-                  "id": 401,
-                  "menuItemId": 102,
-                  "menuItemName": "Pizza nấm Truffle",
-                  "quantity": 1,
-                  "unitPrice": 220000,
-                  "subtotal": 220000,
-                  "specialInstructions": "Cắt 8 miếng",
-                  "status": "PREPARING"
-                },
-                {
-                  "id": 402,
-                  "menuItemId": 107,
-                  "menuItemName": "Trà đào cam sả",
-                  "quantity": 2,
-                  "unitPrice": 72000,
-                  "subtotal": 144000,
-                  "specialInstructions": "Ít ngọt",
-                  "status": "SERVED"
-                }
-              ],
-              "totalAmount": 364000,
-              "notes": "Khách cần lên đồ uống trước.",
-              "createdAt": "2026-04-25T20:18:00+07:00",
-              "updatedAt": "2026-04-25T20:34:00+07:00"
-            },
-            "batches": [
-              {
-                "batchNumber": 1,
-                "status": "Đã gửi bếp",
-                "items": [
-                  {
-                    "id": 401,
-                    "menuItemId": 102,
-                    "menuItemName": "Pizza nấm Truffle",
-                    "quantity": 1,
-                    "unitPrice": 220000,
-                    "subtotal": 220000,
-                    "specialInstructions": "Cắt 8 miếng",
-                    "size": "L"
-                  },
-                  {
-                    "id": 402,
-                    "menuItemId": 107,
-                    "menuItemName": "Trà đào cam sả",
-                    "quantity": 2,
-                    "unitPrice": 72000,
-                    "subtotal": 144000,
-                    "specialInstructions": "Ít ngọt",
-                    "size": "L"
-                  }
-                ]
-              }
-            ],
-            "bill": {
-              "id": 504,
-              "billNumber": "BILL-208",
-              "orderId": 8824,
-              "subtotal": 364000,
-              "tax": 36400,
-              "discount": 0,
-              "serviceCharge": 29120,
-              "totalAmount": 429520,
-              "status": "PENDING",
-              "createdAt": "2026-04-25T20:30:00+07:00",
-              "paidAt": null,
-              "payments": []
-            }
-          },
-          {
-            "tableId": 10,
-            "orderResponse": {
-              "id": 8830,
-              "orderNumber": "ORD-8830",
-              "tableId": 10,
-              "tableName": "Bàn 10",
-              "serverId": 3,
-              "serverName": "Nguyễn An Phục Vụ",
-              "status": "SERVED",
-              "orderType": "DINE_IN",
-              "items": [
-                {
-                  "id": 501,
-                  "menuItemId": 104,
-                  "menuItemName": "Bạch tuộc nướng",
-                  "quantity": 1,
-                  "unitPrice": 280000,
-                  "subtotal": 280000,
-                  "specialInstructions": "",
-                  "status": "SERVED"
-                }
-              ],
-              "totalAmount": 280000,
-              "notes": "",
-              "createdAt": "2026-04-25T19:55:00+07:00",
-              "updatedAt": "2026-04-25T20:20:00+07:00"
-            },
-            "batches": [
-              {
-                "batchNumber": 1,
-                "status": "Đã gửi bếp",
-                "items": [
-                  {
-                    "id": 501,
-                    "menuItemId": 104,
-                    "menuItemName": "Bạch tuộc nướng",
-                    "quantity": 1,
-                    "unitPrice": 280000,
-                    "subtotal": 280000,
-                    "specialInstructions": "",
-                    "size": "Mặc định"
-                  }
-                ]
-              }
-            ],
-            "bill": {
-              "id": 510,
-              "billNumber": "BILL-210",
-              "orderId": 8830,
-              "subtotal": 280000,
-              "tax": 28000,
-              "discount": 10000,
-              "serviceCharge": 22400,
-              "totalAmount": 320400,
-              "status": "PARTIALLY_PAID",
-              "createdAt": "2026-04-25T20:15:00+07:00",
-              "paidAt": null,
-              "payments": [
-                {
-                  "id": 901,
-                  "billId": 510,
-                  "amount": 150000,
-                  "paymentMethod": "CREDIT_CARD",
-                  "status": "COMPLETED",
-                  "transactionId": "TXN-8830-1",
-                  "paidAt": "2026-04-25T20:21:00+07:00",
-                  "createdAt": "2026-04-25T20:21:00+07:00",
-                  "processedAt": "2026-04-25T20:21:00+07:00",
-                  "processedBy": 5,
-                  "notes": "Khách thanh toán trước một phần"
-                }
-              ]
-            }
-          }
-        ],
         "paymentMethods": [
           {
             "code": "CASH",
@@ -638,93 +134,37 @@
             "code": "DIGITAL_WALLET",
             "label": "Ví điện tử",
             "hint": "Mô phỏng quét QR và xác nhận giao dịch"
+          },
+          {
+            "code": "BANK_TRANSFER",
+            "label": "Chuyển khoản",
+            "hint": "Đối chiếu giao dịch ngân hàng"
           }
         ]
       }
-    },
-    "ADMIN": {
-      "roleLabel": "Quản trị hệ thống",
-      "sourceLabel": "Dữ liệu dự phòng quản trị",
-      "snapshotTime": "Ảnh chụp lúc 21:30",
-      "footerNote": "Dashboard tạm thời giữ ở mức tối giản cho role quản trị",
-      "summaryMetrics": [
-        {
-          "label": "Người dùng hoạt động",
-          "value": "24",
-          "note": "Đang đăng nhập trong ca tối"
-        }
-      ],
-      "activity": [
-        {
-          "id": "admin-1",
-          "title": "Đã đồng bộ danh mục món",
-          "description": "Danh mục thực đơn đã được làm mới từ dữ liệu seed.",
-          "time": "5 phút trước"
-        }
-      ],
-      "highlights": [
-        {
-          "kicker": "Tạm thời",
-          "title": "Role quản trị đang dùng dashboard rút gọn",
-          "description": "Ưu tiên triển khai sâu cho dashboard nhân viên phục vụ theo requirement."
-        }
-      ],
-      "collections": [],
-      "quickActions": []
-    },
-    "MANAGER": {
-      "roleLabel": "Quản lý",
-      "sourceLabel": "Dữ liệu dự phòng quản lý",
-      "snapshotTime": "Ảnh chụp lúc 21:30",
-      "footerNote": "Dashboard tạm thời giữ ở mức tối giản cho role quản lý",
-      "summaryMetrics": [
-        {
-          "label": "Doanh thu hôm nay",
-          "value": "12.400.000đ",
-          "note": "Tổng hợp theo ca"
-        }
-      ],
-      "activity": [
-        {
-          "id": "manager-1",
-          "title": "Sảnh chính đang đông khách",
-          "description": "Cần theo dõi thời gian phục vụ ở 4 bàn chính.",
-          "time": "Hiện tại"
-        }
-      ],
-      "highlights": [
-        {
-          "kicker": "Tạm thời",
-          "title": "Role quản lý đang dùng dashboard rút gọn",
-          "description": "Có thể mở rộng thêm analytics sau khi backend hoàn thiện."
-        }
-      ],
-      "collections": [],
-      "quickActions": []
-    },
-    "CHEF": {
-      "roleLabel": "Bếp",
-      "sourceLabel": "Dữ liệu dự phòng bếp, kho và trạng thái món",
-      "snapshotTime": "Ảnh chụp lúc 21:30",
-      "footerNote": "Dữ liệu bám theo order theo bàn, nguyên liệu tồn kho và trạng thái món trên menu",
+    },    "CHEF": {
+      "roleLabel": "Báº¿p",
+      "sourceLabel": "Dá»¯ liá»‡u dá»± phÃ²ng báº¿p, kho vÃ  tráº¡ng thÃ¡i mÃ³n",
+      "snapshotTime": "áº¢nh chá»¥p lÃºc 21:30",
+      "footerNote": "Dá»¯ liá»‡u bÃ¡m theo order theo bÃ n, nguyÃªn liá»‡u tá»“n kho vÃ  tráº¡ng thÃ¡i mÃ³n trÃªn menu",
       "navigation": {
         "sideItems": [
           {
             "id": "orders",
-            "label": "Quản lý món"
+            "label": "Quáº£n lÃ½ mÃ³n"
           },
           {
             "id": "inventory",
-            "label": "Quản lý kho"
+            "label": "Quáº£n lÃ½ kho"
           },
           {
             "id": "menu",
-            "label": "Quản lý món ăn"
+            "label": "Quáº£n lÃ½ mÃ³n Äƒn"
           }
         ]
       },
       "kitchenDisplay": {
-        "stationName": "Bếp chính",
+        "stationName": "Báº¿p chÃ­nh",
         "tables": [
           {
             "id": 4,
@@ -732,7 +172,7 @@
             "capacity": 6,
             "status": "OCCUPIED",
             "serviceState": "WAITING_FOOD",
-            "location": "Sảnh chính",
+            "location": "Sáº£nh chÃ­nh",
             "currentGuests": 6,
             "elapsedMinutes": 18,
             "activeOrderId": 8824,
@@ -745,7 +185,7 @@
             "capacity": 2,
             "status": "OCCUPIED",
             "serviceState": "WAITING_FOOD",
-            "location": "Sảnh chính",
+            "location": "Sáº£nh chÃ­nh",
             "currentGuests": 2,
             "elapsedMinutes": 15,
             "activeOrderId": 8828,
@@ -758,7 +198,7 @@
             "capacity": 4,
             "status": "OCCUPIED",
             "serviceState": "WAITING_FOOD",
-            "location": "Phòng riêng",
+            "location": "PhÃ²ng riÃªng",
             "currentGuests": 4,
             "elapsedMinutes": 11,
             "activeOrderId": 8831,
@@ -771,7 +211,7 @@
             "capacity": 2,
             "status": "OCCUPIED",
             "serviceState": "WAITING_FOOD",
-            "location": "Sảnh chính",
+            "location": "Sáº£nh chÃ­nh",
             "currentGuests": 2,
             "elapsedMinutes": 9,
             "activeOrderId": 8832,
@@ -784,7 +224,7 @@
             "capacity": 4,
             "status": "OCCUPIED",
             "serviceState": "WAITING_FOOD",
-            "location": "Sân hiên",
+            "location": "SÃ¢n hiÃªn",
             "currentGuests": 3,
             "elapsedMinutes": 14,
             "activeOrderId": 8834,
@@ -797,7 +237,7 @@
             "capacity": 6,
             "status": "OCCUPIED",
             "serviceState": "WAITING_FOOD",
-            "location": "Sảnh chính",
+            "location": "Sáº£nh chÃ­nh",
             "currentGuests": 5,
             "elapsedMinutes": 22,
             "activeOrderId": 8835,
@@ -810,7 +250,7 @@
             "capacity": 2,
             "status": "OCCUPIED",
             "serviceState": "WAITING_FOOD",
-            "location": "Sân hiên",
+            "location": "SÃ¢n hiÃªn",
             "currentGuests": 2,
             "elapsedMinutes": 7,
             "activeOrderId": 8836,
@@ -823,7 +263,7 @@
             "capacity": 4,
             "status": "OCCUPIED",
             "serviceState": "WAITING_FOOD",
-            "location": "Phòng riêng",
+            "location": "PhÃ²ng riÃªng",
             "currentGuests": 4,
             "elapsedMinutes": 17,
             "activeOrderId": 8838,
@@ -836,7 +276,7 @@
             "capacity": 2,
             "status": "OCCUPIED",
             "serviceState": "WAITING_FOOD",
-            "location": "Sảnh chính",
+            "location": "Sáº£nh chÃ­nh",
             "currentGuests": 1,
             "elapsedMinutes": 6,
             "activeOrderId": 8839,
@@ -849,7 +289,7 @@
             "capacity": 6,
             "status": "OCCUPIED",
             "serviceState": "WAITING_FOOD",
-            "location": "Sảnh chính",
+            "location": "Sáº£nh chÃ­nh",
             "currentGuests": 6,
             "elapsedMinutes": 19,
             "activeOrderId": 8841,
@@ -863,25 +303,25 @@
             "tableNumber": "04",
             "orderId": 8824,
             "orderNumber": "ORD-8824",
-            "orderType": "Tại bàn",
+            "orderType": "Táº¡i bÃ n",
             "elapsedMinutes": 18,
             "items": [
               {
                 "id": "k-401",
                 "menuItemId": 102,
-                "name": "Pizza nấm Truffle",
+                "name": "Pizza náº¥m Truffle",
                 "quantity": 1,
-                "station": "Lò nướng",
-                "note": "Cắt 8 miếng",
+                "station": "LÃ² nÆ°á»›ng",
+                "note": "Cáº¯t 8 miáº¿ng",
                 "status": "WAITING"
               },
               {
                 "id": "k-402",
                 "menuItemId": 107,
-                "name": "Trà đào cam sả",
+                "name": "TrÃ  Ä‘Ã o cam sáº£",
                 "quantity": 2,
-                "station": "Quầy lạnh",
-                "note": "Ít ngọt",
+                "station": "Quáº§y láº¡nh",
+                "note": "Ãt ngá»t",
                 "status": "WAITING"
               }
             ]
@@ -891,24 +331,24 @@
             "tableNumber": "08",
             "orderId": 8828,
             "orderNumber": "ORD-8828",
-            "orderType": "Tại bàn",
+            "orderType": "Táº¡i bÃ n",
             "elapsedMinutes": 15,
             "items": [
               {
                 "id": "k-801",
                 "menuItemId": 101,
-                "name": "Burger bò Wagyu",
+                "name": "Burger bÃ² Wagyu",
                 "quantity": 1,
-                "station": "Bếp nóng",
-                "note": "Không hành",
+                "station": "Báº¿p nÃ³ng",
+                "note": "KhÃ´ng hÃ nh",
                 "status": "WAITING"
               },
               {
                 "id": "k-802",
                 "menuItemId": 103,
-                "name": "Salad vườn xanh",
+                "name": "Salad vÆ°á»n xanh",
                 "quantity": 1,
-                "station": "Ra món lạnh",
+                "station": "Ra mÃ³n láº¡nh",
                 "note": "",
                 "status": "WAITING"
               }
@@ -919,24 +359,24 @@
             "tableNumber": "11",
             "orderId": 8831,
             "orderNumber": "ORD-8831",
-            "orderType": "Tại bàn",
+            "orderType": "Táº¡i bÃ n",
             "elapsedMinutes": 11,
             "items": [
               {
                 "id": "k-1101",
                 "menuItemId": 104,
-                "name": "Bạch tuộc nướng",
+                "name": "Báº¡ch tuá»™c nÆ°á»›ng",
                 "quantity": 1,
-                "station": "Bếp nóng",
-                "note": "Lên món sau khai vị",
+                "station": "Báº¿p nÃ³ng",
+                "note": "LÃªn mÃ³n sau khai vá»‹",
                 "status": "WAITING"
               },
               {
                 "id": "k-1102",
                 "menuItemId": 105,
-                "name": "Tiramisu truyền thống",
+                "name": "Tiramisu truyá»n thá»‘ng",
                 "quantity": 2,
-                "station": "Tráng miệng",
+                "station": "TrÃ¡ng miá»‡ng",
                 "note": "",
                 "status": "COMPLETED"
               }
@@ -947,25 +387,25 @@
             "tableNumber": "12",
             "orderId": 8832,
             "orderNumber": "ORD-8832",
-            "orderType": "Tại bàn",
+            "orderType": "Táº¡i bÃ n",
             "elapsedMinutes": 9,
             "items": [
               {
                 "id": "k-1201",
                 "menuItemId": 103,
-                "name": "Salad vườn xanh",
+                "name": "Salad vÆ°á»n xanh",
                 "quantity": 2,
-                "station": "Ra món lạnh",
-                "note": "Sốt để riêng",
+                "station": "Ra mÃ³n láº¡nh",
+                "note": "Sá»‘t Ä‘á»ƒ riÃªng",
                 "status": "WAITING"
               },
               {
                 "id": "k-1202",
                 "menuItemId": 106,
-                "name": "Latte yến mạch đá",
+                "name": "Latte yáº¿n máº¡ch Ä‘Ã¡",
                 "quantity": 2,
-                "station": "Quầy lạnh",
-                "note": "Không đường",
+                "station": "Quáº§y láº¡nh",
+                "note": "KhÃ´ng Ä‘Æ°á»ng",
                 "status": "WAITING"
               }
             ]
@@ -975,24 +415,24 @@
             "tableNumber": "14",
             "orderId": 8834,
             "orderNumber": "ORD-8834",
-            "orderType": "Tại bàn",
+            "orderType": "Táº¡i bÃ n",
             "elapsedMinutes": 14,
             "items": [
               {
                 "id": "k-1401",
                 "menuItemId": 102,
-                "name": "Pizza nấm Truffle",
+                "name": "Pizza náº¥m Truffle",
                 "quantity": 1,
-                "station": "Lò nướng",
-                "note": "Không ớt",
+                "station": "LÃ² nÆ°á»›ng",
+                "note": "KhÃ´ng á»›t",
                 "status": "WAITING"
               },
               {
                 "id": "k-1402",
                 "menuItemId": 105,
-                "name": "Tiramisu truyền thống",
+                "name": "Tiramisu truyá»n thá»‘ng",
                 "quantity": 1,
-                "station": "Tráng miệng",
+                "station": "TrÃ¡ng miá»‡ng",
                 "note": "",
                 "status": "WAITING"
               }
@@ -1003,25 +443,25 @@
             "tableNumber": "15",
             "orderId": 8835,
             "orderNumber": "ORD-8835",
-            "orderType": "Tại bàn",
+            "orderType": "Táº¡i bÃ n",
             "elapsedMinutes": 22,
             "items": [
               {
                 "id": "k-1501",
                 "menuItemId": 101,
-                "name": "Burger bò Wagyu",
+                "name": "Burger bÃ² Wagyu",
                 "quantity": 3,
-                "station": "Bếp nóng",
-                "note": "1 phần không sốt",
+                "station": "Báº¿p nÃ³ng",
+                "note": "1 pháº§n khÃ´ng sá»‘t",
                 "status": "WAITING"
               },
               {
                 "id": "k-1502",
                 "menuItemId": 107,
-                "name": "Trà đào cam sả",
+                "name": "TrÃ  Ä‘Ã o cam sáº£",
                 "quantity": 3,
-                "station": "Quầy lạnh",
-                "note": "Ít đá",
+                "station": "Quáº§y láº¡nh",
+                "note": "Ãt Ä‘Ã¡",
                 "status": "WAITING"
               }
             ]
@@ -1031,24 +471,24 @@
             "tableNumber": "16",
             "orderId": 8836,
             "orderNumber": "ORD-8836",
-            "orderType": "Tại bàn",
+            "orderType": "Táº¡i bÃ n",
             "elapsedMinutes": 7,
             "items": [
               {
                 "id": "k-1601",
                 "menuItemId": 104,
-                "name": "Bạch tuộc nướng",
+                "name": "Báº¡ch tuá»™c nÆ°á»›ng",
                 "quantity": 1,
-                "station": "Bếp nóng",
-                "note": "Ưu tiên lên món",
+                "station": "Báº¿p nÃ³ng",
+                "note": "Æ¯u tiÃªn lÃªn mÃ³n",
                 "status": "WAITING"
               },
               {
                 "id": "k-1602",
                 "menuItemId": 103,
-                "name": "Salad vườn xanh",
+                "name": "Salad vÆ°á»n xanh",
                 "quantity": 1,
-                "station": "Ra món lạnh",
+                "station": "Ra mÃ³n láº¡nh",
                 "note": "",
                 "status": "WAITING"
               }
@@ -1059,24 +499,24 @@
             "tableNumber": "18",
             "orderId": 8838,
             "orderNumber": "ORD-8838",
-            "orderType": "Tại bàn",
+            "orderType": "Táº¡i bÃ n",
             "elapsedMinutes": 17,
             "items": [
               {
                 "id": "k-1801",
                 "menuItemId": 102,
-                "name": "Pizza nấm Truffle",
+                "name": "Pizza náº¥m Truffle",
                 "quantity": 2,
-                "station": "Lò nướng",
-                "note": "Một đế mỏng",
+                "station": "LÃ² nÆ°á»›ng",
+                "note": "Má»™t Ä‘áº¿ má»ng",
                 "status": "WAITING"
               },
               {
                 "id": "k-1802",
                 "menuItemId": 106,
-                "name": "Latte yến mạch đá",
+                "name": "Latte yáº¿n máº¡ch Ä‘Ã¡",
                 "quantity": 1,
-                "station": "Quầy lạnh",
+                "station": "Quáº§y láº¡nh",
                 "note": "",
                 "status": "COMPLETED"
               }
@@ -1087,24 +527,24 @@
             "tableNumber": "19",
             "orderId": 8839,
             "orderNumber": "ORD-8839",
-            "orderType": "Tại bàn",
+            "orderType": "Táº¡i bÃ n",
             "elapsedMinutes": 6,
             "items": [
               {
                 "id": "k-1901",
                 "menuItemId": 107,
-                "name": "Trà đào cam sả",
+                "name": "TrÃ  Ä‘Ã o cam sáº£",
                 "quantity": 1,
-                "station": "Quầy lạnh",
-                "note": "Không topping",
+                "station": "Quáº§y láº¡nh",
+                "note": "KhÃ´ng topping",
                 "status": "WAITING"
               },
               {
                 "id": "k-1902",
                 "menuItemId": 105,
-                "name": "Tiramisu truyền thống",
+                "name": "Tiramisu truyá»n thá»‘ng",
                 "quantity": 1,
-                "station": "Tráng miệng",
+                "station": "TrÃ¡ng miá»‡ng",
                 "note": "",
                 "status": "WAITING"
               }
@@ -1115,34 +555,34 @@
             "tableNumber": "21",
             "orderId": 8841,
             "orderNumber": "ORD-8841",
-            "orderType": "Tại bàn",
+            "orderType": "Táº¡i bÃ n",
             "elapsedMinutes": 19,
             "items": [
               {
                 "id": "k-2101",
                 "menuItemId": 101,
-                "name": "Burger bò Wagyu",
+                "name": "Burger bÃ² Wagyu",
                 "quantity": 2,
-                "station": "Bếp nóng",
-                "note": "Bánh nướng giòn",
+                "station": "Báº¿p nÃ³ng",
+                "note": "BÃ¡nh nÆ°á»›ng giÃ²n",
                 "status": "WAITING"
               },
               {
                 "id": "k-2102",
                 "menuItemId": 104,
-                "name": "Bạch tuộc nướng",
+                "name": "Báº¡ch tuá»™c nÆ°á»›ng",
                 "quantity": 2,
-                "station": "Bếp nóng",
+                "station": "Báº¿p nÃ³ng",
                 "note": "",
                 "status": "WAITING"
               },
               {
                 "id": "k-2103",
                 "menuItemId": 103,
-                "name": "Salad vườn xanh",
+                "name": "Salad vÆ°á»n xanh",
                 "quantity": 1,
-                "station": "Ra món lạnh",
-                "note": "Lên sau món nóng",
+                "station": "Ra mÃ³n láº¡nh",
+                "note": "LÃªn sau mÃ³n nÃ³ng",
                 "status": "WAITING"
               }
             ]
@@ -1151,17 +591,17 @@
       },
       "inventoryManagement": {
         "categories": [
-          "Tất cả",
-          "Rau củ",
-          "Thịt cá",
-          "Sữa và phô mai",
-          "Đồ uống"
+          "Táº¥t cáº£",
+          "Rau cá»§",
+          "Thá»‹t cÃ¡",
+          "Sá»¯a vÃ  phÃ´ mai",
+          "Äá»“ uá»‘ng"
         ],
         "items": [
           {
             "id": "ing-01",
-            "name": "Phô mai mozzarella",
-            "category": "Sữa và phô mai",
+            "name": "PhÃ´ mai mozzarella",
+            "category": "Sá»¯a vÃ  phÃ´ mai",
             "unit": "g",
             "quantity": 1200,
             "threshold": 500,
@@ -1169,8 +609,8 @@
           },
           {
             "id": "ing-02",
-            "name": "Bò Wagyu",
-            "category": "Thịt cá",
+            "name": "BÃ² Wagyu",
+            "category": "Thá»‹t cÃ¡",
             "unit": "g",
             "quantity": 900,
             "threshold": 400,
@@ -1178,8 +618,8 @@
           },
           {
             "id": "ing-03",
-            "name": "Xà lách romaine",
-            "category": "Rau củ",
+            "name": "XÃ  lÃ¡ch romaine",
+            "category": "Rau cá»§",
             "unit": "g",
             "quantity": 250,
             "threshold": 300,
@@ -1187,8 +627,8 @@
           },
           {
             "id": "ing-04",
-            "name": "Trà đào",
-            "category": "Đồ uống",
+            "name": "TrÃ  Ä‘Ã o",
+            "category": "Äá»“ uá»‘ng",
             "unit": "ml",
             "quantity": 0,
             "threshold": 600,
@@ -1196,8 +636,8 @@
           },
           {
             "id": "ing-05",
-            "name": "Bạch tuộc tươi",
-            "category": "Thịt cá",
+            "name": "Báº¡ch tuá»™c tÆ°Æ¡i",
+            "category": "Thá»‹t cÃ¡",
             "unit": "g",
             "quantity": 640,
             "threshold": 300,
@@ -1206,7 +646,7 @@
           {
             "id": "ing-06",
             "name": "Mascarpone",
-            "category": "Sữa và phô mai",
+            "category": "Sá»¯a vÃ  phÃ´ mai",
             "unit": "g",
             "quantity": 180,
             "threshold": 200,
@@ -1216,66 +656,66 @@
       },
       "menuManagement": {
         "categories": [
-          "Tất cả",
-          "Món chính",
-          "Khai vị",
-          "Tráng miệng",
-          "Nước uống"
+          "Táº¥t cáº£",
+          "MÃ³n chÃ­nh",
+          "Khai vá»‹",
+          "TrÃ¡ng miá»‡ng",
+          "NÆ°á»›c uá»‘ng"
         ],
         "items": [
           {
             "id": 101,
-            "name": "Burger bò Wagyu",
-            "category": "Món chính",
-            "station": "Bếp nóng",
+            "name": "Burger bÃ² Wagyu",
+            "category": "MÃ³n chÃ­nh",
+            "station": "Báº¿p nÃ³ng",
             "preparationTime": 16,
             "isAvailable": true
           },
           {
             "id": 102,
-            "name": "Pizza nấm Truffle",
-            "category": "Món chính",
-            "station": "Lò nướng",
+            "name": "Pizza náº¥m Truffle",
+            "category": "MÃ³n chÃ­nh",
+            "station": "LÃ² nÆ°á»›ng",
             "preparationTime": 15,
             "isAvailable": true
           },
           {
             "id": 103,
-            "name": "Salad vườn xanh",
-            "category": "Khai vị",
-            "station": "Ra món lạnh",
+            "name": "Salad vÆ°á»n xanh",
+            "category": "Khai vá»‹",
+            "station": "Ra mÃ³n láº¡nh",
             "preparationTime": 8,
             "isAvailable": true
           },
           {
             "id": 104,
-            "name": "Bạch tuộc nướng",
-            "category": "Món chính",
-            "station": "Bếp nóng",
+            "name": "Báº¡ch tuá»™c nÆ°á»›ng",
+            "category": "MÃ³n chÃ­nh",
+            "station": "Báº¿p nÃ³ng",
             "preparationTime": 18,
             "isAvailable": true
           },
           {
             "id": 105,
-            "name": "Tiramisu truyền thống",
-            "category": "Tráng miệng",
-            "station": "Tráng miệng",
+            "name": "Tiramisu truyá»n thá»‘ng",
+            "category": "TrÃ¡ng miá»‡ng",
+            "station": "TrÃ¡ng miá»‡ng",
             "preparationTime": 4,
             "isAvailable": true
           },
           {
             "id": 106,
-            "name": "Latte yến mạch đá",
-            "category": "Nước uống",
-            "station": "Quầy lạnh",
+            "name": "Latte yáº¿n máº¡ch Ä‘Ã¡",
+            "category": "NÆ°á»›c uá»‘ng",
+            "station": "Quáº§y láº¡nh",
             "preparationTime": 3,
             "isAvailable": false
           },
           {
             "id": 107,
-            "name": "Trà đào cam sả",
-            "category": "Nước uống",
-            "station": "Quầy lạnh",
+            "name": "TrÃ  Ä‘Ã o cam sáº£",
+            "category": "NÆ°á»›c uá»‘ng",
+            "station": "Quáº§y láº¡nh",
             "preparationTime": 4,
             "isAvailable": true
           }
@@ -1283,60 +723,60 @@
       }
     },
     "CASHIER": {
-      "roleLabel": "Thu ngân",
-      "sourceLabel": "Dữ liệu dự phòng thanh toán",
-      "snapshotTime": "Ảnh chụp lúc 21:30",
-      "footerNote": "Dashboard tạm thời giữ ở mức tối giản cho role thu ngân",
+      "roleLabel": "Thu ngÃ¢n",
+      "sourceLabel": "Dá»¯ liá»‡u dá»± phÃ²ng thanh toÃ¡n",
+      "snapshotTime": "áº¢nh chá»¥p lÃºc 21:30",
+      "footerNote": "Dashboard táº¡m thá»i giá»¯ á»Ÿ má»©c tá»‘i giáº£n cho role thu ngÃ¢n",
       "summaryMetrics": [
         {
-          "label": "Hóa đơn chờ thanh toán",
+          "label": "HÃ³a Ä‘Æ¡n chá» thanh toÃ¡n",
           "value": "6",
-          "note": "Trong ca tối"
+          "note": "Trong ca tá»‘i"
         }
       ],
       "activity": [
         {
           "id": "cashier-1",
-          "title": "Có 2 hóa đơn chờ xử lý",
-          "description": "Ưu tiên bàn đã yêu cầu tách hóa đơn.",
-          "time": "4 phút trước"
+          "title": "CÃ³ 2 hÃ³a Ä‘Æ¡n chá» xá»­ lÃ½",
+          "description": "Æ¯u tiÃªn bÃ n Ä‘Ã£ yÃªu cáº§u tÃ¡ch hÃ³a Ä‘Æ¡n.",
+          "time": "4 phÃºt trÆ°á»›c"
         }
       ],
       "highlights": [
         {
-          "kicker": "Tạm thời",
-          "title": "Role thu ngân đang dùng dashboard rút gọn",
-          "description": "Có thể tách riêng màn hình thanh toán đầy đủ sau."
+          "kicker": "Táº¡m thá»i",
+          "title": "Role thu ngÃ¢n Ä‘ang dÃ¹ng dashboard rÃºt gá»n",
+          "description": "CÃ³ thá»ƒ tÃ¡ch riÃªng mÃ n hÃ¬nh thanh toÃ¡n Ä‘áº§y Ä‘á»§ sau."
         }
       ],
       "collections": [],
       "quickActions": []
     },
     "HOST": {
-      "roleLabel": "Lễ tân",
-      "sourceLabel": "Dữ liệu dự phòng lễ tân",
-      "snapshotTime": "Ảnh chụp lúc 21:30",
-      "footerNote": "Dashboard tạm thời giữ ở mức tối giản cho role lễ tân",
+      "roleLabel": "Lá»… tÃ¢n",
+      "sourceLabel": "Dá»¯ liá»‡u dá»± phÃ²ng lá»… tÃ¢n",
+      "snapshotTime": "áº¢nh chá»¥p lÃºc 21:30",
+      "footerNote": "Dashboard táº¡m thá»i giá»¯ á»Ÿ má»©c tá»‘i giáº£n cho role lá»… tÃ¢n",
       "summaryMetrics": [
         {
-          "label": "Khách đang chờ",
-          "value": "4 nhóm",
-          "note": "Ở khu vực đón khách"
+          "label": "KhÃ¡ch Ä‘ang chá»",
+          "value": "4 nhÃ³m",
+          "note": "á»ž khu vá»±c Ä‘Ã³n khÃ¡ch"
         }
       ],
       "activity": [
         {
           "id": "host-1",
-          "title": "Có 2 lượt đặt bàn sắp đến",
-          "description": "Cần giữ bàn 05 và bàn 07 theo khung giờ đã hẹn.",
-          "time": "7 phút trước"
+          "title": "CÃ³ 2 lÆ°á»£t Ä‘áº·t bÃ n sáº¯p Ä‘áº¿n",
+          "description": "Cáº§n giá»¯ bÃ n 05 vÃ  bÃ n 07 theo khung giá» Ä‘Ã£ háº¹n.",
+          "time": "7 phÃºt trÆ°á»›c"
         }
       ],
       "highlights": [
         {
-          "kicker": "Tạm thời",
-          "title": "Role lễ tân đang dùng dashboard rút gọn",
-          "description": "Có thể mở rộng thêm sơ đồ chờ và đặt chỗ sau."
+          "kicker": "Táº¡m thá»i",
+          "title": "Role lá»… tÃ¢n Ä‘ang dÃ¹ng dashboard rÃºt gá»n",
+          "description": "CÃ³ thá»ƒ má»Ÿ rá»™ng thÃªm sÆ¡ Ä‘á»“ chá» vÃ  Ä‘áº·t chá»— sau."
         }
       ],
       "collections": [],

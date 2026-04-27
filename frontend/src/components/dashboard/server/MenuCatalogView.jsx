@@ -1,10 +1,18 @@
 import { useMemo, useState } from 'react'
-import { formatCurrency } from './utils'
+import { formatCurrency, mapCategoryLabel } from './utils'
 
 function MenuCard({ item }) {
   return (
     <article className="overflow-hidden rounded-[22px] border border-[#e7edf2] bg-white">
-      <img src={item.imageUrl} alt={item.name} className="h-48 w-full object-cover" />
+      <div className="h-48 bg-[#eef2f7]">
+        {item.imageUrl ? (
+          <img src={item.imageUrl} alt={item.name} className="h-48 w-full object-cover" />
+        ) : (
+          <div className="grid h-full place-items-center px-4 text-center text-sm font-semibold text-[#62707f]">
+            {item.name}
+          </div>
+        )}
+      </div>
       <div className="space-y-3 p-4">
         <div className="flex items-start justify-between gap-4">
           <div>
@@ -16,7 +24,7 @@ function MenuCard({ item }) {
 
         <div className="flex flex-wrap gap-2">
           <span className="rounded-full bg-[#f8fafc] px-3 py-1 text-xs font-medium text-[#62707f]">
-            {item.category}
+            {mapCategoryLabel(item.category)}
           </span>
           <span className="rounded-full bg-[#f8fafc] px-3 py-1 text-xs font-medium text-[#62707f]">
             {item.preparationTime} phút
@@ -66,7 +74,7 @@ function MenuCatalogView({ menuCatalog }) {
               }`}
               onClick={() => setActiveCategory(category)}
             >
-              {category}
+              {category === 'Tất cả' ? category : mapCategoryLabel(category)}
             </button>
           ))}
         </div>

@@ -72,7 +72,7 @@ export const authApi = {
     try {
       await api.post('/auth/logout', token ? { token } : {})
     } catch {
-      // Ignore logout network errors because JWT logout is client-side cleanup.
+      // JWT logout chỉ cần dọn session ở client.
     } finally {
       writeStoredSession(null)
     }

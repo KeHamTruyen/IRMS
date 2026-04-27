@@ -1,6 +1,8 @@
 import {
   DRAFT_BATCH_STATUS,
   formatCurrency,
+  mapBillStatusLabel,
+  mapOrderItemStatusLabel,
   mapServiceStateLabel,
 } from './utils'
 
@@ -28,6 +30,9 @@ function BatchItem({ item, removable, onRemove }) {
           <p className="mt-1 text-sm text-[#62707f]">
             {item.size}
             {item.specialInstructions ? ` • ${item.specialInstructions}` : ''}
+          </p>
+          <p className="mt-1 text-xs font-semibold text-[#94a3b8]">
+            {mapOrderItemStatusLabel(item.status)}
           </p>
         </div>
       </div>
@@ -97,6 +102,7 @@ function ActiveOrderPanel({
   onDraftBatchNoteChange,
   onSubmitOrder,
   canOrder,
+  isBusy,
 }) {
   const hasSession = Boolean(session)
   const draftBatch =
@@ -122,7 +128,7 @@ function ActiveOrderPanel({
 
           <div className="text-right">
             <div className="text-[2rem] font-bold text-[#2d7871]">
-              {formatCurrency(session?.bill?.subtotal ?? 0)}
+              {formatCurrency(session?.bill?.subtotal ?? session?.orderResponse?.totalAmount ?? 0)}
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#94a3b8]">
               Tổng hóa đơn
@@ -150,10 +156,12 @@ function ActiveOrderPanel({
               <div className="flex items-center justify-between gap-3">
                 <div>
                   <p className="text-sm font-semibold text-[#62707f]">Mã hóa đơn</p>
-                  <p className="mt-1 text-lg font-bold text-[#16202a]">{session.bill.billNumber}</p>
+                  <p className="mt-1 text-lg font-bold text-[#16202a]">
+                    {session.bill?.billNumber ?? session.orderResponse?.orderNumber ?? 'Chưa tạo hóa đơn'}
+                  </p>
                 </div>
                 <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-[#516072]">
-                  {session.bill.status === 'PAID' ? 'Đã thanh toán' : 'Chờ thanh toán'}
+                  {mapBillStatusLabel(session.bill?.status ?? 'PENDING')}
                 </span>
               </div>
             </div>
@@ -161,7 +169,7 @@ function ActiveOrderPanel({
             <div className="max-h-[calc(100vh-23rem)] space-y-6 overflow-y-auto pr-1">
               {session.batches.map((batch, index) => (
                 <div
-                  key={batch.batchNumber}
+                  key={`${batch.batchNumber}-${batch.status}`}
                   className={index === 0 ? '' : 'border-t border-dashed border-[#d8e0e7] pt-6'}
                 >
                   <OrderBatch batch={batch} onRemoveDraftItem={onRemoveDraftItem} />
@@ -181,10 +189,10 @@ function ActiveOrderPanel({
           <button
             type="button"
             onClick={onSubmitOrder}
-            disabled={!hasDraftItems}
+            disabled={!hasDraftItems || isBusy}
             className="w-full rounded-2xl bg-[#2d7871] px-4 py-3 font-semibold text-white disabled:cursor-not-allowed disabled:opacity-50"
           >
-            Đặt món
+            {isBusy ? 'Đang gửi...' : 'Đặt món'}
           </button>
         </div>
       ) : null}

@@ -16,9 +16,7 @@ export function useTerminalAuth() {
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [session, setSession] = useState(() => authApi.getStoredSession())
   const [dashboardResponse, setDashboardResponse] = useState(null)
-  const [loadingDashboard, setLoadingDashboard] = useState(() =>
-    Boolean(authApi.getStoredSession())
-  )
+  const [loadingDashboard, setLoadingDashboard] = useState(() => Boolean(authApi.getStoredSession()))
 
   const loadDashboard = useCallback(async (role) => {
     if (!role) return null
