@@ -309,7 +309,7 @@ export const mockApi = {
   async getDashboard(role) {
     await wait(180)
 
-    const dashboard = role === 'ADMIN' ? buildAdminDashboard() : dashboards[role]
+    const dashboard = dashboards[role]
 
     if (!dashboard) {
       return buildError(`Chưa có dashboard cho vai trò ${role}`, 'Thiếu dữ liệu dự phòng')

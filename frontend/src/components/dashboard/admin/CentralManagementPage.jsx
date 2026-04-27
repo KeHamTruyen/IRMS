@@ -631,7 +631,7 @@ function CentralManagementPage({
                         <p>{staff.email || 'Chưa có email'}</p>
                         <p className="mt-1 text-xs">{staff.phone || 'Chưa có số điện thoại'}</p>
                       </td>
-                      <td className="px-4 py-4 text-[#516072]">{staff.authMethod === 'pin' ? 'PIN' : 'Mật khẩu'}</td>
+                      <td className="px-4 py-4 text-[#516072]">{staff.authMethod === 'PIN' ? 'PIN' : 'Mật khẩu'}</td>
                       <td className="px-4 py-4">
                         <span
                           className={`rounded-full px-3 py-1 text-xs font-semibold ${getStatusBadgeClass(
@@ -727,8 +727,8 @@ function CentralManagementPage({
                     onChange={(event) => onStaffFormChange('authMethod', event.target.value)}
                     className="min-h-11 w-full rounded-2xl border border-[#d8e0e7] px-4 outline-none focus:border-[#0d9488]"
                   >
-                    <option value="pin">PIN</option>
-                    <option value="password">Mật khẩu</option>
+                    <option value="PIN">PIN</option>
+                    <option value="PASSWORD">Mật khẩu</option>
                   </select>
                 </label>
               </div>

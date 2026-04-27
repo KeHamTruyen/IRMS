@@ -5,6 +5,7 @@ import AdminSidebar from './AdminSidebar'
 import AnalyticsReportsPage from './AnalyticsReportsPage'
 import CentralManagementPage from './CentralManagementPage'
 import { createEmptyMenuForm, normalizeSizeOptions } from './utils'
+import { adminApi } from '../../../services/adminApi'
 
 const toFormState = (item) => ({
   name: item.name ?? '',
@@ -24,7 +25,7 @@ const createEmptyStaffForm = (roles = []) => ({
   email: '',
   phone: '',
   role: roles[0] ?? 'SERVER',
-  authMethod: 'pin',
+  authMethod: 'PIN',
   isActive: true,
 })
 
@@ -34,7 +35,7 @@ const toStaffFormState = (staff, roles = []) => ({
   email: staff.email ?? '',
   phone: staff.phone ?? '',
   role: staff.role ?? roles[0] ?? 'SERVER',
-  authMethod: staff.authMethod ?? 'pin',
+  authMethod: staff.authMethod ?? 'PIN',
   isActive: Boolean(staff.isActive),
 })
 
@@ -181,30 +182,33 @@ function AdminDashboard({ session, dashboard, onSignOut }) {
     setMenuForm(createEmptyMenuForm(dashboard.centralizedManagement.menuCategories))
   }
 
-  const handleSubmitMenu = (event) => {
+  const handleSubmitMenu = async (event) => {
     event.preventDefault()
 
-    const nextItem = {
-      id: editingMenuItemId ?? Date.now(),
-      sku: editingMenuItemId
-        ? menuItems.find((item) => item.id === editingMenuItemId)?.sku ?? `MN-${editingMenuItemId}`
-        : `MN-${Date.now().toString().slice(-5)}`,
+    const payload = {
       name: menuForm.name.trim(),
       category: menuForm.category,
       price: Number(menuForm.price || 0),
       description: menuForm.description.trim(),
       isAvailable: menuForm.isAvailable,
       preparationTime: Number(menuForm.preparationTime || 0),
-      imageUrl:
-        menuForm.imageUrl.trim() ||
-        'https://images.unsplash.com/photo-1544025162-d76694265947?auto=format&fit=crop&w=900&q=80',
+      imageUrl: menuForm.imageUrl.trim(),
+    }
+
+    if (!payload.name) return
+
+    const saved = editingMenuItemId
+      ? await adminApi.updateMenuItem(editingMenuItemId, payload)
+      : await adminApi.createMenuItem(payload)
+
+    const nextItem = {
+      ...saved,
+      sku: `MN-${saved.id}`,
       sizeOptions: normalizeSizeOptions(menuForm.sizeOptions || 'Mặc định'),
       station: menuForm.station.trim() || 'Chưa gán quầy',
       featured: false,
-      lastUpdated: new Date().toISOString(),
+      lastUpdated: saved.updatedAt ?? new Date().toISOString(),
     }
-
-    if (!nextItem.name) return
 
     setMenuItems((current) => {
       if (editingMenuItemId) {
@@ -224,7 +228,8 @@ function AdminDashboard({ session, dashboard, onSignOut }) {
     setMenuForm(toFormState(item))
   }
 
-  const handleDeleteItem = (itemId) => {
+  const handleDeleteItem = async (itemId) => {
+    await adminApi.deleteMenuItem(itemId)
     setMenuItems((current) => current.filter((item) => item.id !== itemId))
 
     if (editingMenuItemId === itemId) {
@@ -244,7 +249,7 @@ function AdminDashboard({ session, dashboard, onSignOut }) {
     setStaffForm(createEmptyStaffForm(dashboard.centralizedManagement.staffRoles))
   }
 
-  const handleSubmitStaff = (event) => {
+  const handleSubmitStaff = async (event) => {
     event.preventDefault()
 
     const nextStaff = {
@@ -260,12 +265,22 @@ function AdminDashboard({ session, dashboard, onSignOut }) {
 
     if (!nextStaff.fullName || !nextStaff.username) return
 
+    const payload = {
+      ...nextStaff,
+      password: nextStaff.authMethod === 'PASSWORD' ? 'password123' : undefined,
+      pin: nextStaff.authMethod === 'PIN' ? '1234' : undefined,
+    }
+
+    const saved = editingStaffId
+      ? await adminApi.updateUser(editingStaffId, payload)
+      : await adminApi.createUser(payload)
+
     setStaffMembers((current) => {
       if (editingStaffId) {
-        return current.map((staff) => (staff.id === editingStaffId ? { ...staff, ...nextStaff } : staff))
+        return current.map((staff) => (staff.id === editingStaffId ? { ...staff, ...saved } : staff))
       }
 
-      return [nextStaff, ...current]
+      return [saved, ...current]
     })
 
     resetStaffForm()
@@ -276,7 +291,8 @@ function AdminDashboard({ session, dashboard, onSignOut }) {
     setStaffForm(toStaffFormState(staff, dashboard.centralizedManagement.staffRoles))
   }
 
-  const handleDeleteStaff = (staffId) => {
+  const handleDeleteStaff = async (staffId) => {
+    await adminApi.deleteUser(staffId)
     setStaffMembers((current) => current.filter((staff) => staff.id !== staffId))
 
     if (editingStaffId === staffId) {
@@ -296,15 +312,14 @@ function AdminDashboard({ session, dashboard, onSignOut }) {
     setInventoryForm(createEmptyInventoryForm(dashboard.centralizedManagement.inventoryCategories))
   }
 
-  const handleSubmitInventory = (event) => {
+  const handleSubmitInventory = async (event) => {
     event.preventDefault()
 
     const quantity = Math.max(0, Number(inventoryForm.quantity || 0))
     const threshold = Math.max(0, Number(inventoryForm.threshold || 0))
     const status = quantity <= 0 ? 'OUT_OF_STOCK' : inventoryForm.status
 
-    const nextItem = {
-      id: editingInventoryId ?? `ing-${Date.now().toString().slice(-5)}`,
+    const payload = {
       name: inventoryForm.name.trim(),
       category: inventoryForm.category,
       unit: inventoryForm.unit.trim() || 'g',
@@ -313,16 +328,20 @@ function AdminDashboard({ session, dashboard, onSignOut }) {
       status,
     }
 
-    if (!nextItem.name) return
+    if (!payload.name) return
+
+    const saved = editingInventoryId
+      ? await adminApi.updateInventoryItem(editingInventoryId, payload)
+      : await adminApi.createInventoryItem(payload)
 
     setInventoryItems((current) => {
       if (editingInventoryId) {
         return current.map((item) =>
-          item.id === editingInventoryId ? { ...item, ...nextItem } : item
+          item.id === editingInventoryId ? { ...item, ...saved } : item
         )
       }
 
-      return [nextItem, ...current]
+      return [saved, ...current]
     })
 
     resetInventoryForm()
@@ -333,7 +352,8 @@ function AdminDashboard({ session, dashboard, onSignOut }) {
     setInventoryForm(toInventoryFormState(item, dashboard.centralizedManagement.inventoryCategories))
   }
 
-  const handleDeleteInventory = (itemId) => {
+  const handleDeleteInventory = async (itemId) => {
+    await adminApi.deleteInventoryItem(itemId)
     setInventoryItems((current) => current.filter((item) => item.id !== itemId))
 
     if (editingInventoryId === itemId) {
@@ -353,39 +373,34 @@ function AdminDashboard({ session, dashboard, onSignOut }) {
     setTableForm(createEmptyTableForm(dashboard.centralizedManagement.tableLocations))
   }
 
-  const handleSubmitTable = (event) => {
+  const handleSubmitTable = async (event) => {
     event.preventDefault()
 
     const serviceState = tableForm.serviceState
     const currentGuests = Math.max(0, Number(tableForm.currentGuests || 0))
-    const nextTable = {
-      id: editingTableId ?? Date.now(),
+    const status = serviceState === 'WAITING_FOOD' || serviceState === 'SERVED' ? 'OCCUPIED' : serviceState
+    const payload = {
       tableNumber: tableForm.tableNumber.trim(),
       capacity: Math.max(1, Number(tableForm.capacity || 1)),
       location: tableForm.location,
-      serviceState,
-      currentGuests,
-      reservationName: tableForm.reservationName.trim() || null,
-      status:
-        serviceState === 'WAITING_FOOD' || serviceState === 'SERVED'
-          ? 'OCCUPIED'
-          : serviceState === 'CLEANING'
-            ? 'CLEANING'
-            : serviceState,
-      elapsedMinutes: serviceState === 'WAITING_FOOD' || serviceState === 'SERVED' ? 5 : 0,
-      activeOrderId:
-        serviceState === 'WAITING_FOOD' || serviceState === 'SERVED'
-          ? tables.find((item) => item.id === editingTableId)?.activeOrderId ?? null
-          : null,
-      billingStatus:
-        serviceState === 'WAITING_FOOD' || serviceState === 'SERVED'
-          ? 'PENDING'
-          : serviceState === 'CLEANING'
-            ? 'PAID'
-            : null,
+      status: status === 'CLEANING' ? 'CLEANING' : status,
     }
 
-    if (!nextTable.tableNumber) return
+    if (!payload.tableNumber) return
+
+    const saved = editingTableId
+      ? await adminApi.updateTable(editingTableId, payload)
+      : await adminApi.createTable(payload)
+
+    const nextTable = {
+      ...saved,
+      serviceState: saved.status,
+      currentGuests: saved.status === 'OCCUPIED' ? currentGuests || saved.capacity : 0,
+      reservationName: tableForm.reservationName.trim() || null,
+      elapsedMinutes: saved.status === 'OCCUPIED' ? 5 : 0,
+      activeOrderId: saved.status === 'OCCUPIED' ? tables.find((item) => item.id === editingTableId)?.activeOrderId ?? null : null,
+      billingStatus: saved.status === 'OCCUPIED' ? 'PENDING' : saved.status === 'CLEANING' ? 'PAID' : null,
+    }
 
     setTables((current) => {
       if (editingTableId) {
@@ -403,7 +418,8 @@ function AdminDashboard({ session, dashboard, onSignOut }) {
     setTableForm(toTableFormState(table, dashboard.centralizedManagement.tableLocations))
   }
 
-  const handleDeleteTable = (tableId) => {
+  const handleDeleteTable = async (tableId) => {
+    await adminApi.deleteTable(tableId)
     setTables((current) => current.filter((table) => table.id !== tableId))
 
     if (editingTableId === tableId) {

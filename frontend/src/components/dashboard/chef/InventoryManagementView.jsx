@@ -8,13 +8,10 @@ const inventoryTone = {
 }
 
 function SummaryCard({ label, value, note, tone = 'default' }) {
-  const toneClass =
-    tone === 'alert'
-      ? 'border-[#f0d2cb] bg-[#fff6f4]'
-      : 'border-[#e7edf2] bg-white'
+  const toneClass = tone === 'alert' ? 'border-[#f0d2cb] bg-[#fff6f4]' : 'border-[#e7edf2] bg-white'
 
   return (
-    <article className={`rounded-[24px] border p-5 ${toneClass} text-center`}>
+    <article className={`rounded-[24px] border p-5 text-center ${toneClass}`}>
       <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#94a3b8]">{label}</p>
       <div className="mt-3 text-[2rem] font-bold text-[#16202a]">{value}</div>
       <p className="mt-2 text-sm text-[#62707f]">{note}</p>
@@ -157,7 +154,8 @@ function AdjustmentPanel({ item, onChangeQuantity, onChangeStatus }) {
         </div>
 
         <div className="rounded-[20px] bg-[#fbfcfd] px-4 py-3 text-sm text-[#62707f]">
-          Nếu số lượng bằng 0, trạng thái sẽ tự chuyển sang <span className="font-semibold text-[#c36d4b]">Đã hết</span>.
+          Nếu số lượng bằng 0, trạng thái sẽ tự chuyển sang{' '}
+          <span className="font-semibold text-[#c36d4b]">Đã hết</span>.
         </div>
       </div>
     </aside>
@@ -175,7 +173,6 @@ function InventoryManagementView({ inventoryManagement, onChangeQuantity, onChan
 
   const selectedVisibleItemId = useMemo(() => {
     if (!items.length) return null
-
     return items.some((item) => item.id === selectedItemId) ? selectedItemId : items[0].id
   }, [items, selectedItemId])
 
@@ -188,13 +185,9 @@ function InventoryManagementView({ inventoryManagement, onChangeQuantity, onChan
       <section className="rounded-[28px] border border-[#e7edf2] bg-white p-6">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
           <div>
-            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#0d9488]">
-              Quản lý kho
-            </p>
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#0d9488]">Quản lý kho</p>
             <h2 className="mt-2 text-[2rem] font-bold text-[#16202a]">Danh sách nguyên liệu</h2>
-            <p className="mt-2 text-sm text-[#62707f]">
-              Theo dõi và quản lý tồn kho nguyên liệu.
-            </p>
+            <p className="mt-2 text-sm text-[#62707f]">Theo dõi và quản lý tồn kho nguyên liệu.</p>
           </div>
 
           <div className="flex flex-wrap gap-2">
@@ -225,12 +218,7 @@ function InventoryManagementView({ inventoryManagement, onChangeQuantity, onChan
               note="Số lượng dưới mức an toàn"
               tone="alert"
             />
-            <SummaryCard
-              label="Đã hết"
-              value={outOfStockCount}
-              note="Cần nhập hàng ngay"
-              tone="alert"
-            />
+            <SummaryCard label="Đã hết" value={outOfStockCount} note="Cần nhập hàng ngay" tone="alert" />
           </div>
 
           <InventoryTable

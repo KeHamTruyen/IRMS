@@ -1,6 +1,7 @@
 package com.irms.analytics.presentation.controller;
 
 import com.irms.analytics.application.dto.DashboardStatsResponse;
+import com.irms.analytics.application.dto.RevenueAnalyticsResponse;
 import com.irms.analytics.application.service.AnalyticsService;
 import com.irms.common.dto.ApiResponse;
 import io.swagger.v3.oas.annotations.Operation;
@@ -26,5 +27,13 @@ public class AnalyticsController {
     public ResponseEntity<ApiResponse<DashboardStatsResponse>> getDashboardStats() {
         DashboardStatsResponse stats = analyticsService.getDashboardStats();
         return ResponseEntity.ok(ApiResponse.success(stats));
+    }
+
+    @GetMapping("/revenue")
+    @PreAuthorize("hasAnyRole('MANAGER', 'ADMIN')")
+    @Operation(summary = "Get revenue analytics")
+    public ResponseEntity<ApiResponse<RevenueAnalyticsResponse>> getRevenueAnalytics() {
+        RevenueAnalyticsResponse analytics = analyticsService.getRevenueAnalytics();
+        return ResponseEntity.ok(ApiResponse.success(analytics));
     }
 }

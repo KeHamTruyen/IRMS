@@ -2,6 +2,8 @@ import { useCallback, useEffect, useMemo, useState } from 'react'
 import { DASHBOARD_CONFIG } from '../constants/dashboard'
 import { EMPLOYEE_ROLES, getRoleMeta } from '../constants/roles'
 import { authApi } from '../services/authApi'
+import { adminApi } from '../services/adminApi'
+import { chefApi } from '../services/chefApi'
 import { mockApi } from '../services/mockApi'
 
 export function useTerminalAuth() {
@@ -20,6 +22,18 @@ export function useTerminalAuth() {
 
   const loadDashboard = useCallback(async (role) => {
     if (!role) return null
+    if (role === 'CHEF') {
+      return {
+        success: true,
+        data: await chefApi.getDashboard(),
+      }
+    }
+    if (role === 'ADMIN') {
+      return {
+        success: true,
+        data: await adminApi.getDashboard(),
+      }
+    }
     return mockApi.getDashboard(role)
   }, [])
 
@@ -31,7 +45,12 @@ export function useTerminalAuth() {
       window.location.hash = `/dashboard/${session.role.toLowerCase()}`
 
       ;(async () => {
-        const response = await loadDashboard(session.role)
+        let response = null
+        try {
+          response = await loadDashboard(session.role)
+        } catch {
+          response = null
+        }
         if (cancelled) return
 
         setDashboardResponse(response?.success ? response.data : null)

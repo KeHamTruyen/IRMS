@@ -1,4 +1,4 @@
-import { IoRestaurant } from "react-icons/io5";
+import { IoRestaurant } from 'react-icons/io5'
 
 function ChefHeader() {
   return (
@@ -8,7 +8,7 @@ function ChefHeader() {
           <IoRestaurant />
         </div>
         <div>
-          <div className="text-2xl font-bold text-[#2d7871] items-start">IRMS</div>
+          <div className="items-start text-2xl font-bold text-[#2d7871]">IRMS</div>
           <p className="text-xs font-semibold uppercase tracking-[0.14em] text-[#94a3b8]">
             Quản lý bếp
           </p>

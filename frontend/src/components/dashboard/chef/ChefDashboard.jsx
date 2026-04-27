@@ -1,9 +1,10 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import ChefHeader from './ChefHeader'
 import ChefSidebar from './ChefSidebar'
 import InventoryManagementView from './InventoryManagementView'
 import KitchenOrdersView from './KitchenOrdersView'
 import MenuStatusView from './MenuStatusView'
+import { chefApi } from '../../../services/chefApi'
 
 function ChefDashboard({ dashboard, onSignOut }) {
   const [activeSection, setActiveSection] = useState(dashboard.navigation.sideItems[0]?.id ?? 'orders')
@@ -11,6 +12,16 @@ function ChefDashboard({ dashboard, onSignOut }) {
   const [inventoryManagement, setInventoryManagement] = useState(dashboard.inventoryManagement)
   const [menuManagement, setMenuManagement] = useState(dashboard.menuManagement)
   const [selectedTableId, setSelectedTableId] = useState(dashboard.kitchenDisplay.tables[0]?.id ?? null)
+  const [actionError, setActionError] = useState('')
+
+  useEffect(() => {
+    setActiveSection(dashboard.navigation.sideItems[0]?.id ?? 'orders')
+    setKitchenDisplay(dashboard.kitchenDisplay)
+    setInventoryManagement(dashboard.inventoryManagement)
+    setMenuManagement(dashboard.menuManagement)
+    setSelectedTableId(dashboard.kitchenDisplay.tables[0]?.id ?? null)
+    setActionError('')
+  }, [dashboard])
 
   const waitingTables = useMemo(
     () =>
@@ -43,68 +54,99 @@ function ChefDashboard({ dashboard, onSignOut }) {
     [kitchenDisplay, waitingTables]
   )
 
-  const handleCompleteItem = (tableId, itemId) => {
-    setKitchenDisplay((current) => ({
-      ...current,
-      orders: current.orders.map((order) =>
-        order.tableId === tableId
-          ? {
-              ...order,
-              items: order.items.map((item) =>
-                item.id === itemId ? { ...item, status: 'COMPLETED' } : item
-              ),
-            }
-          : order
-      ),
-    }))
+  const handleCompleteItem = async (tableId, itemId) => {
+    const targetOrder = kitchenDisplay.orders.find((order) =>
+      order.items.some((item) => item.id === itemId)
+    )
+    const targetItem = targetOrder?.items.find((item) => item.id === itemId)
+    if (!targetItem) return
+
+    try {
+      setActionError('')
+      await chefApi.completeKitchenItem(itemId, targetItem.backendStatus)
+      setKitchenDisplay((current) => ({
+        ...current,
+        orders: current.orders.map((order) =>
+          order.tableId === tableId
+            ? {
+                ...order,
+                items: order.items.map((item) =>
+                  item.id === itemId
+                    ? { ...item, status: 'COMPLETED', backendStatus: 'READY' }
+                    : item
+                ),
+              }
+            : order
+        ),
+      }))
+    } catch (error) {
+      setActionError(error.message ?? 'Không thể cập nhật trạng thái món.')
+    }
   }
 
-  const handleChangeInventoryQuantity = (itemId, quantity) => {
-    setInventoryManagement((current) => ({
-      ...current,
-      items: current.items.map((item) =>
-        item.id === itemId
-          ? {
-              ...item,
-              quantity,
-              status:
-                quantity <= 0
-                  ? 'OUT_OF_STOCK'
-                  : item.status === 'OUT_OF_STOCK'
-                    ? 'IN_STOCK'
-                    : item.status,
-            }
-          : item
-      ),
-    }))
+  const handleChangeInventoryQuantity = async (itemId, quantity) => {
+    try {
+      setActionError('')
+      const updated = await chefApi.updateInventoryQuantity(itemId, quantity)
+      setInventoryManagement((current) => ({
+        ...current,
+        items: current.items.map((item) =>
+          item.id === itemId
+            ? {
+                ...item,
+                quantity: updated.quantity,
+                status: updated.status,
+              }
+            : item
+        ),
+      }))
+    } catch (error) {
+      setActionError(error.message ?? 'Không thể cập nhật tồn kho.')
+    }
   }
 
-  const handleChangeInventoryStatus = (itemId, status) => {
-    setInventoryManagement((current) => ({
-      ...current,
-      items: current.items.map((item) =>
-        item.id === itemId
-          ? {
-              ...item,
-              status: item.quantity <= 0 ? 'OUT_OF_STOCK' : status,
-            }
-          : item
-      ),
-    }))
+  const handleChangeInventoryStatus = async (itemId, status) => {
+    try {
+      setActionError('')
+      const updated = await chefApi.updateInventoryStatus(itemId, status)
+      setInventoryManagement((current) => ({
+        ...current,
+        items: current.items.map((item) =>
+          item.id === itemId
+            ? {
+                ...item,
+                quantity: updated.quantity,
+                status: updated.status,
+              }
+            : item
+        ),
+      }))
+    } catch (error) {
+      setActionError(error.message ?? 'Không thể cập nhật trạng thái nguyên liệu.')
+    }
   }
 
-  const handleToggleMenuAvailability = (itemId) => {
-    setMenuManagement((current) => ({
-      ...current,
-      items: current.items.map((item) =>
-        item.id === itemId
-          ? {
-              ...item,
-              isAvailable: !item.isAvailable,
-            }
-          : item
-      ),
-    }))
+  const handleToggleMenuAvailability = async (itemId) => {
+    const target = menuManagement.items.find((item) => item.id === itemId)
+    if (!target) return
+
+    try {
+      setActionError('')
+      const updated = await chefApi.updateMenuAvailability(itemId, !target.isAvailable)
+      setMenuManagement((current) => ({
+        ...current,
+        items: current.items.map((item) =>
+          item.id === itemId
+            ? {
+                ...item,
+                isAvailable: updated.isAvailable,
+              }
+            : item
+        ),
+      }))
+    } catch (error) {
+      setActionError(error.message ?? 'Không thể cập nhật trạng thái phục vụ.')
+    }
   }
 
   return (
@@ -122,6 +164,12 @@ function ChefDashboard({ dashboard, onSignOut }) {
         />
 
         <section className="min-w-0 max-h-full self-start space-y-5 bg-[#f8fafc] p-5 lg:p-6">
+          {actionError ? (
+            <div className="rounded-2xl border border-[#f0d2cb] bg-[#fff6f4] px-4 py-3 text-sm font-medium text-[#a24a2f]">
+              {actionError}
+            </div>
+          ) : null}
+
           {activeSection === 'orders' ? (
             <KitchenOrdersView
               kitchenDisplay={visibleKitchenDisplay}

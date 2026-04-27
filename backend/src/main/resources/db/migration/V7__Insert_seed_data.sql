@@ -365,6 +365,66 @@ VALUES
         'https://source.unsplash.com/800x600/?iced-latte'
     );
 
+-- Insert inventory items
+INSERT INTO
+    inventory_items (
+        name,
+        category,
+        unit,
+        quantity,
+        threshold,
+        status
+    )
+VALUES
+    (
+        'Phô mai mozzarella',
+        'Sữa và phô mai',
+        'g',
+        1200,
+        500,
+        'IN_STOCK'
+    ),
+    (
+        'Bò Wagyu',
+        'Thịt cá',
+        'g',
+        900,
+        400,
+        'IN_STOCK'
+    ),
+    (
+        'Xà lách romaine',
+        'Rau củ',
+        'g',
+        250,
+        300,
+        'RESTOCKING'
+    ),
+    (
+        'Trà đào',
+        'Đồ uống',
+        'ml',
+        0,
+        600,
+        'OUT_OF_STOCK'
+    ),
+    (
+        'Bạch tuộc tươi',
+        'Thịt cá',
+        'g',
+        640,
+        300,
+        'IN_STOCK'
+    ),
+    (
+        'Mascarpone',
+        'Sữa và phô mai',
+        'g',
+        180,
+        200,
+        'RESTOCKING'
+    );
+
 -- Insert orders
 INSERT INTO
     orders (
@@ -741,6 +801,266 @@ VALUES (
         ),
         'Đã thanh toán bằng ví điện tử'
     );
+
+-- Insert completed and paid orders for analytics testing
+INSERT INTO
+    orders (
+        order_number,
+        table_id,
+        server_id,
+        status,
+        order_type,
+        total_amount,
+        notes,
+        created_at,
+        updated_at
+    )
+VALUES
+    (
+        'ORD-ANALYTICS-TODAY-001',
+        (SELECT id FROM tables WHERE table_number = 'T01'),
+        (SELECT id FROM users WHERE username = 'server1'),
+        'COMPLETED',
+        'DINE_IN',
+        1250000.00,
+        'Đơn hoàn thành dùng để kiểm thử doanh thu hôm nay.',
+        CURRENT_DATE + INTERVAL '10 hours',
+        CURRENT_DATE + INTERVAL '10 hours 45 minutes'
+    ),
+    (
+        'ORD-ANALYTICS-TODAY-002',
+        (SELECT id FROM tables WHERE table_number = 'T02'),
+        (SELECT id FROM users WHERE username = 'server2'),
+        'COMPLETED',
+        'TAKEAWAY',
+        820000.00,
+        'Đơn mang về đã thanh toán trong ngày.',
+        CURRENT_DATE + INTERVAL '14 hours',
+        CURRENT_DATE + INTERVAL '14 hours 20 minutes'
+    ),
+    (
+        'ORD-ANALYTICS-YESTERDAY-001',
+        (SELECT id FROM tables WHERE table_number = 'T05'),
+        (SELECT id FROM users WHERE username = 'server1'),
+        'COMPLETED',
+        'DINE_IN',
+        1460000.00,
+        'Đơn hoàn thành dùng để so sánh hôm qua.',
+        CURRENT_DATE - INTERVAL '1 day' + INTERVAL '19 hours',
+        CURRENT_DATE - INTERVAL '1 day' + INTERVAL '19 hours 35 minutes'
+    ),
+    (
+        'ORD-ANALYTICS-LAST-WEEK-001',
+        (SELECT id FROM tables WHERE table_number = 'T06'),
+        (SELECT id FROM users WHERE username = 'server2'),
+        'COMPLETED',
+        'DINE_IN',
+        960000.00,
+        'Đơn hoàn thành cùng ngày tuần trước.',
+        CURRENT_DATE - INTERVAL '7 days' + INTERVAL '12 hours',
+        CURRENT_DATE - INTERVAL '7 days' + INTERVAL '12 hours 40 minutes'
+    ),
+    (
+        'ORD-ANALYTICS-LAST-WEEK-002',
+        (SELECT id FROM tables WHERE table_number = 'T07'),
+        (SELECT id FROM users WHERE username = 'server1'),
+        'COMPLETED',
+        'DELIVERY',
+        540000.00,
+        'Đơn giao hàng đã thanh toán trong tuần trước.',
+        CURRENT_DATE - INTERVAL '9 days' + INTERVAL '18 hours',
+        CURRENT_DATE - INTERVAL '9 days' + INTERVAL '18 hours 20 minutes'
+    ),
+    (
+        'ORD-ANALYTICS-THIS-MONTH-001',
+        (SELECT id FROM tables WHERE table_number = 'T09'),
+        (SELECT id FROM users WHERE username = 'server2'),
+        'COMPLETED',
+        'DINE_IN',
+        1730000.00,
+        'Đơn hoàn thành đầu tháng hiện tại.',
+        date_trunc('month', CURRENT_DATE) + INTERVAL '5 days 13 hours',
+        date_trunc('month', CURRENT_DATE) + INTERVAL '5 days 13 hours 50 minutes'
+    ),
+    (
+        'ORD-ANALYTICS-LAST-MONTH-001',
+        (SELECT id FROM tables WHERE table_number = 'T10'),
+        (SELECT id FROM users WHERE username = 'server1'),
+        'COMPLETED',
+        'DINE_IN',
+        1880000.00,
+        'Đơn hoàn thành cùng kỳ tháng trước.',
+        date_trunc('month', CURRENT_DATE - INTERVAL '1 month') + INTERVAL '5 days 13 hours',
+        date_trunc('month', CURRENT_DATE - INTERVAL '1 month') + INTERVAL '5 days 13 hours 55 minutes'
+    ),
+    (
+        'ORD-ANALYTICS-LAST-MONTH-002',
+        (SELECT id FROM tables WHERE table_number = 'T11'),
+        (SELECT id FROM users WHERE username = 'server2'),
+        'COMPLETED',
+        'TAKEAWAY',
+        690000.00,
+        'Đơn mang về đã thanh toán trong tháng trước.',
+        date_trunc('month', CURRENT_DATE - INTERVAL '1 month') + INTERVAL '14 days 11 hours',
+        date_trunc('month', CURRENT_DATE - INTERVAL '1 month') + INTERVAL '14 days 11 hours 15 minutes'
+    ),
+    (
+        'ORD-ANALYTICS-PENDING-IGNORED',
+        (SELECT id FROM tables WHERE table_number = 'T12'),
+        (SELECT id FROM users WHERE username = 'server1'),
+        'PREPARING',
+        'DINE_IN',
+        999000.00,
+        'Đơn chưa hoàn thành, không được tính vào doanh thu phân tích.',
+        CURRENT_DATE + INTERVAL '16 hours',
+        CURRENT_DATE + INTERVAL '16 hours 10 minutes'
+    );
+
+INSERT INTO
+    bills (
+        bill_number,
+        order_id,
+        subtotal,
+        tax,
+        discount,
+        service_charge,
+        total_amount,
+        status,
+        created_at,
+        paid_at
+    )
+VALUES
+    (
+        'BILL-ANALYTICS-TODAY-001',
+        (SELECT id FROM orders WHERE order_number = 'ORD-ANALYTICS-TODAY-001'),
+        1100000.00,
+        110000.00,
+        0.00,
+        40000.00,
+        1250000.00,
+        'PAID',
+        CURRENT_DATE + INTERVAL '10 hours 45 minutes',
+        CURRENT_DATE + INTERVAL '10 hours 50 minutes'
+    ),
+    (
+        'BILL-ANALYTICS-TODAY-002',
+        (SELECT id FROM orders WHERE order_number = 'ORD-ANALYTICS-TODAY-002'),
+        760000.00,
+        76000.00,
+        16000.00,
+        0.00,
+        820000.00,
+        'PAID',
+        CURRENT_DATE + INTERVAL '14 hours 20 minutes',
+        CURRENT_DATE + INTERVAL '14 hours 25 minutes'
+    ),
+    (
+        'BILL-ANALYTICS-YESTERDAY-001',
+        (SELECT id FROM orders WHERE order_number = 'ORD-ANALYTICS-YESTERDAY-001'),
+        1320000.00,
+        132000.00,
+        20000.00,
+        28000.00,
+        1460000.00,
+        'PAID',
+        CURRENT_DATE - INTERVAL '1 day' + INTERVAL '19 hours 35 minutes',
+        CURRENT_DATE - INTERVAL '1 day' + INTERVAL '19 hours 40 minutes'
+    ),
+    (
+        'BILL-ANALYTICS-LAST-WEEK-001',
+        (SELECT id FROM orders WHERE order_number = 'ORD-ANALYTICS-LAST-WEEK-001'),
+        880000.00,
+        88000.00,
+        8000.00,
+        0.00,
+        960000.00,
+        'PAID',
+        CURRENT_DATE - INTERVAL '7 days' + INTERVAL '12 hours 40 minutes',
+        CURRENT_DATE - INTERVAL '7 days' + INTERVAL '12 hours 45 minutes'
+    ),
+    (
+        'BILL-ANALYTICS-LAST-WEEK-002',
+        (SELECT id FROM orders WHERE order_number = 'ORD-ANALYTICS-LAST-WEEK-002'),
+        500000.00,
+        50000.00,
+        10000.00,
+        0.00,
+        540000.00,
+        'PAID',
+        CURRENT_DATE - INTERVAL '9 days' + INTERVAL '18 hours 20 minutes',
+        CURRENT_DATE - INTERVAL '9 days' + INTERVAL '18 hours 25 minutes'
+    ),
+    (
+        'BILL-ANALYTICS-THIS-MONTH-001',
+        (SELECT id FROM orders WHERE order_number = 'ORD-ANALYTICS-THIS-MONTH-001'),
+        1580000.00,
+        158000.00,
+        8000.00,
+        0.00,
+        1730000.00,
+        'PAID',
+        date_trunc('month', CURRENT_DATE) + INTERVAL '5 days 13 hours 50 minutes',
+        date_trunc('month', CURRENT_DATE) + INTERVAL '5 days 13 hours 55 minutes'
+    ),
+    (
+        'BILL-ANALYTICS-LAST-MONTH-001',
+        (SELECT id FROM orders WHERE order_number = 'ORD-ANALYTICS-LAST-MONTH-001'),
+        1720000.00,
+        172000.00,
+        12000.00,
+        0.00,
+        1880000.00,
+        'PAID',
+        date_trunc('month', CURRENT_DATE - INTERVAL '1 month') + INTERVAL '5 days 13 hours 55 minutes',
+        date_trunc('month', CURRENT_DATE - INTERVAL '1 month') + INTERVAL '5 days 14 hours'
+    ),
+    (
+        'BILL-ANALYTICS-LAST-MONTH-002',
+        (SELECT id FROM orders WHERE order_number = 'ORD-ANALYTICS-LAST-MONTH-002'),
+        640000.00,
+        64000.00,
+        14000.00,
+        0.00,
+        690000.00,
+        'PAID',
+        date_trunc('month', CURRENT_DATE - INTERVAL '1 month') + INTERVAL '14 days 11 hours 15 minutes',
+        date_trunc('month', CURRENT_DATE - INTERVAL '1 month') + INTERVAL '14 days 11 hours 20 minutes'
+    ),
+    (
+        'BILL-ANALYTICS-PENDING-IGNORED',
+        (SELECT id FROM orders WHERE order_number = 'ORD-ANALYTICS-PENDING-IGNORED'),
+        910000.00,
+        91000.00,
+        2000.00,
+        0.00,
+        999000.00,
+        'PAID',
+        CURRENT_DATE + INTERVAL '16 hours 10 minutes',
+        CURRENT_DATE + INTERVAL '16 hours 15 minutes'
+    );
+
+INSERT INTO
+    payments (
+        bill_id,
+        amount,
+        payment_method,
+        status,
+        transaction_id,
+        processed_at,
+        processed_by,
+        notes
+    )
+SELECT
+    b.id,
+    b.total_amount,
+    'CASH',
+    'COMPLETED',
+    'TXN-' || b.bill_number,
+    b.paid_at,
+    (SELECT id FROM users WHERE username = 'cashier1'),
+    'Thanh toán seed cho chức năng phân tích doanh thu'
+FROM bills b
+WHERE b.bill_number LIKE 'BILL-ANALYTICS-%';
 
 -- Insert kitchen orders
 INSERT INTO

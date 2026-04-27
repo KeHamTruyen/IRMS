@@ -16,9 +16,7 @@ function TableChip({ table, isSelected, onSelect }) {
       } ${isSelected ? 'ring-2 ring-[#0d9488]/20' : ''}`}
     >
       <div className="flex items-center justify-between gap-3">
-        <div className="text-xs font-bold uppercase tracking-[0.12em]">
-          Bàn {table.tableNumber}
-        </div>
+        <div className="text-xs font-bold uppercase tracking-[0.12em]">Bàn {table.tableNumber}</div>
         <div className="text-sm font-semibold">{table.currentGuests} khách</div>
       </div>
       <p className="mt-3 text-sm font-semibold">{table.location}</p>
@@ -107,12 +105,7 @@ function KitchenOrderCard({ order, isSelected, onSelectTable, onCompleteItem }) 
   )
 }
 
-function KitchenOrdersView({
-  kitchenDisplay,
-  selectedTableId,
-  onSelectTable,
-  onCompleteItem,
-}) {
+function KitchenOrdersView({ kitchenDisplay, selectedTableId, onSelectTable, onCompleteItem }) {
   const waitingTables = kitchenDisplay.tables
   const prioritizedOrders = useMemo(() => {
     if (!selectedTableId) return kitchenDisplay.orders
