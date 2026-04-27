@@ -1,5 +1,6 @@
 package com.irms.admin.application.dto;
 
+import com.irms.admin.domain.entity.AuthMethod;
 import com.irms.admin.domain.entity.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -16,5 +17,6 @@ public class AuthResponse {
     private String username;
     private String fullName;
     private RoleType role;
+    private AuthMethod authMethod;
     private Long userId;
 }

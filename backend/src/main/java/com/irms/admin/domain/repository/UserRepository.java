@@ -1,5 +1,6 @@
 package com.irms.admin.domain.repository;
 
+import com.irms.admin.domain.entity.AuthMethod;
 import com.irms.admin.domain.entity.RoleType;
 import com.irms.admin.domain.entity.User;
 import org.springframework.data.jpa.repository.JpaRepository;
@@ -16,6 +17,8 @@ public interface UserRepository extends JpaRepository<User, Long> {
     Optional<User> findByEmail(String email);
     
     List<User> findByRole(RoleType role);
+
+    List<User> findByRoleAndAuthMethodAndIsActive(RoleType role, AuthMethod authMethod, Boolean isActive);
     
     List<User> findByIsActive(Boolean isActive);
     

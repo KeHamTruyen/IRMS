@@ -1,5 +1,6 @@
 package com.irms.admin.domain.entity;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -28,8 +29,11 @@ public class User implements UserDetails {
     @Column(unique = true, nullable = false, length = 50)
     private String username;
     
-    @Column(nullable = false)
+    @JsonIgnore
     private String passwordHash;
+
+    @JsonIgnore
+    private String pinHash;
     
     @Column(nullable = false, length = 100)
     private String fullName;
@@ -43,6 +47,10 @@ public class User implements UserDetails {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private RoleType role;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private AuthMethod authMethod;
     
     @Column(nullable = false)
     @Builder.Default
@@ -66,7 +74,7 @@ public class User implements UserDetails {
     
     @Override
     public String getPassword() {
-        return passwordHash;
+        return passwordHash != null ? passwordHash : "";
     }
     
     @Override

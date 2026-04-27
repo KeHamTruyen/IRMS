@@ -1,6 +1,7 @@
 package com.irms.admin.application.dto;
 
-import jakarta.validation.constraints.NotBlank;
+import com.irms.admin.domain.entity.AuthMethod;
+import com.irms.admin.domain.entity.RoleType;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,10 +12,10 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class AuthRequest {
-    
-    @NotBlank(message = "Username is required")
+
+    private AuthMethod authMethod;
     private String username;
-    
-    @NotBlank(message = "Password is required")
     private String password;
+    private String pin;
+    private RoleType role;
 }

@@ -28,4 +28,10 @@ public class AuthController {
         AuthResponse response = authenticationService.authenticate(request);
         return ResponseEntity.ok(ApiResponse.success(response, "Login successful"));
     }
+
+    @PostMapping("/logout")
+    @Operation(summary = "Logout from the system")
+    public ResponseEntity<ApiResponse<Void>> logout() {
+        return ResponseEntity.ok(ApiResponse.success(null, "Logout successful"));
+    }
 }
