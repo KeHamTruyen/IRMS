@@ -442,20 +442,17 @@ Authorization: Bearer <token>
 
 ## 🔑 Demo Credentials
 
-### Quick Demo Mode (No Login Required)
+### Test Login
 
-Click vào role bất kỳ trong Demo tab để truy cập ngay
+Dung cac thong tin duoi day de dang nhap nhanh khi test frontend.
 
-### Real Login Credentials
+### Tai khoan / PIN test
 
-| Role    | Username | Password    | Access Level         |
-| ------- | -------- | ----------- | -------------------- |
-| Admin   | admin    | password123 | Full system access   |
-| Manager | manager1 | password123 | Analytics, reports   |
-| Server  | server1  | password123 | Orders, tables       |
-| Chef    | chef1    | password123 | Kitchen display      |
-| Cashier | cashier1 | password123 | Billing, payments    |
-| Host    | host1    | password123 | Reservations, tables |
+| Vai tro | Cach dang nhap | Thong tin test |
+| ------- | -------------- | -------------- |
+| Nhan vien phuc vu | PIN | `1234` |
+| Bep | PIN | `2580` |
+| Admin | Username / Password | `admin` / `123` |
 
 ---
 

@@ -4,6 +4,7 @@ import { EMPLOYEE_ROLES, getRoleMeta } from '../constants/roles'
 import { authApi } from '../services/authApi'
 import { adminApi } from '../services/adminApi'
 import { chefApi } from '../services/chefApi'
+import { serverApi } from '../services/serverApi'
 
 export function useTerminalAuth() {
   const [authMode, setAuthMode] = useState('employee')
@@ -33,6 +34,12 @@ export function useTerminalAuth() {
         data: await adminApi.getDashboard(),
       }
     }
+    if (role === 'SERVER') {
+      return {
+        success: true,
+        data: await serverApi.getDashboard(),
+      }
+    }
     return {
       success: true,
       data: null,
@@ -47,15 +54,16 @@ export function useTerminalAuth() {
       window.location.hash = `/dashboard/${session.role.toLowerCase()}`
 
       ;(async () => {
-        let response = null
         try {
-          response = await loadDashboard(session.role)
-        } catch {
-          response = null
-        }
-        if (cancelled) return
+          const response = await loadDashboard(session.role)
+          if (cancelled) return
 
-        setDashboardResponse(response?.success ? response.data : null)
+          setDashboardResponse(response?.success ? response.data : null)
+        } catch {
+          if (cancelled) return
+
+          setDashboardResponse(null)
+        }
         setLoadingDashboard(false)
       })()
 
