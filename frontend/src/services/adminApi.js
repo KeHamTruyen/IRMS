@@ -86,6 +86,7 @@ const buildAdminOrders = (orders, kitchenDisplayItems, tables) => {
       orderId: order.id,
       orderNumber: order.orderNumber,
       orderType: mapOrderTypeLabel(order.orderType),
+      createdAt: order.createdAt,
       elapsedMinutes: elapsedMinutes(order.createdAt),
       status: pendingItems > 0 ? 'WAITING' : 'COMPLETED',
       pendingItems,
@@ -110,6 +111,27 @@ const buildAnalyticsReports = (revenue, orders, menuItems) => {
   const today = comparisons.find((item) => item.id === 'today')
   const week = comparisons.find((item) => item.id === 'week')
   const month = comparisons.find((item) => item.id === 'month')
+  const bestSellingItems = [...orders.reduce((map, order) => {
+    if (order.status !== 'COMPLETED') return map
+
+    ;(order.items ?? []).forEach((orderItem) => {
+      const menuItem = menuItems.find((item) => item.id === orderItem.menuItemId)
+      const current = map.get(orderItem.menuItemId) ?? {
+        id: orderItem.menuItemId,
+        name: orderItem.menuItemName ?? menuItem?.name ?? 'Món chưa xác định',
+        orders: 0,
+        revenue: 0,
+      }
+
+      current.orders += Number(orderItem.quantity || 0)
+      current.revenue += Number(orderItem.subtotal || 0)
+      map.set(orderItem.menuItemId, current)
+    })
+
+    return map
+  }, new Map()).values()]
+    .sort((left, right) => right.orders - left.orders || right.revenue - left.revenue)
+    .slice(0, 4)
 
   return {
     rangeOptions: ['Tuần', 'Tháng'],
@@ -144,26 +166,7 @@ const buildAnalyticsReports = (revenue, orders, menuItems) => {
       previous: Number(item.previous || 0),
     })),
     revenueComparisons: comparisons,
-    bestSellingItems: menuItems.slice(0, 4).map((item) => ({
-      id: item.id,
-      name: item.name,
-      orders: orders.reduce(
-        (sum, order) =>
-          sum +
-          (order.items ?? [])
-            .filter((orderItem) => orderItem.menuItemId === item.id)
-            .reduce((itemSum, orderItem) => itemSum + Number(orderItem.quantity || 0), 0),
-        0
-      ),
-      revenue: orders.reduce(
-        (sum, order) =>
-          sum +
-          (order.items ?? [])
-            .filter((orderItem) => orderItem.menuItemId === item.id)
-            .reduce((itemSum, orderItem) => itemSum + Number(orderItem.subtotal || 0), 0),
-        0
-      ),
-    })),
+    bestSellingItems,
     peakHours: [],
     operationalMetrics: [
       { id: 'orders', label: 'Đơn trong hệ thống', value: `${orders.length}`, note: 'Tổng số đơn backend trả về' },

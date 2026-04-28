@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { formatCurrency, getRoleLabel, getStatusBadgeClass } from './utils'
+import { formatCurrency, formatDateTime, getRoleLabel, getStatusBadgeClass } from './utils'
 
 function ManagementStat({ label, value, note }) {
   return (
@@ -1131,6 +1131,11 @@ function CentralManagementPage({
                       <p className="mt-1 text-sm text-[#62707f]">
                         {order.orderType} • {order.elapsedMinutes} phút
                       </p>
+                      {order.createdAt ? (
+                        <p className="mt-1 text-xs font-medium text-[#94a3b8]">
+                          Ngày tạo: {formatDateTime(order.createdAt)}
+                        </p>
+                      ) : null}
                     </div>
 
                     <span
