@@ -191,53 +191,84 @@ src/app/
 
 ## 🚀 Cài Đặt & Chạy
 
-### Prerequisites
+### Yêu cầu môi trường
 
-- Node.js 18+ và npm/pnpm
-- Java 17+
-- Maven 3.9+
-- PostgreSQL 15+
+- **Node.js 18+** và npm (hoặc pnpm)
+- **Java 17+**
+- **Maven 3.9+**
+- **Docker** (khuyến nghị, để chạy nhanh cả backend & database)
 
-### Backend Setup
+---
+
+### Chạy Backend (Spring Boot)
+
+**Cách 1: Chạy bằng Docker Compose (khuyến nghị)**
 
 ```bash
-# 1. Clone repository
-git clone <repository-url>
 cd backend
+docker-compose up --build
+# Backend chạy tại http://localhost:3000
+# Database PostgreSQL chạy tại localhost:5432 (user/pass: irms_user/irms_pass)
+```
 
-# 2. Configure database
-# Edit src/main/resources/application.yml
-# Set your PostgreSQL credentials
+**Cách 2: Chạy thủ công bằng Maven**
 
-# 3. Build & run
+1. Tạo database PostgreSQL (nếu chưa có):
+
+- DB name: `irms_db`, user: `irms_user`, password: `irms_pass`
+
+2. Cấu hình lại file `src/main/resources/application.yml` hoặc `.env` nếu cần.
+3. Build & chạy:
+
+```bash
+cd backend
 mvn clean install
 mvn spring-boot:run
-
-# Backend will run on http://localhost:8080
+# Backend chạy tại http://localhost:3000
 ```
 
-### Frontend Setup
+---
+
+### Chạy Frontend (React + Vite)
 
 ```bash
-# 1. Move to frontend folder
 cd frontend
+# Tạo file .env nếu chưa có:
+echo VITE_API_URL=http://localhost:3000/api > .env
 
-# 2. Install dependencies
+# Cài dependencies
 npm install
-# or
+# hoặc
 pnpm install
 
-# 3. Start development server
+# Chạy dev server
 npm run dev
-# or
+# hoặc
 pnpm dev
-
-# Frontend will run on http://localhost:5173
+# Frontend chạy tại http://localhost:5173
 ```
+
+---
+
+### Build production
+
+```bash
+# Frontend
+cd frontend
+npm run build
+# Kết quả build ở frontend/dist
+
+# Backend (tạo file jar)
+cd backend
+mvn clean package -DskipTests
+# File jar ở backend/target/*.jar
+```
+
+---
 
 ### Database Migration
 
-Flyway sẽ tự động chạy migrations khi start backend:
+Flyway sẽ tự động migrate khi backend khởi động (không cần thao tác thủ công):
 
 ```
 V1__Create_users_table.sql

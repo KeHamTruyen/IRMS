@@ -4,7 +4,6 @@ import { EMPLOYEE_ROLES, getRoleMeta } from '../constants/roles'
 import { authApi } from '../services/authApi'
 import { adminApi } from '../services/adminApi'
 import { chefApi } from '../services/chefApi'
-import { mockApi } from '../services/mockApi'
 
 export function useTerminalAuth() {
   const [authMode, setAuthMode] = useState('employee')
@@ -34,7 +33,10 @@ export function useTerminalAuth() {
         data: await adminApi.getDashboard(),
       }
     }
-    return mockApi.getDashboard(role)
+    return {
+      success: true,
+      data: null,
+    }
   }, [])
 
   useEffect(() => {

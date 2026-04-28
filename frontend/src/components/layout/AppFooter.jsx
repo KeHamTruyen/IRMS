@@ -4,7 +4,7 @@ function AppFooter({ session, dashboard }) {
       <span>Vai trò: {dashboard?.roleLabel ?? session.role}</span>
       <span>Nguồn dữ liệu: {dashboard?.sourceLabel ?? session.source}</span>
       <span>
-        {dashboard?.footerNote ?? 'Dữ liệu dự phòng đã bám theo cấu trúc phản hồi từ backend'}
+        {dashboard?.footerNote ?? 'Dữ liệu lấy trực tiếp từ backend'}
       </span>
     </footer>
   )

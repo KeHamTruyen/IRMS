@@ -203,7 +203,7 @@ VALUES
         'Gỏi cuốn tươi với tôm, thịt ba chỉ, rau thơm và nước chấm đậu phộng.',
         true,
         8,
-        'https://source.unsplash.com/800x600/?spring-roll,vietnamese-food'
+        'https://images.unsplash.com/photo-1540189549336-e6e99c3679fe?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Chả giò hải sản',
@@ -212,7 +212,7 @@ VALUES
         'Chả giò giòn nhân tôm mực, dùng kèm rau sống và nước mắm chua ngọt.',
         true,
         12,
-        'https://source.unsplash.com/800x600/?fried-spring-roll,seafood'
+        'https://images.unsplash.com/photo-1562967916-eb82221dfb92?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Salad bò áp chảo',
@@ -221,7 +221,7 @@ VALUES
         'Bò áp chảo lát mỏng trộn xà lách, cà chua bi và sốt mè rang.',
         true,
         15,
-        'https://source.unsplash.com/800x600/?beef-salad'
+        'https://images.unsplash.com/photo-1543352634-99a5d50ae78e?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Khoai lang kén',
@@ -230,7 +230,7 @@ VALUES
         'Khoai lang kén chiên giòn, vị ngọt nhẹ, dùng kèm sốt mayonnaise.',
         true,
         10,
-        'https://source.unsplash.com/800x600/?sweet-potato-fries'
+        'https://images.unsplash.com/photo-1639024471283-03518883512d?auto=format&fit=crop&w=800&q=80'
     ),
 
     -- Món chính
@@ -241,7 +241,7 @@ VALUES
         'Cá hồi áp chảo ăn cùng rau củ nướng và sốt chanh dây chua ngọt.',
         true,
         25,
-        'https://source.unsplash.com/800x600/?salmon,dinner'
+        'https://images.unsplash.com/photo-1467003909585-2f8a72700288?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Bò lúc lắc khoai tây',
@@ -250,7 +250,7 @@ VALUES
         'Bò mềm xào ớt chuông, hành tây, dùng kèm khoai tây chiên và salad.',
         true,
         22,
-        'https://source.unsplash.com/800x600/?beef-steak,potato'
+        'https://images.unsplash.com/photo-1558030006-450675393462?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Cơm gà Hội An',
@@ -259,7 +259,7 @@ VALUES
         'Cơm nghệ, gà xé, rau răm, hành phi và nước mắm gừng.',
         true,
         18,
-        'https://source.unsplash.com/800x600/?chicken-rice'
+        'https://images.unsplash.com/photo-1512058564366-18510be2db19?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Mì Ý cua cay',
@@ -268,7 +268,7 @@ VALUES
         'Mì Ý sốt cà chua cay nhẹ với thịt cua, tỏi, ớt và phô mai parmesan.',
         true,
         20,
-        'https://source.unsplash.com/800x600/?spaghetti,crab'
+        'https://images.unsplash.com/photo-1551183053-bf91a1d81141?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Pizza nấm truffle',
@@ -277,7 +277,7 @@ VALUES
         'Pizza đế mỏng với nấm, phô mai mozzarella và dầu truffle.',
         true,
         18,
-        'https://source.unsplash.com/800x600/?mushroom-pizza'
+        'https://images.unsplash.com/photo-1565299624946-b28f40a0ae38?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Bún bò Huế đặc biệt',
@@ -286,7 +286,7 @@ VALUES
         'Nước dùng đậm vị, bắp bò, chả cua, giò heo và rau sống.',
         true,
         15,
-        'https://source.unsplash.com/800x600/?vietnamese-noodle-soup'
+        'https://images.unsplash.com/photo-1569718212165-3a8278d5f624?auto=format&fit=crop&w=800&q=80'
     ),
 
     -- Tráng miệng
@@ -297,7 +297,7 @@ VALUES
         'Tiramisu kem mascarpone kết hợp cà phê phin Việt Nam.',
         true,
         5,
-        'https://source.unsplash.com/800x600/?tiramisu'
+        'https://images.unsplash.com/photo-1571877227200-a0d98ea607e9?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Bánh chocolate lava',
@@ -306,7 +306,7 @@ VALUES
         'Bánh chocolate nóng chảy dùng kèm kem vanilla.',
         true,
         8,
-        'https://source.unsplash.com/800x600/?chocolate-lava-cake'
+        'https://images.unsplash.com/photo-1606313564200-e75d5e30476c?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Chè khúc bạch trái cây',
@@ -315,7 +315,7 @@ VALUES
         'Khúc bạch mềm, nhãn, hạnh nhân lát và trái cây theo mùa.',
         true,
         5,
-        'https://source.unsplash.com/800x600/?fruit-dessert'
+        'https://images.unsplash.com/photo-1488477181946-6428a0291777?auto=format&fit=crop&w=800&q=80'
     ),
 
     -- Đồ uống
@@ -326,7 +326,7 @@ VALUES
         'Trà đào thơm nhẹ với cam vàng, sả tươi và đào ngâm.',
         true,
         4,
-        'https://source.unsplash.com/800x600/?peach-tea'
+        'https://images.unsplash.com/photo-1556679343-c7306c1976bc?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Cà phê sữa đá',
@@ -335,7 +335,7 @@ VALUES
         'Cà phê phin đậm vị pha sữa đặc và đá viên.',
         true,
         5,
-        'https://source.unsplash.com/800x600/?vietnamese-coffee'
+        'https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Nước ép cam tươi',
@@ -344,7 +344,7 @@ VALUES
         'Cam tươi ép nguyên chất, không thêm đường.',
         true,
         3,
-        'https://source.unsplash.com/800x600/?orange-juice'
+        'https://images.unsplash.com/photo-1600271886742-f049cd451bba?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Soda chanh bạc hà',
@@ -353,7 +353,7 @@ VALUES
         'Soda mát lạnh với chanh tươi, bạc hà và syrup đường mía.',
         true,
         3,
-        'https://source.unsplash.com/800x600/?lemon-mint-soda'
+        'https://images.unsplash.com/photo-1502741224143-90386d7f8c82?auto=format&fit=crop&w=800&q=80'
     ),
     (
         'Latte yến mạch đá',
@@ -362,7 +362,7 @@ VALUES
         'Espresso pha sữa yến mạch, vị béo nhẹ và ít ngọt.',
         true,
         5,
-        'https://source.unsplash.com/800x600/?iced-latte'
+        'https://images.unsplash.com/photo-1517701550927-30cf4ba1dba5?auto=format&fit=crop&w=800&q=80'
     );
 
 -- Insert inventory items

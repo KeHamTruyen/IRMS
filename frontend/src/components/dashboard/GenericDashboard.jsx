@@ -44,7 +44,7 @@ function GenericDashboard({ session, dashboard, dashboardConfig, roleMeta, loadi
           </div>
           <div className="min-w-[220px] rounded-[18px] border border-[#d8e0e7] bg-white p-4">
             <strong className="block text-sm text-[#16202a]">
-              {dashboard?.sourceLabel ?? 'Dữ liệu dự phòng từ mock API'}
+              {dashboard?.sourceLabel ?? 'Dữ liệu từ backend'}
             </strong>
             <span className="mt-1 block text-sm text-[#62707f]">
               {dashboard?.snapshotTime ?? 'Chưa có ảnh chụp dữ liệu thời gian thực'}
