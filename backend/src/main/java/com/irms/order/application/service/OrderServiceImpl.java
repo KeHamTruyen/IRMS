@@ -4,6 +4,7 @@ import com.irms.admin.domain.entity.MenuItem;
 import com.irms.admin.domain.entity.User;
 import com.irms.admin.domain.repository.MenuItemRepository;
 import com.irms.admin.domain.repository.UserRepository;
+import com.irms.audit.application.service.IAuditLogService;
 import com.irms.common.event.DomainEventPublisher;
 import com.irms.common.exception.BusinessException;
 import com.irms.common.exception.ResourceNotFoundException;
@@ -16,6 +17,7 @@ import com.irms.order.domain.entity.OrderType;
 import com.irms.order.domain.event.OrderPlacedEvent;
 import com.irms.order.domain.repository.OrderRepository;
 import com.irms.order.domain.service.OrderCalculator;
+import com.irms.order.domain.service.OrderItemCalculator;
 import com.irms.order.domain.service.OrderNumberGenerator;
 import com.irms.order.domain.service.OrderStatusTransitionValidator;
 import com.irms.order.domain.service.OrderValidator;
@@ -51,8 +53,10 @@ public class OrderServiceImpl implements IOrderService {
     // ✅ SRP: Domain services injected
     private final OrderValidator orderValidator;
     private final OrderCalculator orderCalculator;
+    private final OrderItemCalculator orderItemCalculator;
     private final OrderNumberGenerator orderNumberGenerator;
     private final OrderStatusTransitionValidator orderStatusTransitionValidator;
+    private final IAuditLogService auditLogService;
     
     @Override
     @Transactional
@@ -104,6 +108,12 @@ public class OrderServiceImpl implements IOrderService {
         // Save order
         Order savedOrder = orderRepository.save(order);
         log.info("Order created: {}", savedOrder.getOrderNumber());
+        auditLogService.logAction(
+            "ORDER_CREATED",
+            "ORDER",
+            savedOrder.getId(),
+            "status=" + savedOrder.getStatus() + ", tableId=" + savedOrder.getTableId()
+        );
         
         // Publish event
         eventPublisher.publish(OrderPlacedEvent.builder()
@@ -147,6 +157,12 @@ public class OrderServiceImpl implements IOrderService {
         
         Order updatedOrder = orderRepository.save(order);
         log.info("Order {} status updated to {}", order.getOrderNumber(), newStatus);
+        auditLogService.logAction(
+            "ORDER_STATUS_UPDATED",
+            "ORDER",
+            updatedOrder.getId(),
+            "newStatus=" + newStatus
+        );
         
         return updatedOrder;
     }
@@ -174,6 +190,12 @@ public class OrderServiceImpl implements IOrderService {
         }
         
         log.info("Order {} cancelled", order.getOrderNumber());
+        auditLogService.logAction(
+            "ORDER_CANCELLED",
+            "ORDER",
+            order.getId(),
+            "tableId=" + order.getTableId()
+        );
     }
     
     private List<OrderItem> createOrderItems(List<OrderItemRequest> itemRequests) {
@@ -199,7 +221,7 @@ public class OrderServiceImpl implements IOrderService {
                 .build();
         
         item.setMenuItemName(menuItem.getName());
-        // ✅ Subtotal auto-calculated by JPA @PrePersist
+        item.setSubtotal(orderItemCalculator.calculateSubtotal(menuItem.getPrice(), request.getQuantity()));
         
         return item;
     }

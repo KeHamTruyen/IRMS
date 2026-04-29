@@ -6,6 +6,9 @@ export { menuService } from './menu.service';
 export { kitchenService } from './kitchen.service';
 export { billingService } from './billing.service';
 export { analyticsService } from './analytics.service';
+export { auditService } from './audit.service';
+export { reservationService } from './reservation.service';
+export { inventoryService } from './inventory.service';
 export { websocketService, WS_TOPICS } from './websocket.service';
 export type { NotificationEvent } from './websocket.service';
 

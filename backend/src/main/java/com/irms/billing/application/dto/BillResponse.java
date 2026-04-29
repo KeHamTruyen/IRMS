@@ -22,7 +22,10 @@ public class BillResponse {
     private BigDecimal tax;
     private BigDecimal discount;
     private BigDecimal serviceCharge;
+    private BigDecimal tipAmount;
     private BigDecimal totalAmount;
+    private BigDecimal amountPaid;
+    private BigDecimal remainingDue;
     private BillStatus status;
     private LocalDateTime createdAt;
     private LocalDateTime paidAt;

@@ -68,10 +68,11 @@
 
 ### 💰 Billing & Payment
 - ✅ Multi-payment methods: Cash, Card, E-Wallet
-- ✅ Split billing support
+- ✅ Split payment (partial payment nhiều lần cho 1 bill)
+- ✅ Tip management (áp dụng trước lần thanh toán đầu tiên)
 - ✅ Discount strategies: Percentage, Fixed, Coupon, Membership
 - ✅ Tax calculation với VAT/Service charge
-- ✅ Bill history và export
+- ✅ Bill history và receipt export (.txt)
 
 ### 🪑 Table & Reservation Management
 - ✅ Visual table layout
@@ -84,8 +85,14 @@
 - ✅ Dashboard với revenue metrics
 - ✅ Order statistics by period
 - ✅ Popular items ranking
-- ✅ Staff performance tracking
+- ✅ Peak hour analysis
+- ✅ Sales report export CSV
 - ✅ Real-time charts với Recharts
+
+### 📜 Audit Logs
+- ✅ Audit trail cho các hành động critical
+- ✅ Log các action: tạo bill, thanh toán thành công/thất bại, tạo/cập nhật/hủy order
+- ✅ Admin/Manager có thể xem recent audit logs
 
 ### 🔧 Admin Panel
 - ✅ User management (CRUD)
@@ -237,6 +244,11 @@ V4__Create_orders_table.sql
 V5__Create_bills_table.sql
 V6__Create_kitchen_orders_table.sql
 V7__Insert_seed_data.sql
+V8__Create_reservations_table.sql
+V9__Create_inventory_items_table.sql
+V10__Insert_reservations_inventory_seed.sql
+V11__Add_tip_amount_to_bills.sql
+V12__Create_audit_logs_table.sql
 ```
 
 ---
@@ -348,14 +360,21 @@ Content-Type: application/json
 
 #### Process Payment
 ```http
-POST /api/bills/{billId}/payment
+POST /api/bills/{billId}/payments
 Authorization: Bearer <token>
 Content-Type: application/json
 
 {
   "paymentMethod": "CASH",
-  "amount": 150000
+  "amount": 150000,
+  "tipAmount": 10000
 }
+```
+
+#### Download Receipt
+```http
+GET /api/bills/{billId}/receipt
+Authorization: Bearer <token>
 ```
 
 ### Tables
@@ -383,6 +402,69 @@ Content-Type: application/json
 #### Get Dashboard Stats
 ```http
 GET /api/analytics/dashboard
+Authorization: Bearer <token>
+```
+
+#### Get Sales Report
+```http
+GET /api/analytics/sales?startDate=2026-04-01&endDate=2026-04-14
+Authorization: Bearer <token>
+```
+
+#### Export Sales Report CSV
+```http
+GET /api/analytics/sales/export?startDate=2026-04-01&endDate=2026-04-14
+Authorization: Bearer <token>
+```
+
+### Reservations
+
+#### Get Reservations
+```http
+GET /api/reservations?date=2026-04-14&status=PENDING
+Authorization: Bearer <token>
+```
+
+#### Create Reservation
+```http
+POST /api/reservations
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "customerName": "Alice Johnson",
+  "customerPhone": "555-1010",
+  "guestCount": 4,
+  "reservationDate": "2026-04-14",
+  "reservationTime": "19:00",
+  "notes": "Window seat preferred"
+}
+```
+
+### Inventory
+
+#### Get Inventory
+```http
+GET /api/inventory?category=Vegetables&lowStock=true
+Authorization: Bearer <token>
+```
+
+#### Update Inventory Quantity
+```http
+PATCH /api/inventory/{id}/quantity
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "quantity": 25.5
+}
+```
+
+### Audit Logs
+
+#### Get Recent Audit Logs
+```http
+GET /api/audit-logs?limit=100
 Authorization: Bearer <token>
 ```
 
@@ -425,7 +507,10 @@ IRMS/
 │   │   ├── billing/                 # Billing module
 │   │   │   └── domain/strategy/     # Payment & discount strategies
 │   │   ├── table/                   # Table module
+│   │   ├── reservation/             # Reservation module
+│   │   ├── inventory/               # Inventory module
 │   │   ├── analytics/               # Analytics module
+│   │   ├── audit/                   # Audit log module
 │   │   ├── notification/            # WebSocket notifications
 │   │   ├── common/                  # Shared utilities
 │   │   └── config/                  # Configuration
@@ -458,6 +543,9 @@ IRMS/
 │   │   ├── table.service.ts        # Table API
 │   │   ├── menu.service.ts         # Menu API
 │   │   ├── analytics.service.ts    # Analytics API
+│   │   ├── reservation.service.ts  # Reservation API
+│   │   ├── inventory.service.ts    # Inventory API
+│   │   └── audit.service.ts        # Audit log API
 │   │   └── websocket.service.ts    # WebSocket client
 │   ├── store/                       # State management
 │   │   └── RestaurantContext.tsx   # Global context
@@ -476,8 +564,16 @@ IRMS/
 ├── package.json                     # Frontend dependencies
 ├── vite.config.ts                  # Vite configuration
 ├── tsconfig.json                   # TypeScript config
+├── vitest.config.ts                # Frontend test config
 └── README.md                        # This file
 ```
+
+---
+
+## ✅ Test Status
+
+- Backend: `mvn test` -> **33 passed, 0 failed**
+- Frontend: `npm test` -> **22 passed, 0 failed**
 
 ---
 

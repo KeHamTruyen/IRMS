@@ -21,4 +21,6 @@ public class DashboardStatsResponse {
     private Integer availableTables;
     private Integer pendingKitchenOrders;
     private Integer readyToServeOrders;
+    private Integer pendingReservations;
+    private Integer lowStockItems;
 }

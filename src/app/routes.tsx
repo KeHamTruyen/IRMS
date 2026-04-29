@@ -27,7 +27,11 @@ export const router = createBrowserRouter([
   },
   {
     path: '/test',
-    element: <ApiTestPage />,
+    element: (
+      <ProtectedRoute allowedRoles={['admin']}>
+        <ApiTestPage />
+      </ProtectedRoute>
+    ),
   },
   {
     path: '/',

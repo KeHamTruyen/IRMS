@@ -10,7 +10,7 @@ export const RootLayout: React.FC = () => {
 
   useEffect(() => {
     if (!currentUser) {
-      navigate('/');
+      navigate('/login');
     }
   }, [currentUser, navigate]);
 

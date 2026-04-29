@@ -24,7 +24,7 @@ export const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 
   // Logged in but wrong role - redirect to their correct dashboard
   if (currentUser && !allowedRoles.includes(currentUser.role)) {
-    return <Navigate to={`/${currentUser.role}`} replace />;
+    return <Navigate to="/unauthorized" replace />;
   }
 
   // Authorized - render the page

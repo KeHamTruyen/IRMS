@@ -46,4 +46,9 @@ public interface IBillingService {
         request.setBillId(billId);
         return processPayment(request);
     }
+
+    /**
+     * Generate a printable text receipt for a bill.
+     */
+    String generateReceiptText(Long billId);
 }

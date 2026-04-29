@@ -14,12 +14,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Bill Controller (SRP, DIP)
@@ -137,4 +140,17 @@ public class BillController {
             .status(HttpStatus.CREATED)
             .body(ApiResponse.success(response, message));
         }
+
+    @GetMapping("/{billId}/receipt")
+    @PreAuthorize("hasAnyRole('CASHIER', 'MANAGER', 'ADMIN')")
+    @Operation(summary = "Download receipt as text file")
+    public ResponseEntity<byte[]> downloadReceipt(@PathVariable Long billId) {
+        String receipt = billingService.generateReceiptText(billId);
+        String filename = "receipt-" + billId + ".txt";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(receipt.getBytes(StandardCharsets.UTF_8));
+    }
 }

@@ -1,5 +1,6 @@
 package com.irms.billing.application.service;
 
+import com.irms.audit.application.service.IAuditLogService;
 import com.irms.billing.application.dto.CreateBillRequest;
 import com.irms.billing.application.dto.ProcessPaymentRequest;
 import com.irms.billing.application.service.payment.PaymentProcessorFactory;
@@ -52,6 +53,7 @@ public class BillingServiceImpl implements IBillingService {
     private final BillNumberGenerator billNumberGenerator;
     private final PaymentStatusCalculator paymentStatusCalculator;
     private final OrderStatusTransitionValidator orderStatusTransitionValidator;
+    private final IAuditLogService auditLogService;
     
     @Value("${app.tax-rate}")
     private BigDecimal taxRate;
@@ -117,6 +119,12 @@ public class BillingServiceImpl implements IBillingService {
         
         Bill savedBill = billRepository.save(bill);
         log.info("Bill created: {} with total: {}", savedBill.getBillNumber(), savedBill.getTotalAmount());
+        auditLogService.logAction(
+            "BILL_CREATED",
+            "BILL",
+            savedBill.getId(),
+            "orderId=" + savedBill.getOrderId() + ", total=" + savedBill.getTotalAmount()
+        );
         
         return savedBill;
     }
@@ -137,11 +145,21 @@ public class BillingServiceImpl implements IBillingService {
         Bill bill = billRepository.findById(request.getBillId())
                 .orElseThrow(() -> new ResourceNotFoundException("Bill", request.getBillId()));
         
-        // Business Rule 5: Payment amount must be equal to or greater than bill total
-        if (request.getAmount().compareTo(bill.getTotalAmount()) < 0) {
+        // Apply tip before first completed payment so total is fixed for split payments.
+        applyTipIfPresent(bill, request.getTipAmount());
+
+        BigDecimal amountPaid = paymentStatusCalculator.calculateTotalPaid(bill.getPayments());
+        BigDecimal remainingDue = bill.getTotalAmount().subtract(amountPaid);
+
+        if (remainingDue.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("Bill is already fully paid");
+        }
+
+        // Split payment rule: each payment must be > 0 and cannot exceed remaining due.
+        if (request.getAmount().compareTo(remainingDue) > 0) {
             throw new BusinessException(
-                    String.format("Payment amount %.2f is less than bill total %.2f",
-                            request.getAmount(), bill.getTotalAmount())
+                    String.format("Payment amount %.2f exceeds remaining due %.2f",
+                            request.getAmount(), remainingDue)
             );
         }
         
@@ -165,11 +183,24 @@ public class BillingServiceImpl implements IBillingService {
         boolean paymentSuccess = processor.processPayment(payment, request.getAmount());
         
         if (paymentSuccess) {
-            // Business Rule 6: Successful payment sets bill=PAID, payment=SUCCESS, order=COMPLETED, table=AVAILABLE
-            handleSuccessfulPayment(bill, payment);
+            // Successful payment updates payment status. Bill/order state is finalized after status recalculation.
+            payment.setStatus(PaymentStatus.COMPLETED);
+            payment.setProcessedAt(LocalDateTime.now());
+            auditLogService.logAction(
+                    "PAYMENT_COMPLETED",
+                    "BILL",
+                    bill.getId(),
+                    "method=" + request.getPaymentMethod() + ", amount=" + request.getAmount()
+            );
         } else {
             // Business Rule 7: Failed payment keeps bill UNPAID
             handleFailedPayment(bill, payment);
+            auditLogService.logAction(
+                    "PAYMENT_FAILED",
+                    "BILL",
+                    bill.getId(),
+                    "method=" + request.getPaymentMethod() + ", amount=" + request.getAmount()
+            );
         }
         
         // Add payment to bill
@@ -183,22 +214,61 @@ public class BillingServiceImpl implements IBillingService {
         bill.setStatus(newStatus);
         if (newStatus == BillStatus.PAID) {
             bill.setPaidAt(LocalDateTime.now());
+            finalizeOrderAndTableWhenBillPaid(bill);
         }
         
         billRepository.save(bill);
         
         return payment;
     }
+
+    @Override
+    @Transactional(readOnly = true)
+    public String generateReceiptText(Long billId) {
+        Bill bill = getBillById(billId);
+        BigDecimal amountPaid = paymentStatusCalculator.calculateTotalPaid(bill.getPayments());
+        BigDecimal remainingDue = bill.getTotalAmount().subtract(amountPaid).max(BigDecimal.ZERO);
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("IRMS RECEIPT\n");
+        sb.append("==============================\n");
+        sb.append("Bill No: ").append(bill.getBillNumber()).append("\n");
+        sb.append("Order ID: ").append(bill.getOrderId()).append("\n");
+        sb.append("Created: ").append(bill.getCreatedAt()).append("\n");
+        if (bill.getPaidAt() != null) {
+            sb.append("Paid At: ").append(bill.getPaidAt()).append("\n");
+        }
+        sb.append("\n");
+        sb.append(String.format("Subtotal:      %.2f\n", bill.getSubtotal()));
+        sb.append(String.format("Tax:           %.2f\n", bill.getTax()));
+        sb.append(String.format("Service:       %.2f\n", bill.getServiceCharge()));
+        sb.append(String.format("Discount:     -%.2f\n", bill.getDiscount()));
+        sb.append(String.format("Tip:           %.2f\n", bill.getTipAmount()));
+        sb.append(String.format("TOTAL:         %.2f\n", bill.getTotalAmount()));
+        sb.append("\n");
+        sb.append(String.format("Paid:          %.2f\n", amountPaid));
+        sb.append(String.format("Remaining:     %.2f\n", remainingDue));
+        sb.append("Status: ").append(bill.getStatus()).append("\n");
+        sb.append("\n");
+        sb.append("Payments:\n");
+        for (Payment payment : bill.getPayments()) {
+            sb.append(" - ")
+                    .append(payment.getPaymentMethod())
+                    .append(" | ")
+                    .append(payment.getStatus())
+                    .append(" | ")
+                    .append(payment.getAmount())
+                    .append("\n");
+        }
+        sb.append("==============================\n");
+
+        return sb.toString();
+    }
     
     /**
      * Business Rule 6: Handle successful payment
      */
-    private void handleSuccessfulPayment(Bill bill, Payment payment) {
-        log.info("Payment successful for bill: {}", bill.getBillNumber());
-        
-        // Set payment as SUCCESS (already done in processor)
-        payment.setStatus(PaymentStatus.COMPLETED);
-        
+    private void finalizeOrderAndTableWhenBillPaid(Bill bill) {
         // Set order as COMPLETED
         Order order = orderRepository.findById(bill.getOrderId())
                 .orElseThrow(() -> new ResourceNotFoundException("Order", bill.getOrderId()));
@@ -217,7 +287,7 @@ public class BillingServiceImpl implements IBillingService {
             });
         }
         
-        log.info("Payment workflow completed successfully");
+        log.info("Bill {} fully paid. Order and table states finalized", bill.getBillNumber());
     }
     
     /**
@@ -231,5 +301,25 @@ public class BillingServiceImpl implements IBillingService {
         payment.setStatus(PaymentStatus.FAILED);
         
         log.info("Bill remains UNPAID, customer can retry payment");
+    }
+
+    private void applyTipIfPresent(Bill bill, BigDecimal tipAmount) {
+        if (tipAmount == null || tipAmount.compareTo(BigDecimal.ZERO) <= 0) {
+            return;
+        }
+
+        if (paymentStatusCalculator.calculateTotalPaid(bill.getPayments()).compareTo(BigDecimal.ZERO) > 0) {
+            throw new BusinessException("Cannot change tip after payments have started");
+        }
+
+        bill.setTipAmount(tipAmount);
+        bill.setTotalAmount(
+                billCalculator.recalculateTotal(
+                        bill.getSubtotal(),
+                        bill.getTax(),
+                        bill.getServiceCharge(),
+                        bill.getDiscount().subtract(tipAmount)
+                )
+        );
     }
 }

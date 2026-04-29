@@ -22,7 +22,10 @@ interface BillResponse {
   tax: number;
   discount: number;
   serviceCharge: number;
+  tipAmount: number;
   totalAmount: number;
+  amountPaid: number;
+  remainingDue: number;
   status: string;
   createdAt: string;
   paidAt?: string;
@@ -37,6 +40,7 @@ interface CreateBillRequest {
 interface ProcessPaymentRequest {
   amount: number;
   paymentMethod: string;
+  tipAmount?: number;
   transactionId?: string;
   notes?: string;
 }
@@ -84,7 +88,11 @@ const mapBill = (backendBill: BillResponse): Bill => {
     subtotal: backendBill.subtotal,
     tax: backendBill.tax,
     discount: backendBill.discount,
+    serviceCharge: backendBill.serviceCharge,
+    tipAmount: backendBill.tipAmount,
     total: backendBill.totalAmount,
+    amountPaid: backendBill.amountPaid,
+    remainingDue: backendBill.remainingDue,
     paymentStatus: mapPaymentStatus(backendBill.status),
     paymentMethod: payments.length > 0 
       ? mapPaymentMethod(payments[0].paymentMethod)
@@ -135,13 +143,15 @@ export const billingService = {
     amount: number,
     paymentMethod: PaymentMethod,
     transactionId?: string,
-    notes?: string
+    notes?: string,
+    tipAmount?: number
   ): Promise<Bill> {
     const request: ProcessPaymentRequest = {
       amount,
       paymentMethod: mapPaymentMethodToBackend(paymentMethod),
       transactionId,
       notes,
+      tipAmount,
     };
     
     const response = await api.post<BillResponse>(
@@ -150,5 +160,20 @@ export const billingService = {
     );
     const data = (response as any).data || response;
     return mapBill(data);
+  },
+
+  async downloadReceipt(billId: string): Promise<Blob> {
+    const response = await fetch(`/api/bills/${billId}/receipt`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${localStorage.getItem('jwt_token') || ''}`,
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error('Failed to download receipt');
+    }
+
+    return response.blob();
   },
 };

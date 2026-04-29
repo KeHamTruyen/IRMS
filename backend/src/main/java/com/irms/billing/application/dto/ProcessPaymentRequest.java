@@ -25,6 +25,9 @@ public class ProcessPaymentRequest {
     
     @NotNull(message = "Payment method is required")
     private PaymentMethod paymentMethod;
+
+    @DecimalMin(value = "0.00", message = "Tip amount cannot be negative")
+    private BigDecimal tipAmount;
     
     private String transactionId;
     

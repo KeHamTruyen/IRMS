@@ -52,6 +52,10 @@ public class Bill {
     @Column(nullable = false, precision = 10, scale = 2)
     @Builder.Default
     private BigDecimal serviceCharge = BigDecimal.ZERO;
+
+    @Column(nullable = false, precision = 10, scale = 2)
+    @Builder.Default
+    private BigDecimal tipAmount = BigDecimal.ZERO;
     
     @Column(nullable = false, precision = 10, scale = 2)
     private BigDecimal totalAmount;

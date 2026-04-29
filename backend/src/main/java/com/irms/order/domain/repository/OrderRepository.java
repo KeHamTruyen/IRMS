@@ -29,4 +29,13 @@ public interface OrderRepository extends JpaRepository<Order, Long> {
     
     @Query("SELECT o FROM Order o WHERE o.tableId = :tableId AND o.status NOT IN ('COMPLETED', 'CANCELLED')")
     Optional<Order> findActiveOrderByTableId(Long tableId);
+
+    @Query(value = """
+            SELECT EXTRACT(HOUR FROM o.created_at) AS hour_of_day, COUNT(*) AS total
+            FROM orders o
+            WHERE o.created_at BETWEEN :startDate AND :endDate
+            GROUP BY hour_of_day
+            ORDER BY total DESC
+            """, nativeQuery = true)
+    List<Object[]> countOrdersByHour(LocalDateTime startDate, LocalDateTime endDate);
 }
