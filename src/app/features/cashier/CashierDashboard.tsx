@@ -11,6 +11,9 @@ export const CashierDashboard: React.FC = () => {
   const [paymentMethod, setPaymentMethod] = useState<PaymentMethod>('cash');
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [currentBill, setCurrentBill] = useState<any | null>(null);
+  const [paymentAmount, setPaymentAmount] = useState<string>('0');
+  const [tipAmount, setTipAmount] = useState<string>('0');
 
   const loadOrders = async () => {
     try {
@@ -57,15 +60,68 @@ export const CashierDashboard: React.FC = () => {
     }
   };
 
+  const loadBillForOrder = async (order: Order) => {
+    const bill = await ensureBillForOrder(order);
+    setCurrentBill(bill);
+    const remaining = bill.remainingDue ?? bill.total;
+    setPaymentAmount(remaining.toFixed(2));
+    if ((bill.tipAmount ?? 0) > 0) {
+      setTipAmount((bill.tipAmount as number).toFixed(2));
+    } else {
+      setTipAmount('0');
+    }
+  };
+
   const handleProcessPayment = async (order: Order) => {
     try {
-      const bill = await ensureBillForOrder(order);
-      await billingService.processPayment(bill.id, calculateTotal(order), paymentMethod);
-      toast.success(`Payment processed for Table ${order.tableName ?? order.tableId}`);
-      setSelectedOrder(null);
+      const bill = currentBill ?? await ensureBillForOrder(order);
+      const amount = Number(paymentAmount);
+      const tip = Number(tipAmount);
+
+      if (!Number.isFinite(amount) || amount <= 0) {
+        toast.error('Payment amount must be greater than 0');
+        return;
+      }
+
+      const appliedTip = (bill.amountPaid ?? 0) > 0 ? undefined : (tip > 0 ? tip : undefined);
+      const updated = await billingService.processPayment(
+        bill.id,
+        amount,
+        paymentMethod,
+        undefined,
+        undefined,
+        appliedTip
+      );
+
+      setCurrentBill(updated);
+
+      if ((updated.remainingDue ?? 0) > 0) {
+        setPaymentAmount((updated.remainingDue as number).toFixed(2));
+        toast.success(`Partial payment accepted. Remaining: $${(updated.remainingDue as number).toFixed(2)}`);
+      } else {
+        toast.success(`Payment completed for Table ${order.tableName ?? order.tableId}`);
+        setSelectedOrder(null);
+        setCurrentBill(null);
+      }
+
       await loadOrders();
     } catch (error: any) {
       toast.error(error?.response?.data?.message || error?.message || 'Payment failed');
+    }
+  };
+
+  const handleDownloadReceipt = async () => {
+    if (!currentBill) return;
+    try {
+      const blob = await billingService.downloadReceipt(currentBill.id);
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = `receipt-${currentBill.id}.txt`;
+      link.click();
+      URL.revokeObjectURL(url);
+    } catch (error: any) {
+      toast.error(error?.message || 'Failed to download receipt');
     }
   };
 
@@ -84,7 +140,7 @@ export const CashierDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-screen-2xl mx-auto p-6">
         <div className="mb-6 flex items-start justify-between gap-4">
           <div>
             <h1 className="text-3xl font-bold text-gray-900 mb-2">Cashier Dashboard</h1>
@@ -160,7 +216,10 @@ export const CashierDashboard: React.FC = () => {
                   return (
                     <button
                       key={order.id}
-                      onClick={() => setSelectedOrder(order)}
+                      onClick={() => {
+                        setSelectedOrder(order);
+                        void loadBillForOrder(order);
+                      }}
                       className={`w-full text-left p-4 rounded-lg border-2 transition-all ${
                         selectedOrder?.id === order.id
                           ? 'border-orange-500 bg-orange-50'
@@ -241,15 +300,57 @@ export const CashierDashboard: React.FC = () => {
                 <div className="mb-6 pt-4 border-t border-gray-200 space-y-2">
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Subtotal</span>
-                    <span>${calculateSubtotal(selectedOrder).toFixed(2)}</span>
+                    <span>${(currentBill?.subtotal ?? calculateSubtotal(selectedOrder)).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-sm text-gray-600">
                     <span>Tax (10%)</span>
-                    <span>${calculateTax(calculateSubtotal(selectedOrder)).toFixed(2)}</span>
+                    <span>${(currentBill?.tax ?? calculateTax(calculateSubtotal(selectedOrder))).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Service Charge</span>
+                    <span>${(currentBill?.serviceCharge ?? 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Tip</span>
+                      <span>${(currentBill?.tipAmount ?? (Number(tipAmount) || 0)).toFixed(2)}</span>
                   </div>
                   <div className="flex justify-between text-xl font-bold text-gray-900 pt-2 border-t border-gray-200">
                     <span>Total</span>
-                    <span>${calculateTotal(selectedOrder).toFixed(2)}</span>
+                    <span>${(currentBill?.total ?? calculateTotal(selectedOrder)).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm text-gray-600">
+                    <span>Paid</span>
+                    <span>${(currentBill?.amountPaid ?? 0).toFixed(2)}</span>
+                  </div>
+                  <div className="flex justify-between text-sm font-semibold text-orange-700">
+                    <span>Remaining Due</span>
+                    <span>${(currentBill?.remainingDue ?? currentBill?.total ?? calculateTotal(selectedOrder)).toFixed(2)}</span>
+                  </div>
+                </div>
+
+                <div className="mb-6 grid grid-cols-2 gap-3">
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Payment Amount</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={paymentAmount}
+                      onChange={(e) => setPaymentAmount(e.target.value)}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2"
+                    />
+                  </div>
+                  <div>
+                    <label className="block text-sm font-medium text-gray-700 mb-2">Tip (first payment)</label>
+                    <input
+                      type="number"
+                      step="0.01"
+                      min="0"
+                      value={tipAmount}
+                      onChange={(e) => setTipAmount(e.target.value)}
+                      disabled={(currentBill?.amountPaid ?? 0) > 0}
+                      className="w-full rounded-lg border border-gray-300 px-3 py-2 disabled:bg-gray-100"
+                    />
                   </div>
                 </div>
 
@@ -299,8 +400,17 @@ export const CashierDashboard: React.FC = () => {
                   className="w-full bg-green-500 hover:bg-green-600 text-white py-4 rounded-lg font-bold text-lg transition-colors flex items-center justify-center gap-2"
                 >
                   <CheckCircle className="size-6" />
-                  Process Payment - ${calculateTotal(selectedOrder).toFixed(2)}
+                  Process Payment - ${Number(paymentAmount || '0').toFixed(2)}
                 </button>
+
+                {currentBill?.paymentStatus === 'paid' && (
+                  <button
+                    onClick={() => void handleDownloadReceipt()}
+                    className="mt-3 w-full border border-gray-300 hover:bg-gray-50 text-gray-800 py-3 rounded-lg font-medium transition-colors"
+                  >
+                    Download Receipt
+                  </button>
+                )}
               </div>
             )}
           </div>

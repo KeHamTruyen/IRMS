@@ -1,52 +1,110 @@
-import React, { useState } from 'react';
-import { useRestaurant } from '../../store/RestaurantContext';
+import React, { useEffect, useMemo, useState } from 'react';
 import { Reservation, ReservationStatus } from '../../types';
 import { Calendar, Clock, Users, Phone, CheckCircle, XCircle, Plus } from 'lucide-react';
 import { toast } from 'sonner';
 import { NewReservationModal } from './NewReservationModal';
+import { reservationService } from '../../services/reservation.service';
+import { tableService } from '../../services/table.service';
+import { Table } from '../../types';
 
 export const HostDashboard: React.FC = () => {
-  const { tables, reservations, updateReservation, updateTableStatus } = useRestaurant();
+  const [tables, setTables] = useState<Table[]>([]);
+  const [reservations, setReservations] = useState<Reservation[]>([]);
   const [showNewReservation, setShowNewReservation] = useState(false);
   const [selectedReservation, setSelectedReservation] = useState<Reservation | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [refreshing, setRefreshing] = useState(false);
 
-  const todayReservations = reservations.filter(r => {
+  const loadData = async () => {
+    try {
+      const [tablesData, reservationsData] = await Promise.all([
+        tableService.getTables(),
+        reservationService.getReservations(),
+      ]);
+
+      setTables(tablesData);
+      setReservations(reservationsData);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Failed to load host data');
+    } finally {
+      setLoading(false);
+      setRefreshing(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadData();
+  }, []);
+
+  const todayReservations = useMemo(() => {
     const today = new Date().toDateString();
-    return r.date.toDateString() === today;
-  });
+    return reservations.filter(r => r.date.toDateString() === today);
+  }, [reservations]);
 
   const pendingReservations = todayReservations.filter(r => r.status === 'pending');
   const confirmedReservations = todayReservations.filter(r => r.status === 'confirmed');
 
   const availableTables = tables.filter(t => t.status === 'available');
 
-  const handleConfirmReservation = (reservation: Reservation) => {
-    updateReservation({ ...reservation, status: 'confirmed' });
-    toast.success('Reservation confirmed');
-  };
-
-  const handleCancelReservation = (reservation: Reservation) => {
-    updateReservation({ ...reservation, status: 'cancelled' });
-    if (reservation.tableId) {
-      updateTableStatus(reservation.tableId, 'available');
+  const handleConfirmReservation = async (reservation: Reservation) => {
+    try {
+      await reservationService.updateReservationStatus(reservation.id, 'confirmed');
+      toast.success('Reservation confirmed');
+      setRefreshing(true);
+      await loadData();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Failed to confirm reservation');
     }
-    toast.success('Reservation cancelled');
   };
 
-  const handleSeatGuests = (reservation: Reservation) => {
+  const handleCancelReservation = async (reservation: Reservation) => {
+    try {
+      await reservationService.updateReservationStatus(reservation.id, 'cancelled');
+      toast.success('Reservation cancelled');
+      setRefreshing(true);
+      await loadData();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Failed to cancel reservation');
+    }
+  };
+
+  const handleSeatGuests = async (reservation: Reservation) => {
     if (reservation.tableId) {
-      updateReservation({ ...reservation, status: 'seated' });
-      updateTableStatus(reservation.tableId, 'occupied');
-      toast.success('Guests seated');
+      try {
+        await reservationService.updateReservationStatus(reservation.id, 'seated');
+        toast.success('Guests seated');
+        setRefreshing(true);
+        await loadData();
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message || error?.message || 'Failed to seat guests');
+      }
     } else {
       toast.error('Please assign a table first');
     }
   };
 
-  const handleAssignTable = (reservation: Reservation, tableId: string) => {
-    updateReservation({ ...reservation, tableId, status: 'confirmed' });
-    updateTableStatus(tableId, 'reserved');
-    toast.success('Table assigned');
+  const handleAssignTable = async (reservation: Reservation, tableId: string) => {
+    try {
+      await reservationService.assignTable(reservation.id, tableId);
+      toast.success('Table assigned');
+      setRefreshing(true);
+      await loadData();
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Failed to assign table');
+    }
+  };
+
+  const handleCreateReservation = async (payload: {
+    customerName: string;
+    customerPhone: string;
+    guestCount: number;
+    date: string;
+    time: string;
+    notes?: string;
+  }) => {
+    await reservationService.createReservation(payload);
+    setRefreshing(true);
+    await loadData();
   };
 
   const getStatusColor = (status: ReservationStatus) => {
@@ -60,9 +118,17 @@ export const HostDashboard: React.FC = () => {
     return colors[status];
   };
 
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-600">
+        Loading host dashboard...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-screen-2xl mx-auto p-6">
         {/* Header */}
         <div className="mb-6 flex justify-between items-center">
           <div>
@@ -72,6 +138,7 @@ export const HostDashboard: React.FC = () => {
           <button
             onClick={() => setShowNewReservation(true)}
             className="bg-purple-500 hover:bg-purple-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2 transition-colors"
+            disabled={refreshing}
           >
             <Plus className="size-5" />
             New Reservation
@@ -182,13 +249,13 @@ export const HostDashboard: React.FC = () => {
                           {reservation.status === 'pending' && (
                             <>
                               <button
-                                onClick={() => handleConfirmReservation(reservation)}
+                                onClick={() => void handleConfirmReservation(reservation)}
                                 className="flex-1 bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
                               >
                                 Confirm
                               </button>
                               <button
-                                onClick={() => handleCancelReservation(reservation)}
+                                onClick={() => void handleCancelReservation(reservation)}
                                 className="px-4 py-2 border border-red-300 text-red-600 hover:bg-red-50 rounded-lg text-sm font-medium transition-colors"
                               >
                                 Cancel
@@ -207,7 +274,7 @@ export const HostDashboard: React.FC = () => {
 
                           {reservation.status === 'confirmed' && table && (
                             <button
-                              onClick={() => handleSeatGuests(reservation)}
+                                onClick={() => void handleSeatGuests(reservation)}
                               className="flex-1 bg-green-500 hover:bg-green-600 text-white py-2 px-4 rounded-lg text-sm font-medium transition-colors"
                             >
                               Seat Guests
@@ -256,7 +323,7 @@ export const HostDashboard: React.FC = () => {
                       key={table.id}
                       onClick={() => {
                         if (selectedReservation) {
-                          handleAssignTable(selectedReservation, table.id);
+                          void handleAssignTable(selectedReservation, table.id);
                           setSelectedReservation(null);
                         }
                       }}
@@ -290,7 +357,10 @@ export const HostDashboard: React.FC = () => {
       </div>
 
       {showNewReservation && (
-        <NewReservationModal onClose={() => setShowNewReservation(false)} />
+        <NewReservationModal
+          onClose={() => setShowNewReservation(false)}
+          onCreate={handleCreateReservation}
+        />
       )}
     </div>
   );

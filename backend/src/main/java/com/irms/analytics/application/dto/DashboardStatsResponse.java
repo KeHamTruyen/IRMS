@@ -12,7 +12,7 @@ import java.math.BigDecimal;
 @NoArgsConstructor
 @AllArgsConstructor
 public class DashboardStatsResponse {
-    
+
     private Long totalOrders;
     private Long activeOrders;
     private Long completedOrders;
@@ -21,4 +21,6 @@ public class DashboardStatsResponse {
     private Integer availableTables;
     private Integer pendingKitchenOrders;
     private Integer readyToServeOrders;
+    private Integer pendingReservations;
+    private Integer lowStockItems;
 }

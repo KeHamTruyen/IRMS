@@ -37,28 +37,40 @@ public class InventoryItem {
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
-    @Builder.Default
-    private InventoryStatus status = InventoryStatus.IN_STOCK;
+    private InventoryStatus status;
 
     @Column(nullable = false)
     private LocalDateTime updatedAt;
 
     @PrePersist
+    protected void onCreate() {
+        if (updatedAt == null) {
+            updatedAt = LocalDateTime.now();
+        }
+        if (status == null) {
+            status = quantity != null && quantity <= 0 ? InventoryStatus.OUT_OF_STOCK : InventoryStatus.IN_STOCK;
+        }
+    }
+
     @PreUpdate
-    protected void touch() {
-        this.updatedAt = LocalDateTime.now();
+    protected void onUpdate() {
+        updatedAt = LocalDateTime.now();
     }
 
     public void updateQuantity(Integer nextQuantity) {
-        this.quantity = Math.max(nextQuantity, 0);
+        this.quantity = Math.max(0, nextQuantity == null ? 0 : nextQuantity);
         if (this.quantity <= 0) {
             this.status = InventoryStatus.OUT_OF_STOCK;
-        } else if (this.status == InventoryStatus.OUT_OF_STOCK) {
+        } else if (this.threshold != null && this.quantity <= this.threshold) {
+            this.status = InventoryStatus.RESTOCKING;
+        } else {
             this.status = InventoryStatus.IN_STOCK;
         }
     }
 
     public void updateStatus(InventoryStatus nextStatus) {
-        this.status = this.quantity <= 0 ? InventoryStatus.OUT_OF_STOCK : nextStatus;
+        if (nextStatus != null) {
+            this.status = nextStatus;
+        }
     }
 }

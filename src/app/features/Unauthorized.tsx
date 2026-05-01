@@ -2,6 +2,7 @@ import { ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router';
 import { useRestaurant } from '../store/RestaurantContext';
 import { Button } from '../components/ui/button';
+import { authService } from '../services/auth.service';
 
 export const Unauthorized: React.FC = () => {
   const navigate = useNavigate();
@@ -16,6 +17,7 @@ export const Unauthorized: React.FC = () => {
   };
 
   const handleLogout = () => {
+    authService.logout();
     setCurrentUser(null);
     navigate('/login');
   };

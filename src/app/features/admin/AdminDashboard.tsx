@@ -1,14 +1,26 @@
 import React, { useState } from 'react';
 import { useRestaurant } from '../../store/RestaurantContext';
 import { Settings, Users, Menu, Package, Shield } from 'lucide-react';
+import { auditService, AuditLogEntry } from '../../services/audit.service';
+import { toast } from 'sonner';
 
 export const AdminDashboard: React.FC = () => {
   const { users, menuItems, updateMenuItem } = useRestaurant();
-  const [activeTab, setActiveTab] = useState<'users' | 'menu' | 'settings'>('users');
+  const [activeTab, setActiveTab] = useState<'users' | 'menu' | 'settings' | 'audit'>('users');
+  const [auditLogs, setAuditLogs] = useState<AuditLogEntry[]>([]);
+
+  const loadAuditLogs = async () => {
+    try {
+      const logs = await auditService.getRecentLogs(100);
+      setAuditLogs(logs);
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message || error?.message || 'Failed to load audit logs');
+    }
+  };
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-screen-2xl mx-auto p-6">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2 flex items-center gap-3">
@@ -54,6 +66,20 @@ export const AdminDashboard: React.FC = () => {
               >
                 <Settings className="size-5" />
                 System Settings
+              </button>
+              <button
+                onClick={() => {
+                  setActiveTab('audit');
+                  void loadAuditLogs();
+                }}
+                className={`flex items-center gap-2 px-6 py-3 rounded-lg font-medium transition-colors ${
+                  activeTab === 'audit'
+                    ? 'bg-gray-900 text-white'
+                    : 'text-gray-600 hover:bg-gray-100'
+                }`}
+              >
+                <Package className="size-5" />
+                Audit Logs
               </button>
             </div>
           </div>
@@ -231,6 +257,38 @@ export const AdminDashboard: React.FC = () => {
                   <button className="w-full bg-gray-900 hover:bg-gray-800 text-white py-3 rounded-lg font-medium transition-colors">
                     Save Settings
                   </button>
+                </div>
+              </div>
+            )}
+
+            {activeTab === 'audit' && (
+              <div>
+                <div className="flex items-center justify-between mb-4">
+                  <h2 className="text-xl font-bold text-gray-900">Recent Audit Logs</h2>
+                  <button
+                    onClick={() => void loadAuditLogs()}
+                    className="px-4 py-2 border border-gray-300 rounded-lg text-sm font-medium hover:bg-gray-50"
+                  >
+                    Refresh
+                  </button>
+                </div>
+                <div className="space-y-3 max-h-[500px] overflow-auto">
+                  {auditLogs.length === 0 ? (
+                    <div className="text-sm text-gray-500">No audit logs found.</div>
+                  ) : (
+                    auditLogs.map(log => (
+                      <div key={log.id} className="border border-gray-200 rounded-lg p-4">
+                        <div className="flex items-center justify-between mb-1">
+                          <div className="font-semibold text-gray-900">{log.action}</div>
+                          <div className="text-xs text-gray-500">{new Date(log.createdAt).toLocaleString()}</div>
+                        </div>
+                        <div className="text-sm text-gray-600">
+                          {log.entityType}#{log.entityId ?? '-'} by {log.username}
+                        </div>
+                        {log.details && <div className="text-sm text-gray-700 mt-1">{log.details}</div>}
+                      </div>
+                    ))
+                  )}
                 </div>
               </div>
             )}

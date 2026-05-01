@@ -14,12 +14,15 @@ import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.nio.charset.StandardCharsets;
 
 /**
  * Bill Controller (SRP, DIP)
@@ -31,9 +34,9 @@ import java.util.List;
 @RequiredArgsConstructor
 @Tag(name = "Bills", description = "Billing and payment APIs")
 public class BillController {
-    
-    private final IBillingService billingService;  // Depend on interface (DIP)
-    private final BillMapper billMapper;           // Separated mapping (SRP)
+
+    private final IBillingService billingService; // Depend on interface (DIP)
+    private final BillMapper billMapper; // Separated mapping (SRP)
     private final PaymentMapper paymentMapper;
 
     @GetMapping
@@ -56,7 +59,7 @@ public class BillController {
     }
 
     @PostMapping
-    @PreAuthorize("hasAnyRole('SERVER', 'CASHIER', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CASHIER', 'MANAGER', 'ADMIN')")
     @Operation(summary = "Generate bill from order")
     public ResponseEntity<ApiResponse<BillResponse>> createBill(@Valid @RequestBody CreateBillRequest request) {
         Bill bill = billingService.createBill(request);
@@ -66,14 +69,14 @@ public class BillController {
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, "Bill created successfully"));
     }
-    
+
     @PostMapping("/order/{orderId}")
-    @PreAuthorize("hasAnyRole('SERVER', 'CASHIER', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CASHIER', 'MANAGER', 'ADMIN')")
     @Operation(summary = "Generate bill from order")
     public ResponseEntity<ApiResponse<BillResponse>> createBill(
             @PathVariable Long orderId,
             @Valid @RequestBody(required = false) CreateBillRequest request) {
-        
+
         // If no request body, create default request
         if (request == null) {
             request = new CreateBillRequest();
@@ -81,47 +84,47 @@ public class BillController {
         } else {
             request.setOrderId(orderId);
         }
-        
+
         Bill bill = billingService.createBill(request);
         BillResponse response = billMapper.toResponse(bill);
-        
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, "Bill created successfully"));
     }
-    
+
     @GetMapping("/order/{orderId}")
     @PreAuthorize("hasAnyRole('SERVER', 'CASHIER', 'MANAGER', 'ADMIN')")
     @Operation(summary = "Get bill by order ID")
     public ResponseEntity<ApiResponse<BillResponse>> getBillByOrderId(@PathVariable Long orderId) {
         Bill bill = billingService.getBillByOrderId(orderId);
         BillResponse response = billMapper.toResponse(bill);
-        
+
         return ResponseEntity.ok(ApiResponse.success(response));
     }
-    
+
     @PostMapping("/payments")
-    @PreAuthorize("hasAnyRole('SERVER', 'CASHIER', 'MANAGER', 'ADMIN')")
+    @PreAuthorize("hasAnyRole('CASHIER', 'MANAGER', 'ADMIN')")
     @Operation(summary = "Process payment for bill")
-        public ResponseEntity<ApiResponse<BillResponse>> processPayment(
+    public ResponseEntity<ApiResponse<BillResponse>> processPayment(
             @Valid @RequestBody ProcessPaymentRequest request) {
-        
+
         Payment payment = billingService.processPayment(request);
         BillResponse response = billMapper.toResponse(billingService.getBillById(request.getBillId()));
-        
-        String message = payment.getStatus().name().equals("COMPLETED") 
-                ? "Payment processed successfully" 
+
+        String message = payment.getStatus().name().equals("COMPLETED")
+                ? "Payment processed successfully"
                 : "Payment processing failed";
-        
+
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, message));
     }
 
-        @PostMapping("/{billId}/payments")
-        @PreAuthorize("hasAnyRole('SERVER', 'CASHIER', 'MANAGER', 'ADMIN')")
-        @Operation(summary = "Process payment for bill by ID")
-        public ResponseEntity<ApiResponse<BillResponse>> processPaymentByBillId(
+    @PostMapping("/{billId}/payments")
+    @PreAuthorize("hasAnyRole('CASHIER', 'MANAGER', 'ADMIN')")
+    @Operation(summary = "Process payment for bill by ID")
+    public ResponseEntity<ApiResponse<BillResponse>> processPaymentByBillId(
             @PathVariable Long billId,
             @Valid @RequestBody ProcessPaymentRequest request) {
 
@@ -130,11 +133,24 @@ public class BillController {
         BillResponse response = billMapper.toResponse(billingService.getBillById(billId));
 
         String message = payment.getStatus().name().equals("COMPLETED")
-            ? "Payment processed successfully"
-            : "Payment processing failed";
+                ? "Payment processed successfully"
+                : "Payment processing failed";
 
         return ResponseEntity
-            .status(HttpStatus.CREATED)
-            .body(ApiResponse.success(response, message));
-        }
+                .status(HttpStatus.CREATED)
+                .body(ApiResponse.success(response, message));
+    }
+
+    @GetMapping("/{billId}/receipt")
+    @PreAuthorize("hasAnyRole('CASHIER', 'MANAGER', 'ADMIN')")
+    @Operation(summary = "Download receipt as text file")
+    public ResponseEntity<byte[]> downloadReceipt(@PathVariable Long billId) {
+        String receipt = billingService.generateReceiptText(billId);
+        String filename = "receipt-" + billId + ".txt";
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=" + filename)
+                .contentType(MediaType.TEXT_PLAIN)
+                .body(receipt.getBytes(StandardCharsets.UTF_8));
+    }
 }

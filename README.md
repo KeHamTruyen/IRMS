@@ -72,10 +72,11 @@
 ### 💰 Billing & Payment
 
 - ✅ Multi-payment methods: Cash, Card, E-Wallet
-- ✅ Split billing support
+- ✅ Split payment (partial payment nhiều lần cho 1 bill)
+- ✅ Tip management (áp dụng trước lần thanh toán đầu tiên)
 - ✅ Discount strategies: Percentage, Fixed, Coupon, Membership
 - ✅ Tax calculation với VAT/Service charge
-- ✅ Bill history và export
+- ✅ Bill history và receipt export (.txt)
 
 ### 🪑 Table & Reservation Management
 
@@ -90,8 +91,15 @@
 - ✅ Dashboard với revenue metrics
 - ✅ Order statistics by period
 - ✅ Popular items ranking
-- ✅ Staff performance tracking
+- ✅ Peak hour analysis
+- ✅ Sales report export CSV
 - ✅ Real-time charts với Recharts
+
+### 📜 Audit Logs
+
+- ✅ Audit trail cho các hành động critical
+- ✅ Log các action: tạo bill, thanh toán thành công/thất bại, tạo/cập nhật/hủy order
+- ✅ Admin/Manager có thể xem recent audit logs
 
 ### 🔧 Admin Panel
 
@@ -191,84 +199,50 @@ src/app/
 
 ## 🚀 Cài Đặt & Chạy
 
-### Yêu cầu môi trường
+### Prerequisites
 
-- **Node.js 18+** và npm (hoặc pnpm)
-- **Java 17+**
-- **Maven 3.9+**
-- **Docker** (khuyến nghị, để chạy nhanh cả backend & database)
+- Node.js 18+ và npm/pnpm
+- Java 17+
+- Maven 3.9+
+- PostgreSQL 15+
 
----
-
-### Chạy Backend (Spring Boot)
-
-**Cách 1: Chạy bằng Docker Compose (khuyến nghị)**
+### Backend Setup
 
 ```bash
+# 1. Clone repository
+git clone <repository-url>
 cd backend
-docker-compose up --build
-# Backend chạy tại http://localhost:3000
-# Database PostgreSQL chạy tại localhost:5432 (user/pass: irms_user/irms_pass)
-```
 
-**Cách 2: Chạy thủ công bằng Maven**
+# 2. Configure database
+# Edit src/main/resources/application.yml
+# Set your PostgreSQL credentials
 
-1. Tạo database PostgreSQL (nếu chưa có):
-
-- DB name: `irms_db`, user: `irms_user`, password: `irms_pass`
-
-2. Cấu hình lại file `src/main/resources/application.yml` hoặc `.env` nếu cần.
-3. Build & chạy:
-
-```bash
-cd backend
+# 3. Build & run
 mvn clean install
 mvn spring-boot:run
-# Backend chạy tại http://localhost:3000
+
+# Backend will run on http://localhost:8080
 ```
 
----
-
-### Chạy Frontend (React + Vite)
+### Frontend Setup
 
 ```bash
-cd frontend
-# Tạo file .env nếu chưa có:
-echo VITE_API_URL=http://localhost:3000/api > .env
-
-# Cài dependencies
+# 1. Install dependencies
 npm install
-# hoặc
+# or
 pnpm install
 
-# Chạy dev server
+# 2. Start development server
 npm run dev
-# hoặc
+# or
 pnpm dev
-# Frontend chạy tại http://localhost:5173
+
+# Frontend will run on http://localhost:5173
 ```
-
----
-
-### Build production
-
-```bash
-# Frontend
-cd frontend
-npm run build
-# Kết quả build ở frontend/dist
-
-# Backend (tạo file jar)
-cd backend
-mvn clean package -DskipTests
-# File jar ở backend/target/*.jar
-```
-
----
 
 ### Database Migration
 
-Flyway sẽ tự động migrate khi backend khởi động (không cần thao tác thủ công):
+Flyway sẽ tự động chạy migrations khi start backend:
 
 ```
 V1__Create_users_table.sql
@@ -278,6 +252,11 @@ V4__Create_orders_table.sql
 V5__Create_bills_table.sql
 V6__Create_kitchen_orders_table.sql
 V7__Insert_seed_data.sql
+V8__Create_reservations_table.sql
+V9__Create_inventory_items_table.sql
+V10__Insert_reservations_inventory_seed.sql
+V11__Add_tip_amount_to_bills.sql
+V12__Create_audit_logs_table.sql
 ```
 
 ---
@@ -397,14 +376,22 @@ Content-Type: application/json
 #### Process Payment
 
 ```http
-POST /api/bills/{billId}/payment
+POST /api/bills/{billId}/payments
 Authorization: Bearer <token>
 Content-Type: application/json
 
 {
   "paymentMethod": "CASH",
-  "amount": 150000
+  "amount": 150000,
+  "tipAmount": 10000
 }
+```
+
+#### Download Receipt
+
+```http
+GET /api/bills/{billId}/receipt
+Authorization: Bearer <token>
 ```
 
 ### Tables
@@ -438,21 +425,94 @@ GET /api/analytics/dashboard
 Authorization: Bearer <token>
 ```
 
+#### Get Sales Report
+
+```http
+GET /api/analytics/sales?startDate=2026-04-01&endDate=2026-04-14
+Authorization: Bearer <token>
+```
+
+#### Export Sales Report CSV
+
+```http
+GET /api/analytics/sales/export?startDate=2026-04-01&endDate=2026-04-14
+Authorization: Bearer <token>
+```
+
+### Reservations
+
+#### Get Reservations
+
+```http
+GET /api/reservations?date=2026-04-14&status=PENDING
+Authorization: Bearer <token>
+```
+
+#### Create Reservation
+
+```http
+POST /api/reservations
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "customerName": "Alice Johnson",
+  "customerPhone": "555-1010",
+  "guestCount": 4,
+  "reservationDate": "2026-04-14",
+  "reservationTime": "19:00",
+  "notes": "Window seat preferred"
+}
+```
+
+### Inventory
+
+#### Get Inventory
+
+```http
+GET /api/inventory?category=Vegetables&lowStock=true
+Authorization: Bearer <token>
+```
+
+#### Update Inventory Quantity
+
+```http
+PATCH /api/inventory/{id}/quantity
+Authorization: Bearer <token>
+Content-Type: application/json
+
+{
+  "quantity": 25.5
+}
+```
+
+### Audit Logs
+
+#### Get Recent Audit Logs
+
+```http
+GET /api/audit-logs?limit=100
+Authorization: Bearer <token>
+```
+
 ---
 
 ## 🔑 Demo Credentials
 
-### Test Login
+### Quick Demo Mode (No Login Required)
 
-Dung cac thong tin duoi day de dang nhap nhanh khi test frontend.
+Click vào role bất kỳ trong Demo tab để truy cập ngay
 
-### Tai khoan / PIN test
+### Real Login Credentials
 
-| Vai tro | Cach dang nhap | Thong tin test |
-| ------- | -------------- | -------------- |
-| Nhan vien phuc vu | PIN | `1234` |
-| Bep | PIN | `2580` |
-| Admin | Username / Password | `admin` / `123` |
+| Role    | Username | Password    | Access Level         |
+| ------- | -------- | ----------- | -------------------- |
+| Admin   | admin    | password123 | Full system access   |
+| Manager | manager1 | password123 | Analytics, reports   |
+| Server  | server1  | password123 | Orders, tables       |
+| Chef    | chef1    | password123 | Kitchen display      |
+| Cashier | cashier1 | password123 | Billing, payments    |
+| Host    | host1    | password123 | Reservations, tables |
 
 ---
 
@@ -475,7 +535,10 @@ IRMS/
 │   │   ├── billing/                 # Billing module
 │   │   │   └── domain/strategy/     # Payment & discount strategies
 │   │   ├── table/                   # Table module
+│   │   ├── reservation/             # Reservation module
+│   │   ├── inventory/               # Inventory module
 │   │   ├── analytics/               # Analytics module
+│   │   ├── audit/                   # Audit log module
 │   │   ├── notification/            # WebSocket notifications
 │   │   ├── common/                  # Shared utilities
 │   │   └── config/                  # Configuration
@@ -508,6 +571,9 @@ IRMS/
 │   │   ├── table.service.ts        # Table API
 │   │   ├── menu.service.ts         # Menu API
 │   │   ├── analytics.service.ts    # Analytics API
+│   │   ├── reservation.service.ts  # Reservation API
+│   │   ├── inventory.service.ts    # Inventory API
+│   │   └── audit.service.ts        # Audit log API
 │   │   └── websocket.service.ts    # WebSocket client
 │   ├── store/                       # State management
 │   │   └── RestaurantContext.tsx   # Global context
@@ -526,8 +592,16 @@ IRMS/
 ├── package.json                     # Frontend dependencies
 ├── vite.config.ts                  # Vite configuration
 ├── tsconfig.json                   # TypeScript config
+├── vitest.config.ts                # Frontend test config
 └── README.md                        # This file
 ```
+
+---
+
+## ✅ Test Status
+
+- Backend: `mvn test` -> **33 passed, 0 failed**
+- Frontend: `npm test` -> **22 passed, 0 failed**
 
 ---
 

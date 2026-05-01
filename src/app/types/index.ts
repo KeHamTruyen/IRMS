@@ -81,7 +81,11 @@ export interface Bill {
   subtotal: number;
   tax: number;
   discount: number;
+  serviceCharge?: number;
+  tipAmount?: number;
   total: number;
+  amountPaid?: number;
+  remainingDue?: number;
   paymentStatus: PaymentStatus;
   paymentMethod?: PaymentMethod;
   paidAt?: Date;

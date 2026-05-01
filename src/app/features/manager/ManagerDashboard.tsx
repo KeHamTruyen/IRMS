@@ -1,10 +1,73 @@
-import React from 'react';
-import { useRestaurant } from '../../store/RestaurantContext';
+import React, { useEffect, useMemo, useState } from 'react';
 import { TrendingUp, DollarSign, ShoppingCart, Users, Package, AlertTriangle } from 'lucide-react';
 import { LineChart, Line, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Legend } from 'recharts';
+import { DashboardStats, InventoryItem, MenuItem, Order, SalesData } from '../../types';
+import { analyticsService, SalesReportResponse } from '../../services/analytics.service';
+import { inventoryService } from '../../services/inventory.service';
+import { menuService } from '../../services/menu.service';
+import { orderService } from '../../services/order.service';
+import { toast } from 'sonner';
 
 export const ManagerDashboard: React.FC = () => {
-  const { dashboardStats, salesData, inventory, menuItems, orders } = useRestaurant();
+  const [dashboardStats, setDashboardStats] = useState<DashboardStats>({
+    todayRevenue: 0,
+    todayOrders: 0,
+    activeTable: 0,
+    pendingReservations: 0,
+    lowStockItems: 0,
+  });
+  const [inventory, setInventory] = useState<InventoryItem[]>([]);
+  const [menuItems, setMenuItems] = useState<MenuItem[]>([]);
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [salesReport, setSalesReport] = useState<SalesReportResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const [stats, inventoryItems, items, orderList, report] = await Promise.all([
+          analyticsService.getDashboardStats(),
+          inventoryService.getInventory(),
+          menuService.getMenuItems(),
+          orderService.getOrders(),
+          analyticsService.getSalesReport(),
+        ]);
+
+        setDashboardStats(stats);
+        setInventory(inventoryItems);
+        setMenuItems(items);
+        setOrders(orderList);
+        setSalesReport(report);
+      } catch (error: any) {
+        toast.error(error?.response?.data?.message || error?.message || 'Failed to load manager dashboard data');
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    void loadData();
+  }, []);
+
+  const salesData = useMemo<SalesData[]>(() => {
+    const last7Days = Array.from({ length: 7 }, (_, i) => {
+      const date = new Date();
+      date.setDate(date.getDate() - (6 - i));
+      const key = date.toISOString().split('T')[0];
+
+      const dailyOrders = orders.filter(order => order.createdAt.toISOString().startsWith(key));
+      const revenue = dailyOrders.reduce((sum, order) => sum + order.totalAmount, 0);
+      const orderCount = dailyOrders.length;
+
+      return {
+        date: key,
+        revenue,
+        orders: orderCount,
+        averageOrderValue: orderCount > 0 ? revenue / orderCount : 0,
+      };
+    });
+
+    return last7Days;
+  }, [orders]);
 
   const lowStockItems = inventory.filter(item => item.quantity < item.minStock);
   
@@ -19,13 +82,60 @@ export const ManagerDashboard: React.FC = () => {
     .sort((a, b) => b.sold - a.sold)
     .slice(0, 5);
 
+  const effectiveTopSellingItems = (salesReport?.bestSellingItems?.length ?? 0) > 0
+    ? salesReport!.bestSellingItems.map((item, index) => ({
+        id: item.menuItemId.toString(),
+        name: item.itemName,
+        sold: item.totalQuantity,
+        price: topSellingItems.find(t => t.name === item.itemName)?.price ?? 0,
+        rank: index + 1,
+      }))
+    : topSellingItems.map((item, index) => ({
+        id: item.id,
+        name: item.name,
+        sold: item.sold,
+        price: item.price,
+        rank: index + 1,
+      }));
+
+  const handleExportCsv = async () => {
+    try {
+      const blob = await analyticsService.downloadSalesReportCsv();
+      const url = URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = url;
+      link.download = 'sales-report.csv';
+      link.click();
+      URL.revokeObjectURL(url);
+      toast.success('Sales report exported');
+    } catch (error: any) {
+      toast.error(error?.message || 'Export failed');
+    }
+  };
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center text-gray-600">
+        Loading manager dashboard...
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-screen bg-gray-50">
-      <div className="max-w-7xl mx-auto p-6">
+      <div className="max-w-screen-2xl mx-auto p-6">
         {/* Header */}
         <div className="mb-6">
           <h1 className="text-3xl font-bold text-gray-900 mb-2">Manager Dashboard</h1>
-          <p className="text-gray-600">Business analytics and insights</p>
+          <div className="flex items-center justify-between gap-3">
+            <p className="text-gray-600">Business analytics and insights</p>
+            <button
+              onClick={() => void handleExportCsv()}
+              className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium text-gray-700 hover:bg-gray-50"
+            >
+              Export Sales CSV
+            </button>
+          </div>
         </div>
 
         {/* Key Metrics */}
@@ -47,7 +157,7 @@ export const ManagerDashboard: React.FC = () => {
             <p className="text-blue-100 text-sm mb-1">Today's Orders</p>
             <p className="text-3xl font-bold">{dashboardStats.todayOrders}</p>
             <p className="text-blue-100 text-xs mt-2">
-              Avg: ${dashboardStats.todayOrders > 0 ? (dashboardStats.todayRevenue / dashboardStats.todayOrders).toFixed(2) : '0.00'}
+              Avg: ${(salesReport?.averageOrderValue ?? (dashboardStats.todayOrders > 0 ? (dashboardStats.todayRevenue / dashboardStats.todayOrders) : 0)).toFixed(2)}
             </p>
           </div>
 
@@ -57,7 +167,7 @@ export const ManagerDashboard: React.FC = () => {
             </div>
             <p className="text-purple-100 text-sm mb-1">Active Tables</p>
             <p className="text-3xl font-bold">{dashboardStats.activeTable}</p>
-            <p className="text-purple-100 text-xs mt-2">Out of 10 tables</p>
+            <p className="text-purple-100 text-xs mt-2">Peak hour: {salesReport?.peakHour ?? 'N/A'}</p>
           </div>
 
           <div className="bg-gradient-to-br from-orange-500 to-orange-600 text-white rounded-xl p-6 shadow-lg">
@@ -112,7 +222,7 @@ export const ManagerDashboard: React.FC = () => {
           <div className="bg-white rounded-xl shadow-sm border border-gray-200 p-6">
             <h2 className="text-xl font-bold text-gray-900 mb-4">Top Selling Items</h2>
             <div className="space-y-3">
-              {topSellingItems.map((item, index) => (
+              {effectiveTopSellingItems.map((item, index) => (
                 <div key={item.id} className="flex items-center gap-3">
                   <div className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center font-bold text-white ${
                     index === 0 ? 'bg-yellow-500' :

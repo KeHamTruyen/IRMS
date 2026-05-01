@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 
 import java.math.BigDecimal;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * SRP: Single responsibility - calculate order totals
@@ -26,6 +27,7 @@ public class OrderCalculator {
         
         return items.stream()
                 .map(OrderItem::getSubtotal)
+                .filter(Objects::nonNull)
                 .reduce(BigDecimal.ZERO, BigDecimal::add);
     }
 }

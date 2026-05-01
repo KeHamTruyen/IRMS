@@ -22,17 +22,17 @@ public interface IBillingService {
      * Get bill by ID
      */
     Bill getBillById(Long billId);
-    
+
     /**
      * Create bill from order
      */
     Bill createBill(CreateBillRequest request);
-    
+
     /**
      * Get bill by order ID
      */
     Bill getBillByOrderId(Long orderId);
-    
+
     /**
      * Process payment for bill
      * Uses Strategy Pattern for different payment methods
@@ -46,4 +46,9 @@ public interface IBillingService {
         request.setBillId(billId);
         return processPayment(request);
     }
+
+    /**
+     * Generate a printable text receipt for a bill.
+     */
+    String generateReceiptText(Long billId);
 }
