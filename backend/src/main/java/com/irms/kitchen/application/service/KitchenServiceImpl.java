@@ -6,12 +6,16 @@ import com.irms.admin.domain.entity.User;
 import com.irms.admin.domain.repository.UserRepository;
 import com.irms.common.exception.BusinessException;
 import com.irms.common.exception.ResourceNotFoundException;
+import com.irms.inventory.application.service.IInventoryDeductionService;
 import com.irms.kitchen.application.dto.KitchenDisplayOrderResponse;
 import com.irms.kitchen.domain.entity.KitchenOrder;
 import com.irms.kitchen.domain.entity.KitchenOrderStatus;
 import com.irms.kitchen.domain.repository.KitchenOrderRepository;
+import com.irms.kitchen.domain.service.KitchenOrderFactory;
 import com.irms.order.domain.entity.Order;
 import com.irms.order.domain.entity.OrderItem;
+import com.irms.order.domain.entity.ItemStatus;
+import com.irms.order.domain.entity.OrderStatus;
 import com.irms.order.domain.repository.OrderRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -40,17 +44,13 @@ public class KitchenServiceImpl implements IKitchenService {
     private final UserRepository userRepository;
     private final OrderRepository orderRepository;
     private final MenuItemRepository menuItemRepository;
+    private final IInventoryDeductionService inventoryDeductionService;
+    private final KitchenOrderFactory kitchenOrderFactory;
 
-@Override
+    @Override
     @Transactional
     public void receiveNewOrder(Long orderId) {
         log.info("Receiving new kitchen order for order: {}", orderId);
-
-        List<KitchenOrder> existingOrders = kitchenOrderRepository.findByOrderId(orderId);
-        if (!existingOrders.isEmpty()) {
-            log.warn("Duplicate order received for orderId: {}. Order already exists in kitchen. Discarding duplicate.", orderId);
-            return;
-        }
 
         Order order = orderRepository.findById(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
@@ -68,19 +68,7 @@ public class KitchenServiceImpl implements IKitchenService {
             MenuItem menuItem = menuItemRepository.findById(item.getMenuItemId())
                     .orElseThrow(() -> new ResourceNotFoundException("MenuItem", item.getMenuItemId()));
 
-            KitchenOrder kitchenOrder = KitchenOrder.builder()
-                    .orderId(order.getId())
-                    .orderItemId(item.getId())
-                    .menuItemId(item.getMenuItemId())
-                    .itemName(menuItem.getName())
-                    .quantity(item.getQuantity())
-                    .specialInstructions(item.getSpecialInstructions())
-                    .status(KitchenOrderStatus.PENDING)
-                    .priority(resolvePriority(menuItem.getCategory()))
-                    .estimatedPrepTime(menuItem.getPreparationTime())
-                    .build();
-
-            kitchenOrderRepository.save(kitchenOrder);
+            kitchenOrderRepository.save(kitchenOrderFactory.create(order, item, menuItem));
         }
 
         log.info("New order {} received by kitchen display", order.getOrderNumber());
@@ -139,7 +127,9 @@ public class KitchenServiceImpl implements IKitchenService {
         User chef = userRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("User not found: " + username));
         
+        inventoryDeductionService.deductForKitchenOrder(kitchenOrder);
         kitchenOrder.startPreparation(chef.getId());
+        syncOrderItemStatus(kitchenOrder, ItemStatus.PREPARING);
         
         KitchenOrder updated = kitchenOrderRepository.save(kitchenOrder);
         log.info("Kitchen order {} started preparation by chef {}", kitchenOrderId, chef.getFullName());
@@ -164,6 +154,8 @@ public class KitchenServiceImpl implements IKitchenService {
         }
         
         kitchenOrder.markAsReady();
+        syncOrderItemStatus(kitchenOrder, ItemStatus.READY);
+        markOrderReadyIfEveryItemReady(kitchenOrder.getOrderId());
         
         KitchenOrder updated = kitchenOrderRepository.save(kitchenOrder);
         log.info("Kitchen order {} marked as READY", kitchenOrderId);
@@ -187,7 +179,9 @@ public class KitchenServiceImpl implements IKitchenService {
             );
         }
         
-        kitchenOrder.setStatus(KitchenOrderStatus.SERVED);
+        kitchenOrder.markAsServed();
+        syncOrderItemStatus(kitchenOrder, ItemStatus.SERVED);
+        markOrderServedIfEveryItemServed(kitchenOrder.getOrderId());
         
         KitchenOrder updated = kitchenOrderRepository.save(kitchenOrder);
         log.info("Kitchen order {} marked as SERVED", kitchenOrderId);
@@ -215,23 +209,48 @@ public class KitchenServiceImpl implements IKitchenService {
                 .build();
     }
 
-    private int resolvePriority(String category) {
-        if (category == null || category.isBlank()) {
-            return 1;
-        }
-
-        return switch (category.trim().toUpperCase()) {
-            case "APPETIZER", "STARTER" -> 3;
-            case "MAIN", "MAIN COURSE" -> 2;
-            case "DESSERT", "BEVERAGE" -> 1;
-            default -> 2;
-        };
-    }
-
     private String normalizeCategory(String category) {
         if (category == null || category.isBlank()) {
             return "ZZZ";
         }
         return category.trim().toUpperCase();
+    }
+
+    private void syncOrderItemStatus(KitchenOrder kitchenOrder, ItemStatus status) {
+        Order order = orderRepository.findById(kitchenOrder.getOrderId())
+                .orElseThrow(() -> new ResourceNotFoundException("Order", kitchenOrder.getOrderId()));
+
+        order.getItems().stream()
+                .filter(item -> item.getId().equals(kitchenOrder.getOrderItemId()))
+                .findFirst()
+                .ifPresent(item -> item.setStatus(status));
+
+        orderRepository.save(order);
+    }
+
+    private void markOrderReadyIfEveryItemReady(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+
+        boolean everyItemReady = order.getItems().stream()
+                .allMatch(item -> item.getStatus() == ItemStatus.READY || item.getStatus() == ItemStatus.SERVED);
+
+        if (everyItemReady && order.getStatus() == OrderStatus.PREPARING) {
+            order.setStatus(OrderStatus.READY);
+            orderRepository.save(order);
+        }
+    }
+
+    private void markOrderServedIfEveryItemServed(Long orderId) {
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new ResourceNotFoundException("Order", orderId));
+
+        boolean everyItemServed = order.getItems().stream()
+                .allMatch(item -> item.getStatus() == ItemStatus.SERVED);
+
+        if (everyItemServed && order.getStatus() == OrderStatus.READY) {
+            order.setStatus(OrderStatus.SERVED);
+            orderRepository.save(order);
+        }
     }
 }

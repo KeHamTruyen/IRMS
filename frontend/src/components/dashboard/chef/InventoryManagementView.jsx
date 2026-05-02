@@ -1,4 +1,4 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { formatQuantity, mapInventoryStatusLabel } from './utils'
 
 const inventoryTone = {
@@ -93,7 +93,36 @@ function InventoryTable({ items, selectedItemId, onSelectItem }) {
 }
 
 function AdjustmentPanel({ item, onChangeQuantity, onChangeStatus }) {
+  const [draftQuantity, setDraftQuantity] = useState(String(item.quantity ?? 0))
+  const [draftStatus, setDraftStatus] = useState(item.status)
+  const [isSaving, setIsSaving] = useState(false)
   const isOutOfStock = item.quantity <= 0
+
+  useEffect(() => {
+    setDraftQuantity(String(item.quantity ?? 0))
+    setDraftStatus(item.status)
+  }, [item.id, item.quantity, item.status])
+
+  const parsedQuantity = Number(draftQuantity)
+  const canSaveQuantity = Number.isFinite(parsedQuantity) && parsedQuantity >= 0
+  const quantityChanged = canSaveQuantity && parsedQuantity !== Number(item.quantity || 0)
+  const statusChanged = draftStatus !== item.status
+
+  const saveChanges = async () => {
+    if (!canSaveQuantity || (!quantityChanged && !statusChanged)) return
+
+    setIsSaving(true)
+    try {
+      if (quantityChanged) {
+        await onChangeQuantity(item.id, Number(parsedQuantity.toFixed(2)))
+      }
+      if (statusChanged) {
+        await onChangeStatus(item.id, draftStatus)
+      }
+    } finally {
+      setIsSaving(false)
+    }
+  }
 
   return (
     <aside className="rounded-[24px] border border-[#e7edf2] bg-white p-5">
@@ -117,7 +146,7 @@ function AdjustmentPanel({ item, onChangeQuantity, onChangeStatus }) {
           <div className="flex items-center gap-2">
             <button
               type="button"
-              onClick={() => onChangeQuantity(item.id, Math.max(0, item.quantity - 1))}
+              onClick={() => setDraftQuantity(String(Math.max(0, Number(draftQuantity || 0) - 1)))}
               className="grid h-10 w-10 place-items-center rounded-full border border-[#d8e0e7] bg-white text-sm"
             >
               -
@@ -125,13 +154,14 @@ function AdjustmentPanel({ item, onChangeQuantity, onChangeStatus }) {
             <input
               type="number"
               min="0"
-              value={item.quantity}
-              onChange={(event) => onChangeQuantity(item.id, Math.max(0, Number(event.target.value || 0)))}
+              step="0.01"
+              value={draftQuantity}
+              onChange={(event) => setDraftQuantity(event.target.value)}
               className="h-11 flex-1 rounded-2xl border border-[#d8e0e7] px-4 text-sm font-semibold text-[#16202a] outline-none"
             />
             <button
               type="button"
-              onClick={() => onChangeQuantity(item.id, item.quantity + 1)}
+              onClick={() => setDraftQuantity(String(Number(draftQuantity || 0) + 1))}
               className="grid h-10 w-10 place-items-center rounded-full border border-[#d8e0e7] bg-white text-sm"
             >
               +
@@ -142,9 +172,9 @@ function AdjustmentPanel({ item, onChangeQuantity, onChangeStatus }) {
         <div>
           <label className="mb-2 block text-sm font-semibold text-[#16202a]">Trạng thái</label>
           <select
-            value={isOutOfStock ? 'OUT_OF_STOCK' : item.status}
-            onChange={(event) => onChangeStatus(item.id, event.target.value)}
-            disabled={isOutOfStock}
+            value={isOutOfStock ? 'OUT_OF_STOCK' : draftStatus}
+            onChange={(event) => setDraftStatus(event.target.value)}
+            disabled={isOutOfStock || !canSaveQuantity || parsedQuantity <= 0}
             className="min-h-11 w-full rounded-2xl border border-[#d8e0e7] bg-white px-3 text-sm text-[#16202a] outline-none disabled:cursor-not-allowed disabled:bg-[#f8fafc]"
           >
             <option value="IN_STOCK">Đang dùng</option>
@@ -154,9 +184,24 @@ function AdjustmentPanel({ item, onChangeQuantity, onChangeStatus }) {
         </div>
 
         <div className="rounded-[20px] bg-[#fbfcfd] px-4 py-3 text-sm text-[#62707f]">
-          Nếu số lượng bằng 0, trạng thái sẽ tự chuyển sang{' '}
-          <span className="font-semibold text-[#c36d4b]">Đã hết</span>.
+          Backend tự chuẩn hóa: bằng 0 là <span className="font-semibold text-[#c36d4b]">Đã hết</span>,
+          dưới ngưỡng là <span className="font-semibold text-[#b17a19]">Cần nhập</span>.
         </div>
+
+        {!canSaveQuantity ? (
+          <div className="rounded-[20px] bg-[#fff4f1] px-4 py-3 text-sm font-medium text-[#c36d4b]">
+            Số lượng phải là số không âm.
+          </div>
+        ) : null}
+
+        <button
+          type="button"
+          disabled={isSaving || !canSaveQuantity || (!quantityChanged && !statusChanged)}
+          onClick={saveChanges}
+          className="min-h-11 w-full rounded-2xl bg-[#0d9488] px-4 text-sm font-bold text-white disabled:cursor-not-allowed disabled:bg-[#b8c7c4]"
+        >
+          {isSaving ? 'Đang lưu...' : 'Áp dụng thay đổi'}
+        </button>
       </div>
     </aside>
   )

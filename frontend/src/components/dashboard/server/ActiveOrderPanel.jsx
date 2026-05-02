@@ -111,6 +111,10 @@ function ActiveOrderPanel({
       : null
 
   const hasDraftItems = Boolean(draftBatch?.items?.length)
+  const billSubtotal = Number(session?.bill?.subtotal || 0)
+  const orderTotal = Number(session?.orderResponse?.totalAmount || 0)
+  const batchTotal = getPanelTotal(session)
+  const displayTotal = billSubtotal > 0 ? billSubtotal : orderTotal > 0 ? orderTotal : batchTotal
 
   return (
     <aside className="flex h-full min-h-0 flex-col border-l border-[#e7edf2] bg-white">
@@ -128,7 +132,7 @@ function ActiveOrderPanel({
 
           <div className="text-right">
             <div className="text-[2rem] font-bold text-[#2d7871]">
-              {formatCurrency(session?.bill?.subtotal ?? session?.orderResponse?.totalAmount ?? 0)}
+              {formatCurrency(displayTotal)}
             </div>
             <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#94a3b8]">
               Tổng hóa đơn
@@ -199,5 +203,8 @@ function ActiveOrderPanel({
     </aside>
   )
 }
+
+const getPanelTotal = (session) =>
+  (session?.batches ?? []).reduce((sum, batch) => sum + Number(batch.batchTotal || 0), 0)
 
 export default ActiveOrderPanel

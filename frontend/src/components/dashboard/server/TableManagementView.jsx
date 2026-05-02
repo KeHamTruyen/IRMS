@@ -11,7 +11,9 @@ import {
 const statusTone = {
   AVAILABLE: 'border-[#d8e0e7] bg-white text-[#0d9488]',
   RESERVED: 'border-[#d8e8f6] bg-[#f6fbff] text-[#4f7ea8]',
+  OCCUPIED: 'border-[#d7dde8] bg-[#f8fafc] text-[#475569]',
   WAITING_FOOD: 'border-[#f0d8a8] bg-[#fff8ef] text-[#b17a19]',
+  READY_TO_SERVE: 'border-[#bdd7ff] bg-[#f7fbff] text-[#2563eb]',
   SERVED: 'border-[#d2eadf] bg-[#f5fcf8] text-[#2d7871]',
   CLEANING: 'border-[#f0d2cb] bg-[#fff6f4] text-[#c36d4b]',
 }
@@ -206,7 +208,12 @@ function PaymentWorkspace({
   bill,
   paymentMethods,
   selectedPaymentMethod,
+  paymentAmount,
+  splitParts,
   onSelectPaymentMethod,
+  onPaymentAmountChange,
+  onSplitPartsChange,
+  onSetSplitAmount,
   onConfirmPayment,
   canPay,
   isBusy,
@@ -219,6 +226,8 @@ function PaymentWorkspace({
       </section>
     )
   }
+
+  const remainingDue = Number(bill.remainingDue || bill.totalAmount || 0)
 
   return (
     <section className="rounded-[28px] border border-[#e7edf2] bg-white p-6">
@@ -246,14 +255,72 @@ function PaymentWorkspace({
             <div className="flex justify-between"><span>Thuế</span><span>{formatCurrency(bill.tax)}</span></div>
             <div className="flex justify-between"><span>Phí dịch vụ</span><span>{formatCurrency(bill.serviceCharge)}</span></div>
             <div className="flex justify-between"><span>Giảm giá</span><span>- {formatCurrency(bill.discount)}</span></div>
+            <div className="flex justify-between"><span>Đã thu</span><span>{formatCurrency(bill.amountPaid)}</span></div>
             <div className="flex justify-between border-t border-[#e7edf2] pt-3 text-base font-bold text-[#16202a]">
-              <span>Tổng thanh toán</span>
-              <span>{formatCurrency(bill.totalAmount)}</span>
+              <span>Còn phải thu</span>
+              <span>{formatCurrency(bill.remainingDue || bill.totalAmount)}</span>
             </div>
           </div>
         </div>
 
         <div className="space-y-3">
+          <div className="rounded-[24px] border border-[#e7edf2] bg-white p-4">
+            <div className="text-sm font-semibold text-[#16202a]">Số tiền cần thu</div>
+            <button
+              type="button"
+              disabled={!canPay || bill.status === 'PAID' || isBusy}
+              onClick={() => onPaymentAmountChange(String(remainingDue))}
+              className="mt-3 w-full rounded-2xl bg-[#eef9f7] px-4 py-3 text-sm font-bold text-[#0d9488] disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              Thu toàn bộ còn lại
+            </button>
+            <input
+              className="mt-3 w-full rounded-2xl border border-[#d8e0e7] px-4 py-3 text-sm"
+              type="number"
+              min="0.01"
+              max={remainingDue}
+              step="0.01"
+              placeholder={`Số tiền cần thu (${formatCurrency(remainingDue)})`}
+              value={paymentAmount}
+              onChange={(event) => onPaymentAmountChange(event.target.value)}
+            />
+          </div>
+
+          <div className="rounded-[24px] border border-[#e7edf2] bg-white p-4">
+            <div className="text-sm font-semibold text-[#16202a]">Split bill / thu từng phần</div>
+            <div className="mt-3 grid grid-cols-3 gap-2">
+              {[2, 3, 4].map((parts) => (
+                <button
+                  key={parts}
+                  type="button"
+                  disabled={!canPay || bill.status === 'PAID' || isBusy}
+                  onClick={() => onSetSplitAmount(parts)}
+                  className="rounded-2xl border border-[#d8e0e7] px-3 py-2 text-sm font-semibold text-[#16202a] disabled:cursor-not-allowed disabled:opacity-50"
+                >
+                  Chia {parts}
+                </button>
+              ))}
+            </div>
+            <div className="mt-3 grid grid-cols-[90px_minmax(0,1fr)] gap-2">
+              <input
+                className="rounded-2xl border border-[#d8e0e7] px-3 py-3 text-sm"
+                type="number"
+                min="2"
+                value={splitParts}
+                onChange={(event) => onSplitPartsChange(event.target.value)}
+                aria-label="Số phần chia bill"
+              />
+              <button
+                type="button"
+                disabled={!canPay || bill.status === 'PAID' || isBusy}
+                onClick={() => onSetSplitAmount(splitParts)}
+                className="rounded-2xl border border-[#0d9488] px-4 py-3 text-sm font-bold text-[#0d9488] disabled:cursor-not-allowed disabled:opacity-50"
+              >
+                Áp dụng chia bill
+              </button>
+            </div>
+          </div>
+
           {paymentMethods.map((method) => (
             <button
               key={method.code}
@@ -296,19 +363,49 @@ function TableManagementView({
   onDraftChange,
   onAddItem,
   onSelectPaymentMethod,
+  onPaymentAmountChange,
+  onSplitPartsChange,
+  onSetSplitAmount,
   onConfirmPayment,
   selectedSession,
+  paymentAmount,
+  splitParts,
   draftSelections,
   isBusy,
 }) {
   const metrics = countTableMetrics(tableManagement.tables)
-  const canOrder =
+  const submittedItems = (selectedSession?.batches ?? [])
+    .flatMap((batch) => batch.items ?? [])
+    .filter((item) => item.status !== 'DRAFT')
+  const draftItems = (selectedSession?.batches ?? [])
+    .flatMap((batch) => batch.items ?? [])
+    .filter((item) => item.status === 'DRAFT')
+  const allItemsReady = submittedItems.length > 0 &&
+    submittedItems.every((item) => item.status === 'READY' || item.status === 'SERVED')
+  const hasBill = Boolean(selectedSession?.bill?.id)
+  const billIsPaid = selectedSession?.bill?.status === 'PAID'
+  const canOrder = !hasBill && (
     selectedTable.serviceState === 'AVAILABLE' ||
     selectedTable.serviceState === 'RESERVED' ||
+    selectedTable.serviceState === 'OCCUPIED' ||
     selectedTable.serviceState === 'WAITING_FOOD' ||
+    selectedTable.serviceState === 'READY_TO_SERVE' ||
     selectedTable.serviceState === 'SERVED'
-  const canPay = Boolean(selectedSession?.bill?.id)
-  const canMarkServed = selectedTable.serviceState === 'WAITING_FOOD'
+  )
+  const canMarkServed = Boolean(selectedSession?.orderResponse) &&
+    !hasBill &&
+    (selectedSession.orderResponse.status === 'READY' || allItemsReady)
+  const canPay = hasBill || canMarkServed
+  const nextStepText = (() => {
+    if (!selectedSession && selectedTable.serviceState === 'OCCUPIED') return 'Khách đã vào bàn, chọn món và bấm Đặt món để gửi order sang bếp.'
+    if (!selectedSession) return 'Chọn món và bấm Đặt món để gửi order sang bếp.'
+    if (draftItems.length > 0) return 'Có món đang chọn, bấm Đặt món để gửi thêm sang bếp.'
+    if (canMarkServed) return 'Bếp đã hoàn thành món, bấm Đã phục vụ để mở hóa đơn.'
+    if (!allItemsReady && !hasBill) return 'Đang chờ bếp hoàn thành toàn bộ món cho bàn này.'
+    if (hasBill && !billIsPaid) return 'Hóa đơn đã mở, không nhận thêm món trên order này. Chuyển sang Thanh toán để thu tiền.'
+    if (billIsPaid) return 'Bàn đã thanh toán, chuyển sang trạng thái chờ dọn.'
+    return 'Theo dõi trạng thái order và hóa đơn của bàn hiện tại.'
+  })()
 
   return (
     <section className="space-y-5">
@@ -344,6 +441,9 @@ function TableManagementView({
           <div>
             <h3 className="text-[1.5rem] font-bold text-[#16202a]">Bàn {selectedTable.tableNumber}</h3>
             <p className="mt-2 text-sm text-[#62707f]">Cập nhật trạng thái bàn</p>
+            <p className="mt-2 rounded-2xl bg-[#f8fafc] px-4 py-3 text-sm font-semibold text-[#516072]">
+              Bước tiếp theo: {nextStepText}
+            </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
@@ -378,8 +478,8 @@ function TableManagementView({
           </button>
           <button
             type="button"
-            onClick={() => onSetActiveAction('payment')}
-            disabled={!canPay}
+            onClick={() => (hasBill ? onSetActiveAction('payment') : onMarkTableServed())}
+            disabled={!canPay || isBusy}
             className={`rounded-full px-5 py-3 text-sm font-semibold transition ${
               activeAction === 'payment'
                 ? 'bg-[#1e293b] text-white'
@@ -396,7 +496,12 @@ function TableManagementView({
           bill={selectedSession?.bill}
           paymentMethods={selectedSession?.paymentMethods ?? []}
           selectedPaymentMethod={selectedSession?.selectedPaymentMethod}
+          paymentAmount={paymentAmount}
+          splitParts={splitParts}
           onSelectPaymentMethod={onSelectPaymentMethod}
+          onPaymentAmountChange={onPaymentAmountChange}
+          onSplitPartsChange={onSplitPartsChange}
+          onSetSplitAmount={onSetSplitAmount}
           onConfirmPayment={onConfirmPayment}
           canPay={canPay}
           isBusy={isBusy}

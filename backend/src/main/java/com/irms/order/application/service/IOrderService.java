@@ -1,6 +1,7 @@
 package com.irms.order.application.service;
 
 import com.irms.order.application.dto.CreateOrderRequest;
+import com.irms.order.application.dto.OrderItemRequest;
 import com.irms.order.domain.entity.Order;
 import com.irms.order.domain.entity.OrderStatus;
 
@@ -16,6 +17,11 @@ public interface IOrderService {
      * Tạo mới một đơn hàng từ yêu cầu của khách hàng
      */
     Order createOrder(CreateOrderRequest request);
+
+    /**
+     * Thêm món vào một đơn hàng đang mở trước khi thanh toán.
+     */
+    Order addItems(Long orderId, List<OrderItemRequest> items, String notes);
     
     /**
      * Tìm kiếm đơn hàng theo mã ID

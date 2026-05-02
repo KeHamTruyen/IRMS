@@ -14,18 +14,33 @@ const NAVIGATION = {
   ],
 }
 
-const mapTable = (table, activeOrderByTableId, billByOrderId) => {
+const buildReservationByTableId = (reservations) => {
+  const activeReservations = (reservations ?? [])
+    .filter((reservation) =>
+      reservation.tableId &&
+      (reservation.status === 'CONFIRMED' || reservation.status === 'SEATED')
+    )
+    .sort((left, right) => `${right.reservationDate} ${right.reservationTime}`.localeCompare(`${left.reservationDate} ${left.reservationTime}`))
+
+  return activeReservations.reduce((map, reservation) => {
+    if (!map.has(reservation.tableId)) map.set(reservation.tableId, reservation)
+    return map
+  }, new Map())
+}
+
+const mapTable = (table, activeOrderByTableId, billByOrderId, reservationByTableId) => {
   const order = activeOrderByTableId.get(table.id)
   const bill = order ? billByOrderId.get(order.id) : null
-  const serviceState = table.status === 'OCCUPIED' ? 'WAITING_FOOD' : table.status
+  const reservation = reservationByTableId.get(table.id)
+  const serviceState = table.status === 'OCCUPIED' ? (order ? 'WAITING_FOOD' : 'OCCUPIED') : table.status
 
   return {
     ...table,
     serviceState,
-    currentGuests: table.status === 'OCCUPIED' ? table.capacity : 0,
+    currentGuests: table.status === 'OCCUPIED' ? (reservation?.guestCount ?? table.capacity) : 0,
     activeOrderId: order?.id ?? null,
     billingStatus: bill?.status ?? null,
-    reservationName: null,
+    reservationName: reservation?.customerName ?? null,
     elapsedMinutes: 0,
   }
 }
@@ -43,29 +58,32 @@ const buildActiveOrderByTableId = (orders) => {
 
 export const serverApi = {
   async getDashboard() {
-    const [tablesResult, menuItemsResult, ordersResult, billsResult] = await Promise.allSettled([
+    const [tablesResult, menuItemsResult, ordersResult, billsResult, reservationsResult] = await Promise.allSettled([
       api.get('/tables'),
       api.get('/menu-items'),
       api.get('/orders'),
       api.get('/bills'),
+      api.get('/reservations'),
     ])
 
     const tables = tablesResult.status === 'fulfilled' ? tablesResult.value : []
     const menuItems = menuItemsResult.status === 'fulfilled' ? menuItemsResult.value : []
     const orders = ordersResult.status === 'fulfilled' ? ordersResult.value : []
     const bills = billsResult.status === 'fulfilled' ? billsResult.value : []
-    const successfulRequests = [tablesResult, menuItemsResult, ordersResult, billsResult].filter(
+    const reservations = reservationsResult.status === 'fulfilled' ? reservationsResult.value : []
+    const successfulRequests = [tablesResult, menuItemsResult, ordersResult, billsResult, reservationsResult].filter(
       (result) => result.status === 'fulfilled'
     ).length
 
     const activeOrderByTableId = buildActiveOrderByTableId(orders)
     const billByOrderId = new Map((bills ?? []).map((bill) => [bill.orderId, bill]))
-    const mappedTables = (tables ?? []).map((table) => mapTable(table, activeOrderByTableId, billByOrderId))
+    const reservationByTableId = buildReservationByTableId(reservations)
+    const mappedTables = (tables ?? []).map((table) => mapTable(table, activeOrderByTableId, billByOrderId, reservationByTableId))
 
     return {
       roleLabel: 'Phục vụ',
       sourceLabel:
-        successfulRequests === 4
+        successfulRequests === 5
           ? 'Dữ liệu thời gian thực từ backend'
           : 'Dữ liệu backend (một phần đang tạm gián đoạn)',
       snapshotTime: `Cập nhật lúc ${new Date().toLocaleTimeString('vi-VN', {
@@ -73,8 +91,8 @@ export const serverApi = {
         minute: '2-digit',
       })}`,
       footerNote:
-        successfulRequests === 4
-          ? 'Đồng bộ từ bàn, thực đơn, đơn hàng và hóa đơn'
+        successfulRequests === 5
+          ? 'Đồng bộ từ bàn, đặt bàn, thực đơn, đơn hàng và hóa đơn'
           : 'Một số dịch vụ backend chưa phản hồi, dashboard đang hiển thị phần khả dụng',
       navigation: NAVIGATION,
       tableManagement: {

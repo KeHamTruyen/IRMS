@@ -5,6 +5,7 @@ import com.irms.admin.domain.entity.User;
 import com.irms.admin.domain.repository.MenuItemRepository;
 import com.irms.admin.domain.repository.UserRepository;
 import com.irms.audit.application.service.IAuditLogService;
+import com.irms.billing.domain.repository.BillRepository;
 import com.irms.common.event.DomainEventPublisher;
 import com.irms.common.exception.BusinessException;
 import com.irms.common.exception.ResourceNotFoundException;
@@ -15,6 +16,7 @@ import com.irms.order.domain.entity.OrderItem;
 import com.irms.order.domain.entity.OrderStatus;
 import com.irms.order.domain.entity.OrderType;
 import com.irms.order.domain.event.OrderPlacedEvent;
+import com.irms.order.domain.repository.OrderItemRepository;
 import com.irms.order.domain.repository.OrderRepository;
 import com.irms.order.domain.service.OrderCalculator;
 import com.irms.order.domain.service.OrderItemCalculator;
@@ -48,6 +50,8 @@ public class OrderServiceImpl implements IOrderService {
     private final MenuItemRepository menuItemRepository;
     private final UserRepository userRepository;
     private final TableRepository tableRepository;
+    private final BillRepository billRepository;
+    private final OrderItemRepository orderItemRepository;
     private final DomainEventPublisher eventPublisher;
 
     // ✅ SRP: Domain services injected
@@ -70,10 +74,15 @@ public class OrderServiceImpl implements IOrderService {
                     .orElseThrow(() -> new ResourceNotFoundException("Table", request.getTableId()));
         }
 
-        // Get current user (server)
-        String username = SecurityContextHolder.getContext().getAuthentication().getName();
-        User server = userRepository.findByUsername(username)
-                .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+        User server;
+        if (request.getServerId() != null) {
+            server = userRepository.findById(request.getServerId())
+                    .orElseThrow(() -> new ResourceNotFoundException("User", request.getServerId()));
+        } else {
+            String username = SecurityContextHolder.getContext().getAuthentication().getName();
+            server = userRepository.findByUsername(username)
+                    .orElseThrow(() -> new ResourceNotFoundException("User not found: " + username));
+        }
 
         // ✅ SRP: Generate order number via domain service
         String orderNumber = orderNumberGenerator.generate();
@@ -122,6 +131,49 @@ public class OrderServiceImpl implements IOrderService {
                 .build());
 
         return savedOrder;
+    }
+
+    @Override
+    @Transactional
+    public Order addItems(Long orderId, List<OrderItemRequest> itemRequests, String notes) {
+        Order order = getOrderById(orderId);
+
+        if (order.getStatus() == OrderStatus.COMPLETED || order.getStatus() == OrderStatus.CANCELLED) {
+            throw new BusinessException("Cannot add items to order with status: " + order.getStatus());
+        }
+
+        if (billRepository.findByOrderId(orderId).isPresent()) {
+            throw new BusinessException("Cannot add items after a bill has been created for this order");
+        }
+
+        List<OrderItem> newItems = createOrderItems(itemRequests);
+        newItems.forEach(item -> item.setOrder(order));
+        List<OrderItem> savedItems = orderItemRepository.saveAll(newItems);
+        order.getItems().addAll(savedItems);
+
+        order.setTotalAmount(orderCalculator.calculateTotal(order.getItems()));
+        if (notes != null && !notes.isBlank()) {
+            order.setNotes(notes);
+        }
+
+        if (order.getStatus() == OrderStatus.READY || order.getStatus() == OrderStatus.SERVED) {
+            order.setStatus(OrderStatus.PREPARING);
+        }
+
+        Order updatedOrder = orderRepository.save(order);
+        auditLogService.logAction(
+                "ORDER_ITEMS_ADDED",
+                "ORDER",
+                updatedOrder.getId(),
+                "items=" + newItems.size() + ", total=" + updatedOrder.getTotalAmount());
+
+        eventPublisher.publish(OrderPlacedEvent.builder()
+                .orderId(updatedOrder.getId())
+                .orderNumber(updatedOrder.getOrderNumber())
+                .tableId(updatedOrder.getTableId())
+                .build());
+
+        return updatedOrder;
     }
 
     @Override

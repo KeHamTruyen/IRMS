@@ -8,11 +8,11 @@ import java.util.Optional;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.ArgumentCaptor;
 import static org.mockito.ArgumentMatchers.any;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
@@ -27,10 +27,13 @@ import com.irms.admin.domain.entity.User;
 import com.irms.admin.domain.repository.MenuItemRepository;
 import com.irms.admin.domain.repository.UserRepository;
 import com.irms.common.exception.BusinessException;
+import com.irms.inventory.application.service.IInventoryDeductionService;
 import com.irms.kitchen.application.dto.KitchenDisplayOrderResponse;
 import com.irms.kitchen.domain.entity.KitchenOrder;
 import com.irms.kitchen.domain.entity.KitchenOrderStatus;
 import com.irms.kitchen.domain.repository.KitchenOrderRepository;
+import com.irms.kitchen.domain.service.KitchenOrderFactory;
+import com.irms.order.domain.entity.ItemStatus;
 import com.irms.order.domain.entity.Order;
 import com.irms.order.domain.entity.OrderItem;
 import com.irms.order.domain.entity.OrderStatus;
@@ -52,8 +55,24 @@ class KitchenServiceImplTest {
     @Mock
     private MenuItemRepository menuItemRepository;
 
-    @InjectMocks
+    @Mock
+    private IInventoryDeductionService inventoryDeductionService;
+
+    private KitchenOrderFactory kitchenOrderFactory;
+
     private KitchenServiceImpl kitchenService;
+
+    @BeforeEach
+    void setUp() {
+        kitchenOrderFactory = new KitchenOrderFactory();
+        kitchenService = new KitchenServiceImpl(
+                kitchenOrderRepository,
+                userRepository,
+                orderRepository,
+                menuItemRepository,
+                inventoryDeductionService,
+                kitchenOrderFactory);
+    }
 
     @Test
     void receiveNewOrder_createsKitchenItemsOncePerOrderItem() {
@@ -72,8 +91,10 @@ class KitchenServiceImplTest {
         when(orderRepository.findById(10L)).thenReturn(Optional.of(order));
         when(kitchenOrderRepository.existsByOrderItemId(100L)).thenReturn(false);
         when(kitchenOrderRepository.existsByOrderItemId(101L)).thenReturn(false);
-        when(menuItemRepository.findById(1L)).thenReturn(Optional.of(menuItem(1L, "Soup", "Appetizer", 5)));
-        when(menuItemRepository.findById(2L)).thenReturn(Optional.of(menuItem(2L, "Steak", "Main", 20)));
+        MenuItem soup = menuItem(1L, "Soup", "Appetizer", 5);
+        MenuItem steak = menuItem(2L, "Steak", "Main", 20);
+        when(menuItemRepository.findById(1L)).thenReturn(Optional.of(soup));
+        when(menuItemRepository.findById(2L)).thenReturn(Optional.of(steak));
 
         kitchenService.receiveNewOrder(10L);
 
@@ -129,7 +150,8 @@ class KitchenServiceImplTest {
                 .status(KitchenOrderStatus.PENDING)
                 .build();
 
-        when(kitchenOrderRepository.findByOrderId(50L)).thenReturn(List.of(existingKitchenOrder));
+        when(orderRepository.findById(50L)).thenReturn(Optional.of(order));
+        when(kitchenOrderRepository.existsByOrderItemId(500L)).thenReturn(true);
 
         kitchenService.receiveNewOrder(50L);
 
@@ -162,12 +184,16 @@ class KitchenServiceImplTest {
         when(kitchenOrderRepository.findById(100L)).thenReturn(Optional.of(pendingOrder));
         when(userRepository.findByUsername("chef1")).thenReturn(Optional.of(chef));
         when(kitchenOrderRepository.save(pendingOrder)).thenReturn(pendingOrder);
+        Order order = orderWithItem(20L, OrderStatus.PREPARING, orderItem(200L, 5L, 1, null));
+        when(orderRepository.findById(20L)).thenReturn(Optional.of(order));
 
         KitchenOrder result = kitchenService.startPreparation(100L);
 
         assertEquals(KitchenOrderStatus.IN_PROGRESS, result.getStatus());
+        assertEquals(ItemStatus.PREPARING, order.getItems().get(0).getStatus());
         assertEquals(1L, result.getAssignedChefId());
         assertNotNull(result.getStartedAt());
+        verify(inventoryDeductionService, times(1)).deductForKitchenOrder(pendingOrder);
         verify(kitchenOrderRepository, times(1)).save(pendingOrder);
     }
 
@@ -208,10 +234,14 @@ class KitchenServiceImplTest {
 
         when(kitchenOrderRepository.findById(200L)).thenReturn(Optional.of(preparingOrder));
         when(kitchenOrderRepository.save(preparingOrder)).thenReturn(preparingOrder);
+        Order order = orderWithItem(30L, OrderStatus.PREPARING, orderItem(300L, 5L, 1, null));
+        when(orderRepository.findById(30L)).thenReturn(Optional.of(order));
 
         KitchenOrder result = kitchenService.markAsReady(200L);
 
         assertEquals(KitchenOrderStatus.READY, result.getStatus());
+        assertEquals(ItemStatus.READY, order.getItems().get(0).getStatus());
+        assertEquals(OrderStatus.READY, order.getStatus());
         assertNotNull(result.getCompletedAt());
         verify(kitchenOrderRepository, times(1)).save(preparingOrder);
     }
@@ -354,6 +384,19 @@ class KitchenServiceImplTest {
                 .subtotal(BigDecimal.TEN.multiply(BigDecimal.valueOf(quantity)))
                 .specialInstructions(instructions)
                 .build();
+    }
+
+    private Order orderWithItem(Long id, OrderStatus status, OrderItem item) {
+        Order order = Order.builder()
+                .id(id)
+                .orderNumber("ORD-" + id)
+                .serverId(1L)
+                .status(status)
+                .orderType(OrderType.DINE_IN)
+                .items(new java.util.ArrayList<>())
+                .build();
+        order.addItem(item);
+        return order;
     }
 
     private MenuItem menuItem(Long id, String name, String category, Integer prepTime) {

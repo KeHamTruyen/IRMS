@@ -1,6 +1,6 @@
 export const formatQuantity = (value) =>
   new Intl.NumberFormat('vi-VN', {
-    maximumFractionDigits: 0,
+    maximumFractionDigits: 2,
   }).format(Number(value || 0))
 
 export const mapKitchenItemStatusLabel = (status) => {

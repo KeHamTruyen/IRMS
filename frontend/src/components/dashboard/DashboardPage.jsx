@@ -2,6 +2,8 @@ import GenericDashboard from './GenericDashboard'
 import AdminDashboard from './admin/AdminDashboard'
 import ChefDashboard from './chef/ChefDashboard'
 import ServerDashboard from './server/ServerDashboard'
+import ManagerDashboard from './manager/ManagerDashboard'
+import HostDashboard from './host/HostDashboard'
 import { getRoleMeta } from '../../constants/roles'
 
 function DashboardPage({ session, dashboard, dashboardConfig, loadingDashboard, onSignOut }) {
@@ -17,6 +19,14 @@ function DashboardPage({ session, dashboard, dashboardConfig, loadingDashboard, 
 
   if (session.role === 'ADMIN' && dashboard) {
     return <AdminDashboard session={session} dashboard={dashboard} onSignOut={onSignOut} />
+  }
+
+  if (session.role === 'MANAGER' && dashboard) {
+    return <ManagerDashboard session={session} dashboard={dashboard} onSignOut={onSignOut} />
+  }
+
+  if (session.role === 'HOST' && dashboard) {
+    return <HostDashboard session={session} dashboard={dashboard} onSignOut={onSignOut} />
   }
 
   return (

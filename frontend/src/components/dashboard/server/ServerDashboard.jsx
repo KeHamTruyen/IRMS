@@ -8,6 +8,7 @@ import TableManagementView from './TableManagementView'
 import {
   DRAFT_BATCH_STATUS,
   SUBMITTED_BATCH_STATUS,
+  compareTableNumber,
   deriveServiceState,
   getBatchTotal,
   mapPaymentMethodLabel,
@@ -67,6 +68,8 @@ const normalizeBill = (bill) => {
     discount: Number(bill.discount || 0),
     serviceCharge: Number(bill.serviceCharge || 0),
     totalAmount: Number(bill.totalAmount || 0),
+    amountPaid: Number(bill.amountPaid || 0),
+    remainingDue: Number(bill.remainingDue || bill.totalAmount || 0),
     payments: bill.payments ?? [],
   }
 }
@@ -75,6 +78,7 @@ const createSessionFromOrder = (order, bill, paymentMethods) => ({
   tableId: order.tableId,
   orderResponse: {
     ...order,
+    isDraftOrder: Boolean(order.isDraftOrder),
     totalAmount: Number(order.totalAmount || 0),
     items: (order.items ?? []).map(mapOrderItem),
   },
@@ -110,6 +114,7 @@ const mergeDraftIntoSession = (session, selectedTable, serverSession, paymentMet
         notes: '',
         createdAt: new Date().toISOString(),
         updatedAt: new Date().toISOString(),
+        isDraftOrder: true,
       },
       null,
       paymentMethods
@@ -138,6 +143,8 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
   const [activeAction, setActiveAction] = useState('ordering')
   const [draftSelections, setDraftSelections] = useState(createEmptyDraft)
   const [sessions, setSessions] = useState([])
+  const [paymentAmount, setPaymentAmount] = useState('')
+  const [splitParts, setSplitParts] = useState(2)
   const [isLoading, setIsLoading] = useState(true)
   const [isBusy, setIsBusy] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
@@ -170,25 +177,27 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
         createSessionFromOrder(order, billByOrder.get(order.id), paymentMethods)
       )
 
-      const nextTables = (tableRows ?? []).map((table) => {
-        const order = latestOrderByTable.get(table.id)
-        const bill = order ? billByOrder.get(order.id) : null
-        const tableSession = order ? createSessionFromOrder(order, bill, paymentMethods) : null
-        const baseTable = {
-          ...table,
-          serviceState: table.status === 'OCCUPIED' ? 'WAITING_FOOD' : table.status,
-          currentGuests: table.status === 'OCCUPIED' ? table.capacity : 0,
-          activeOrderId: order?.id ?? null,
-          billingStatus: bill?.status ?? null,
-          reservationName: null,
-          elapsedMinutes: 0,
-        }
+      const nextTables = (tableRows ?? [])
+        .map((table) => {
+          const order = latestOrderByTable.get(table.id)
+          const bill = order ? billByOrder.get(order.id) : null
+          const tableSession = order ? createSessionFromOrder(order, bill, paymentMethods) : null
+          const baseTable = {
+            ...table,
+            serviceState: table.status === 'OCCUPIED' ? 'WAITING_FOOD' : table.status,
+            currentGuests: table.status === 'OCCUPIED' ? table.capacity : 0,
+            activeOrderId: order?.id ?? null,
+            billingStatus: bill?.status ?? null,
+            reservationName: null,
+            elapsedMinutes: 0,
+          }
 
-        return {
-          ...baseTable,
-          serviceState: deriveServiceState(baseTable, tableSession),
-        }
-      })
+          return {
+            ...baseTable,
+            serviceState: deriveServiceState(baseTable, tableSession),
+          }
+        })
+        .sort(compareTableNumber)
 
       setMenuCatalog({ categories, items: normalizedMenuItems })
       setTables(nextTables)
@@ -215,7 +224,13 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
     [sessions, selectedTable?.id]
   )
 
-  const canOrder = selectedTable && selectedTable.serviceState !== 'CLEANING'
+  const canOrder = selectedTable && selectedTable.serviceState !== 'CLEANING' && !selectedSession?.bill?.id
+  const selectedRemainingDue = Number(selectedSession?.bill?.remainingDue || selectedSession?.bill?.totalAmount || 0)
+
+  useEffect(() => {
+    setPaymentAmount(selectedRemainingDue > 0 ? String(selectedRemainingDue) : '')
+    setSplitParts(2)
+  }, [selectedSession?.bill?.id, selectedRemainingDue])
 
   const updateSelectedTable = (nextSession, overrides = {}) => {
     setTables((current) =>
@@ -406,25 +421,39 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
         : null
 
     if (!draftBatch?.items?.length || !selectedTable) return
+    if (selectedSession?.bill?.id) {
+      setErrorMessage('Hóa đơn đã mở cho order này. Không thể thêm món trước khi hoàn tất thanh toán.')
+      return
+    }
 
     setIsBusy(true)
     setErrorMessage('')
 
     try {
-      const order = await api.post('/orders', {
-        tableId: selectedTable.id,
-        serverId: session.userId,
-        orderType: 'DINE_IN',
-        notes: draftBatch.batchNote,
-        items: draftBatch.items.map((item) => ({
-          menuItemId: item.menuItemId,
-          quantity: item.quantity,
-          unitPrice: item.unitPrice,
-          specialInstructions: item.specialInstructions,
-        })),
-      })
+      const items = draftBatch.items.map((item) => ({
+        menuItemId: item.menuItemId,
+        quantity: item.quantity,
+        unitPrice: item.unitPrice,
+        specialInstructions: item.specialInstructions,
+      }))
 
-      await transitionOrderTo(order, 'PREPARING')
+      if (selectedSession?.orderResponse?.id && !selectedSession.orderResponse.isDraftOrder && !selectedSession?.bill?.id) {
+        await api.post(`/orders/${selectedSession.orderResponse.id}/items`, {
+          notes: draftBatch.batchNote,
+          items,
+        })
+      } else {
+        const order = await api.post('/orders', {
+          tableId: selectedTable.id,
+          serverId: session.userId,
+          orderType: 'DINE_IN',
+          notes: draftBatch.batchNote,
+          items,
+        })
+
+        await transitionOrderTo(order, 'PREPARING')
+      }
+
       await loadServerData()
     } catch (error) {
       setErrorMessage(error.message ?? 'Không thể gửi order.')
@@ -433,15 +462,13 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
     }
   }
 
-  const getOrCreateBill = async (order) => {
-    try {
-      return await api.get(`/bills/order/${order.id}`)
-    } catch {
-      return api.post(`/bills/order/${order.id}`, {
-        orderId: order.id,
-        discount: 0,
-      })
-    }
+  const createBillForOrder = async (order) => {
+    if (selectedSession?.bill?.id) return selectedSession.bill
+
+    return api.post(`/bills/order/${order.id}`, {
+      orderId: order.id,
+      discount: 0,
+    })
   }
 
   const handleMarkTableServed = async () => {
@@ -452,7 +479,7 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
 
     try {
       const servedOrder = await transitionOrderTo(selectedSession.orderResponse, 'SERVED')
-      await getOrCreateBill(servedOrder)
+      await createBillForOrder(servedOrder)
       await loadServerData()
       setActiveAction('payment')
     } catch (error) {
@@ -475,10 +502,31 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
     )
   }
 
+  const handleSetSplitAmount = (parts = splitParts) => {
+    const normalizedParts = Math.max(2, Number(parts) || 2)
+    const billTotal = Number(selectedSession?.bill?.totalAmount || selectedRemainingDue || 0)
+    const share = Math.ceil((billTotal / normalizedParts) * 100) / 100
+
+    setSplitParts(normalizedParts)
+    setPaymentAmount(String(Math.min(share, selectedRemainingDue || share)))
+  }
+
   const handleConfirmPayment = async () => {
     const sessionItem = sessions.find((item) => item.tableId === selectedTable.id)
 
     if (!sessionItem?.selectedPaymentMethod || !sessionItem?.bill?.id) return
+    const remainingDue = Number(sessionItem.bill.remainingDue || sessionItem.bill.totalAmount || 0)
+    const amountToPay = Number(paymentAmount || remainingDue)
+
+    if (!amountToPay || amountToPay <= 0) {
+      setErrorMessage('Số tiền thanh toán phải lớn hơn 0.')
+      return
+    }
+
+    if (amountToPay > remainingDue) {
+      setErrorMessage('Số tiền thanh toán không được lớn hơn số tiền còn phải thu.')
+      return
+    }
 
     setIsBusy(true)
     setErrorMessage('')
@@ -490,13 +538,15 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
 
       await api.post(`/bills/${bill.id}/payments`, {
         billId: bill.id,
-        amount: bill.totalAmount,
+        amount: amountToPay,
         paymentMethod: sessionItem.selectedPaymentMethod,
         transactionId: `TXN-${bill.id}-${Date.now()}`,
-        notes: `Thanh toán bằng ${mapPaymentMethodLabel(sessionItem.selectedPaymentMethod)}`,
+        notes: `Thanh toán ${amountToPay < remainingDue ? 'một phần' : 'toàn bộ'} bằng ${mapPaymentMethodLabel(sessionItem.selectedPaymentMethod)}`,
       })
 
-      await api.patch(`/tables/${servedOrder.tableId}/status?status=CLEANING`)
+      if (amountToPay >= remainingDue) {
+        await api.patch(`/tables/${servedOrder.tableId}/status?status=CLEANING`)
+      }
       await loadServerData()
       setActiveAction('payment')
     } catch (error) {
@@ -563,8 +613,13 @@ function ServerDashboard({ session, dashboard, onSignOut }) {
               onDraftChange={handleDraftChange}
               onAddItem={handleAddItem}
               onSelectPaymentMethod={handleSelectPaymentMethod}
+              onPaymentAmountChange={setPaymentAmount}
+              onSplitPartsChange={setSplitParts}
+              onSetSplitAmount={handleSetSplitAmount}
               onConfirmPayment={handleConfirmPayment}
               selectedSession={selectedSession}
+              paymentAmount={paymentAmount}
+              splitParts={splitParts}
               draftSelections={draftSelections}
               isBusy={isBusy}
             />

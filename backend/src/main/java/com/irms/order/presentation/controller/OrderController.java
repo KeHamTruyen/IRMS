@@ -1,6 +1,7 @@
 package com.irms.order.presentation.controller;
 
 import com.irms.common.dto.ApiResponse;
+import com.irms.order.application.dto.AddOrderItemsRequest;
 import com.irms.order.application.dto.CreateOrderRequest;
 import com.irms.order.application.dto.OrderResponse;
 import com.irms.order.application.mapper.OrderMapper;
@@ -44,6 +45,19 @@ public class OrderController {
         return ResponseEntity
                 .status(HttpStatus.CREATED)
                 .body(ApiResponse.success(response, "Order created successfully"));
+    }
+
+    @PostMapping("/{id}/items")
+    @PreAuthorize("hasAnyRole('SERVER', 'MANAGER', 'ADMIN')")
+    @Operation(summary = "Add items to an active order")
+    public ResponseEntity<ApiResponse<OrderResponse>> addItems(
+            @PathVariable Long id,
+            @Valid @RequestBody AddOrderItemsRequest request) {
+
+        Order order = orderService.addItems(id, request.getItems(), request.getNotes());
+        OrderResponse response = orderMapper.toResponse(order);
+
+        return ResponseEntity.ok(ApiResponse.success(response, "Order items added successfully"));
     }
     
     @GetMapping("/{id}")

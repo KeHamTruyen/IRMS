@@ -14,8 +14,12 @@ export const mapServiceStateLabel = (serviceState) => {
       return 'Trống'
     case 'RESERVED':
       return 'Đã đặt trước'
+    case 'OCCUPIED':
+      return 'Có khách'
     case 'WAITING_FOOD':
       return 'Đang chờ món'
+    case 'READY_TO_SERVE':
+      return 'Chờ phục vụ'
     case 'SERVED':
       return 'Đã lên món'
     case 'CLEANING':
@@ -118,7 +122,10 @@ export const toBackendTableState = (serviceState) => {
       return 'AVAILABLE'
     case 'RESERVED':
       return 'RESERVED'
+    case 'OCCUPIED':
+      return 'OCCUPIED'
     case 'WAITING_FOOD':
+    case 'READY_TO_SERVE':
     case 'SERVED':
       return 'OCCUPIED'
     case 'CLEANING':
@@ -137,20 +144,38 @@ export const normalizeBatch = (batch) => ({
   batchTotal: getBatchTotal(batch),
 })
 
+export const compareTableNumber = (left, right) => {
+  const leftNumber = Number(String(left?.tableNumber ?? '').match(/\d+/)?.[0] ?? 0)
+  const rightNumber = Number(String(right?.tableNumber ?? '').match(/\d+/)?.[0] ?? 0)
+
+  if (leftNumber !== rightNumber) return leftNumber - rightNumber
+
+  return String(left?.tableNumber ?? '').localeCompare(String(right?.tableNumber ?? ''), 'vi-VN', {
+    numeric: true,
+    sensitivity: 'base',
+  })
+}
+
 export const deriveServiceState = (table, session) => {
   if (table.billingStatus === 'PAID' || session?.bill?.status === 'PAID') {
     return 'CLEANING'
   }
 
   if (!session?.batches?.length) {
+    if (table.status === 'OCCUPIED' || table.serviceState === 'OCCUPIED') return 'OCCUPIED'
     return table.status === 'RESERVED' || table.serviceState === 'RESERVED' ? 'RESERVED' : 'AVAILABLE'
   }
 
   const items = session.batches.flatMap((batch) => batch.items ?? [])
 
   if (!items.length) {
+    if (table.status === 'OCCUPIED' || table.serviceState === 'OCCUPIED') return 'OCCUPIED'
     return table.status === 'RESERVED' || table.serviceState === 'RESERVED' ? 'RESERVED' : 'AVAILABLE'
   }
 
-  return items.some((item) => item.status === 'READY' || item.status === 'SERVED') ? 'SERVED' : 'WAITING_FOOD'
+  if (items.every((item) => item.status === 'SERVED')) {
+    return 'SERVED'
+  }
+
+  return items.every((item) => item.status === 'READY' || item.status === 'SERVED') ? 'READY_TO_SERVE' : 'WAITING_FOOD'
 }

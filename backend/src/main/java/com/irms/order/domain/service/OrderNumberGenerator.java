@@ -3,8 +3,8 @@ package com.irms.order.domain.service;
 import org.springframework.stereotype.Component;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
-import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * SRP: Single responsibility - generate unique order numbers
@@ -13,9 +13,8 @@ import java.util.concurrent.atomic.AtomicInteger;
 @Component
 public class OrderNumberGenerator {
     
-    private static final AtomicInteger counter = new AtomicInteger(1);
     private static final DateTimeFormatter DATE_FORMAT = DateTimeFormatter.ofPattern("yyyyMMdd");
-    private static volatile String lastDate = LocalDate.now().format(DATE_FORMAT);
+    private static final DateTimeFormatter TIME_FORMAT = DateTimeFormatter.ofPattern("HHmmssSSS");
     
     /**
      * Generate a unique order number in the format ORD-yyyyMMdd-XXXX
@@ -23,12 +22,10 @@ public class OrderNumberGenerator {
      * @return Unique order number string
      */
     public String generate() {
-        String currentDate = LocalDate.now().format(DATE_FORMAT);
-        if (!currentDate.equals(lastDate)) {
-            counter.set(1);
-            lastDate = currentDate;
-        }
-        int num = counter.getAndIncrement();
-        return String.format("ORD-%s-%04d", currentDate, num);
+        return String.format(
+                "ORD-%s-%s-%04d",
+                LocalDate.now().format(DATE_FORMAT),
+                LocalTime.now().format(TIME_FORMAT),
+                Math.abs(System.nanoTime() % 10000));
     }
 }

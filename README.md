@@ -1,866 +1,270 @@
-# 🍽️ Intelligent Restaurant Management System (IRMS)
+# Intelligent Restaurant Management System (IRMS)
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
-[![Java](https://img.shields.io/badge/Java-17-orange.svg)](https://www.oracle.com/java/)
-[![Spring Boot](https://img.shields.io/badge/Spring%20Boot-3.2.0-green.svg)](https://spring.io/projects/spring-boot)
-[![React](https://img.shields.io/badge/React-18.3.1-blue.svg)](https://reactjs.org/)
-[![TypeScript](https://img.shields.io/badge/TypeScript-5.6.2-blue.svg)](https://www.typescriptlang.org/)
+IRMS is an MVP restaurant management system built for the Software Architecture assignment. The project focuses on architecture design and SOLID-oriented implementation for core restaurant workflows: table service, ordering, kitchen coordination, billing/payment, inventory, reservations, analytics, and role-based operation.
 
-> **Hệ thống quản lý nhà hàng thông minh với kiến trúc 100% SOLID Compliance và real-time updates**
+## Current Scope
 
----
+The system implements a multi-module MVP:
 
-## 📋 Mục Lục
+- **Server/Table Service**: table list ordered by table number, active order tracking, add more items before billing, mark served, open bill, full payment, and split/partial payment.
+- **Kitchen Display System**: pending kitchen tickets, item completion flow, and served/completed history.
+- **Billing/Payment**: bill creation from order, service charge/tax/discount calculation, multiple payments per bill, split bill, partial payment, and remaining due calculation.
+- **Inventory**: decimal inventory quantities, manual stock update, threshold status, and inventory deduction when kitchen starts preparation.
+- **Menu/Admin**: menu availability, price/menu management through admin/manager screens.
+- **Reservation/Host**: reservation list, create/update reservation, table assignment, reserved-table state sync, seating reserved guests, and walk-in seating.
+- **Analytics/Reports**: dashboard statistics, revenue, peak-hour and best-selling item style reports.
+- **Security/RBAC**: JWT authentication with active UI roles: `ADMIN`, `MANAGER`, `SERVER`, `CHEF`, `HOST`. The cashier flow is currently handled from the server/table UI.
 
-- [Tổng Quan](#-tổng-quan)
-- [Tính Năng Chính](#-tính-năng-chính)
-- [Kiến Trúc](#-kiến-trúc)
-- [Tech Stack](#-tech-stack)
-- [Cài Đặt & Chạy](#-cài-đặt--chạy)
-- [API Documentation](#-api-documentation)
-- [Demo Credentials](#-demo-credentials)
-- [Project Structure](#-project-structure)
-- [SOLID Compliance](#-solid-compliance)
-- [Screenshots](#-screenshots)
-- [Team](#-team)
-- [License](#-license)
+## Architecture
 
----
+The backend uses a **layered modular monolith** with internal events and a PostgreSQL database.
 
-## 🎯 Tổng Quan
-
-**IRMS (Intelligent Restaurant Management System)** là một hệ thống quản lý nhà hàng toàn diện, được thiết kế để tối ưu hóa quy trình vận hành của nhà hàng từ đặt bàn, gọi món, bếp, thanh toán đến báo cáo và quản trị.
-
-### ✨ Điểm Nổi Bật
-
-- 🏆 **100% SOLID Compliance** - Backend tuân thủ hoàn toàn 5 nguyên tắc SOLID
-- 🔄 **Real-time Updates** - WebSocket integration cho cập nhật trạng thái đơn hàng
-- 🔐 **JWT Authentication** - Bảo mật với JWT token và BCrypt password encryption
-- 🎭 **6 Role-based Dashboards** - UI tùy chỉnh cho từng vai trò
-- 📊 **Analytics Dashboard** - Báo cáo doanh thu, đơn hàng, và thống kê real-time
-- 🧩 **Clean Architecture** - Modular design với separation of concerns
-- 🚀 **Production-Ready** - Session management, auto-logout, form validation
-
----
-
-## 🌟 Tính Năng Chính
-
-### 👤 Quản Lý Người Dùng & Xác Thực
-
-- ✅ Login với username/password hoặc Demo mode
-- ✅ JWT-based authentication với refresh token
-- ✅ Role-based access control (RBAC)
-- ✅ Session management với auto-logout warning
-- ✅ Password encryption với BCrypt
-
-### 🍽️ Quản Lý Đơn Hàng
-
-- ✅ Tạo đơn hàng với menu item selection
-- ✅ Real-time order status tracking
-- ✅ Order types: Dine-in, Takeaway, Delivery
-- ✅ Order modification và cancellation
-- ✅ Order history và search
-
-### 👨‍🍳 Kitchen Display System (KDS)
-
-- ✅ Real-time order notifications
-- ✅ Cooking progress tracking
-- ✅ Priority queue management
-- ✅ Item-level status updates
-- ✅ Auto-refresh kitchen display
-
-### 💰 Billing & Payment
-
-- ✅ Multi-payment methods: Cash, Card, E-Wallet
-- ✅ Split payment (partial payment nhiều lần cho 1 bill)
-- ✅ Tip management (áp dụng trước lần thanh toán đầu tiên)
-- ✅ Discount strategies: Percentage, Fixed, Coupon, Membership
-- ✅ Tax calculation với VAT/Service charge
-- ✅ Bill history và receipt export (.txt)
-
-### 🪑 Table & Reservation Management
-
-- ✅ Visual table layout
-- ✅ Table status: Available, Occupied, Reserved
-- ✅ Reservation booking với time slots
-- ✅ Guest count tracking
-- ✅ Table assignment automation
-
-### 📊 Analytics & Reporting
-
-- ✅ Dashboard với revenue metrics
-- ✅ Order statistics by period
-- ✅ Popular items ranking
-- ✅ Peak hour analysis
-- ✅ Sales report export CSV
-- ✅ Real-time charts với Recharts
-
-### 📜 Audit Logs
-
-- ✅ Audit trail cho các hành động critical
-- ✅ Log các action: tạo bill, thanh toán thành công/thất bại, tạo/cập nhật/hủy order
-- ✅ Admin/Manager có thể xem recent audit logs
-
-### 🔧 Admin Panel
-
-- ✅ User management (CRUD)
-- ✅ Menu item management
-- ✅ Table configuration
-- ✅ System settings
-- ✅ Role permissions
-
----
-
-## 🏗️ Kiến Trúc
-
-### Backend Architecture
-
-```
-┌─────────────────────────────────────────────────────────┐
-│                    PRESENTATION LAYER                   │
-│         (Controllers, DTOs, REST Endpoints)             │
-└──────────────────┬──────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────────────┐
-│                   APPLICATION LAYER                     │
-│    (Services, Use Cases, Event Handlers, Mappers)       │
-└──────────────────┬──────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────────────┐
-│                     DOMAIN LAYER                        │
-│   (Entities, Domain Services, Strategies, Events)       │
-└──────────────────┬──────────────────────────────────────┘
-                   │
-┌──────────────────▼──────────────────────────────────────┐
-│                 INFRASTRUCTURE LAYER                    │
-│     (Repositories, Security, WebSocket, Database)       │
-└─────────────────────────────────────────────────────────┘
+```text
+frontend React/Vite
+        |
+        | REST API
+        v
+Spring Boot backend
+  presentation/     controllers, request/response boundary
+  application/      use cases, services, DTOs, mappers
+  domain/           entities, domain services, strategy interfaces
+  infrastructure/   security, persistence integration, configuration
+        |
+        v
+PostgreSQL + Flyway migrations
 ```
 
-### Frontend Architecture
+Main backend modules:
 
-```
-src/app/
-├── features/           # Feature-based components
-│   ├── admin/         # Admin dashboard
-│   ├── server/        # Server dashboard
-│   ├── kitchen/       # Kitchen display
-│   ├── cashier/       # Cashier dashboard
-│   ├── host/          # Host/Reservation dashboard
-│   └── manager/       # Manager analytics
-├── components/        # Reusable UI components
-│   ├── ui/           # shadcn/ui components
-│   └── shared/       # Shared components
-├── services/          # API services
-│   ├── auth.service.ts
-│   ├── order.service.ts
-│   ├── billing.service.ts
-│   └── websocket.service.ts
-├── store/            # Context API state management
-├── types/            # TypeScript type definitions
-└── utils/            # Utility functions
+```text
+backend/src/main/java/com/irms
+  admin/        users, roles, JWT authentication
+  order/        order lifecycle, order items, domain events
+  kitchen/      kitchen tickets, KDS display, prep status flow
+  billing/      bill, payments, payment processors, calculators
+  table/        table state and demo reset use case
+  reservation/  booking and host workflow
+  inventory/    stock, thresholds, menu item requirements
+  analytics/    dashboard/reporting queries
+  audit/        action logs
+  notification/ websocket notifications
+  common/       shared DTOs, exceptions, event support
 ```
 
----
+## SOLID Notes
 
-## 🛠️ Tech Stack
+The codebase is structured to support SOLID principles:
 
-### Backend
+- **SRP**: controllers handle HTTP only; services handle use cases; repositories handle persistence; factories/calculators/validators isolate domain rules.
+- **OCP**: payment processing uses strategy-style processors such as cash/card/e-wallet processors; bill and order calculations are isolated behind domain services.
+- **LSP**: service and processor implementations follow their interface contracts.
+- **ISP**: focused interfaces such as `IOrderService`, `IKitchenService`, `IBillingService`, and `ITableService` avoid a single broad service contract.
+- **DIP**: controllers depend on service interfaces; services depend on repository abstractions and domain services.
 
-| Technology      | Version | Purpose                        |
-| --------------- | ------- | ------------------------------ |
-| Java            | 17      | Programming language           |
-| Spring Boot     | 3.2.0   | Framework                      |
-| Spring Security | 3.2.0   | Authentication & Authorization |
-| JWT             | 0.11.5  | Token-based auth               |
-| PostgreSQL      | 15      | Database                       |
-| Flyway          | 9.22.3  | Database migration             |
-| WebSocket       | -       | Real-time communication        |
-| Maven           | 3.9+    | Build tool                     |
-| Lombok          | 1.18.30 | Code generation                |
+Pragmatic MVP safeguard: migration `V11__Create_kitchen_tickets_from_order_items.sql` adds a database trigger so every persisted `order_items` row creates a matching kitchen ticket. This protects the demo against missed event delivery and preserves data consistency.
 
-### Frontend
+## Tech Stack
 
-| Technology      | Version | Purpose             |
-| --------------- | ------- | ------------------- |
-| React           | 18.3.1  | UI framework        |
-| TypeScript      | 5.6.2   | Type safety         |
-| React Router    | 7.1.3   | Routing             |
-| Axios           | 1.7.9   | HTTP client         |
-| Recharts        | 2.15.1  | Charts & graphs     |
-| Tailwind CSS    | 4.0.0   | Styling             |
-| shadcn/ui       | Latest  | UI components       |
-| Lucide React    | 0.469.0 | Icons               |
-| Sonner          | 1.7.2   | Toast notifications |
-| React Hook Form | 7.55.0  | Form validation     |
-| Zod             | 3.24.1  | Schema validation   |
+Backend:
 
----
+- Java 17
+- Spring Boot 3.2.3
+- Spring Security + JWT
+- Spring Data JPA
+- PostgreSQL
+- Flyway
+- Maven
 
-## 🚀 Cài Đặt & Chạy
+Frontend:
 
-### Prerequisites
+- React + Vite
+- Tailwind CSS utility classes
+- Fetch-based API client
 
-- Node.js 18+ và npm/pnpm
-- Java 17+
-- Maven 3.9+
-- PostgreSQL 15+
+## Run Locally
 
-### Backend Setup
+### 1. Database
+
+Create a PostgreSQL database and configure `backend/.env`.
+
+Example:
+
+```properties
+DB_HOST=localhost
+DB_PORT=5432
+DB_NAME=irms_db
+DB_USERNAME=postgres
+DB_PASSWORD=your_password
+SERVER_PORT=3000
+JWT_SECRET=change-this-secret-key-in-production-minimum-256-bits-required
+FLYWAY_ENABLED=true
+FLYWAY_BASELINE_ON_MIGRATE=true
+FLYWAY_BASELINE_VERSION=7
+CORS_ORIGINS=http://localhost:3000,http://localhost:5173
+```
+
+### 2. Backend
 
 ```bash
-# 1. Clone repository
-git clone <repository-url>
 cd backend
-
-# 2. Configure database
-# Edit src/main/resources/application.yml
-# Set your PostgreSQL credentials
-
-# 3. Build & run
-mvn clean install
 mvn spring-boot:run
-
-# Backend will run on http://localhost:8080
 ```
 
-### Frontend Setup
+Backend runs at:
+
+```text
+http://localhost:3000
+```
+
+Swagger/OpenAPI:
+
+```text
+http://localhost:3000/swagger-ui.html
+```
+
+### 3. Frontend
 
 ```bash
-# 1. Install dependencies
+cd frontend
 npm install
-# or
-pnpm install
-
-# 2. Start development server
 npm run dev
-# or
-pnpm dev
-
-# Frontend will run on http://localhost:5173
 ```
 
-### Database Migration
+Frontend runs at:
 
-Flyway sẽ tự động chạy migrations khi start backend:
-
-```
-V1__Create_users_table.sql
-V2__Create_menu_items_table.sql
-V3__Create_tables_table.sql
-V4__Create_orders_table.sql
-V5__Create_bills_table.sql
-V6__Create_kitchen_orders_table.sql
-V7__Insert_seed_data.sql
-V8__Create_reservations_table.sql
-V9__Create_inventory_items_table.sql
-V10__Insert_reservations_inventory_seed.sql
-V11__Add_tip_amount_to_bills.sql
-V12__Create_audit_logs_table.sql
+```text
+http://localhost:5173
 ```
 
----
+## Demo Accounts
 
-## 📚 API Documentation
+Seed data provides role accounts. In the UI, use the terminal/login screen for the role you need.
 
-### Base URL
+Common roles:
 
+- `ADMIN`
+- `MANAGER`
+- `SERVER`
+- `CHEF`
+- `HOST`
+
+If local seed credentials differ, check `backend/src/main/resources/db/migration/V7__Insert_seed_data.sql`.
+
+## Main Demo Flow
+
+1. Login as `SERVER`.
+2. For a host flow, login as `HOST` first and either:
+   - create/confirm a reservation, assign a table, then seat the guest, or
+   - seat a walk-in guest directly at an available table.
+3. Return/login as `SERVER`.
+4. Choose the occupied table.
+5. Add menu items and press `Đặt món`.
+6. Login as `CHEF`.
+7. View pending kitchen tickets and press `Hoàn thành món`.
+8. Return to `SERVER`.
+9. Mark the table as served.
+10. Open payment.
+11. Choose either:
+   - `Thu toàn bộ còn lại`, or
+   - `Split bill / thu từng phần`.
+12. Confirm payment. Full payment moves the table to cleaning state.
+
+## Useful API Endpoints
+
+Base URL:
+
+```text
+http://localhost:3000/api
 ```
-http://localhost:8080/api
-```
 
-### Authentication
-
-#### Login
+Selected endpoints:
 
 ```http
-POST /api/auth/login
-Content-Type: application/json
+POST   /auth/login
+GET    /tables
+PATCH  /tables/{id}/status?status=AVAILABLE
+POST   /tables/reset-demo
 
-{
-  "username": "admin",
-  "password": "password123"
-}
+GET    /orders
+POST   /orders
+POST   /orders/{id}/items
+PATCH  /orders/{id}/status?status=PREPARING
 
-Response:
-{
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "user": {
-    "id": 1,
-    "username": "admin",
-    "name": "Admin User",
-    "role": "ADMIN"
-  }
-}
+GET    /kitchen/display
+GET    /kitchen/orders
+PATCH  /kitchen/order-items/{id}/start
+PATCH  /kitchen/order-items/{id}/ready
+
+GET    /bills
+POST   /bills/order/{orderId}
+POST   /bills/{billId}/payments
+
+GET    /inventory-items
+PATCH  /inventory-items/{id}/quantity
+
+GET    /reservations
+POST   /reservations
+
+GET    /analytics/dashboard
+GET    /analytics/sales
 ```
 
-### Orders
+## Reset Demo State
 
-#### Create Order
+To clear active table/order/bill/kitchen state for another demo:
 
 ```http
-POST /api/orders
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "tableId": 1,
-  "items": [
-    {
-      "menuItemId": 1,
-      "quantity": 2,
-      "notes": "Extra spicy"
-    }
-  ],
-  "orderType": "DINE_IN"
-}
+POST /api/tables/reset-demo
+Authorization: Bearer <manager-or-admin-token>
 ```
 
-#### Get All Orders
+This use case is implemented in `DemoResetService`.
 
-```http
-GET /api/orders
-Authorization: Bearer <token>
+## Verification
+
+Backend:
+
+```bash
+cd backend
+mvn -q test
 ```
 
-#### Update Order Status
+Frontend:
 
-```http
-PUT /api/orders/{orderId}/status
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "status": "PREPARING"
-}
+```bash
+cd frontend
+npm run build
 ```
 
-### Kitchen
-
-#### Get Kitchen Orders
-
-```http
-GET /api/kitchen/orders
-Authorization: Bearer <token>
-```
-
-#### Update Kitchen Order Status
-
-```http
-PUT /api/kitchen/orders/{orderId}/status
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "status": "COOKING"
-}
-```
-
-### Billing
-
-#### Create Bill
-
-```http
-POST /api/bills
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "orderId": 1,
-  "billingType": "STANDARD",
-  "discountType": "PERCENTAGE",
-  "discountValue": 10
-}
-```
-
-#### Process Payment
-
-```http
-POST /api/bills/{billId}/payments
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "paymentMethod": "CASH",
-  "amount": 150000,
-  "tipAmount": 10000
-}
-```
-
-#### Download Receipt
-
-```http
-GET /api/bills/{billId}/receipt
-Authorization: Bearer <token>
-```
-
-### Tables
-
-#### Get All Tables
-
-```http
-GET /api/tables
-Authorization: Bearer <token>
-```
-
-#### Update Table Status
-
-```http
-PUT /api/tables/{tableId}
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "status": "OCCUPIED",
-  "guestCount": 4
-}
-```
-
-### Analytics
-
-#### Get Dashboard Stats
-
-```http
-GET /api/analytics/dashboard
-Authorization: Bearer <token>
-```
-
-#### Get Sales Report
-
-```http
-GET /api/analytics/sales?startDate=2026-04-01&endDate=2026-04-14
-Authorization: Bearer <token>
-```
-
-#### Export Sales Report CSV
-
-```http
-GET /api/analytics/sales/export?startDate=2026-04-01&endDate=2026-04-14
-Authorization: Bearer <token>
-```
-
-### Reservations
-
-#### Get Reservations
-
-```http
-GET /api/reservations?date=2026-04-14&status=PENDING
-Authorization: Bearer <token>
-```
-
-#### Create Reservation
-
-```http
-POST /api/reservations
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "customerName": "Alice Johnson",
-  "customerPhone": "555-1010",
-  "guestCount": 4,
-  "reservationDate": "2026-04-14",
-  "reservationTime": "19:00",
-  "notes": "Window seat preferred"
-}
-```
-
-### Inventory
-
-#### Get Inventory
-
-```http
-GET /api/inventory?category=Vegetables&lowStock=true
-Authorization: Bearer <token>
-```
-
-#### Update Inventory Quantity
-
-```http
-PATCH /api/inventory/{id}/quantity
-Authorization: Bearer <token>
-Content-Type: application/json
-
-{
-  "quantity": 25.5
-}
-```
-
-### Audit Logs
-
-#### Get Recent Audit Logs
-
-```http
-GET /api/audit-logs?limit=100
-Authorization: Bearer <token>
-```
-
----
-
-## 🔑 Demo Credentials
-
-### Quick Demo Mode (No Login Required)
-
-Click vào role bất kỳ trong Demo tab để truy cập ngay
-
-### Real Login Credentials
-
-| Role    | Username | Password    | Access Level         |
-| ------- | -------- | ----------- | -------------------- |
-| Admin   | admin    | password123 | Full system access   |
-| Manager | manager1 | password123 | Analytics, reports   |
-| Server  | server1  | password123 | Orders, tables       |
-| Chef    | chef1    | password123 | Kitchen display      |
-| Cashier | cashier1 | password123 | Billing, payments    |
-| Host    | host1    | password123 | Reservations, tables |
-
----
-
-## 📁 Project Structure
-
-```
-IRMS/
-├── backend/                          # Java Spring Boot backend
-│   ├── src/main/java/com/irms/
-│   │   ├── admin/                   # Admin module
-│   │   │   ├── application/         # Services, DTOs
-│   │   │   ├── domain/              # Entities, repos
-│   │   │   ├── infrastructure/      # Security, JWT
-│   │   │   └── presentation/        # Controllers
-│   │   ├── order/                   # Order module
-│   │   │   ├── application/         # Services, mappers
-│   │   │   ├── domain/              # Order entities, events
-│   │   │   └── presentation/        # REST endpoints
-│   │   ├── kitchen/                 # Kitchen module
-│   │   ├── billing/                 # Billing module
-│   │   │   └── domain/strategy/     # Payment & discount strategies
-│   │   ├── table/                   # Table module
-│   │   ├── reservation/             # Reservation module
-│   │   ├── inventory/               # Inventory module
-│   │   ├── analytics/               # Analytics module
-│   │   ├── audit/                   # Audit log module
-│   │   ├── notification/            # WebSocket notifications
-│   │   ├── common/                  # Shared utilities
-│   │   └── config/                  # Configuration
-│   └── src/main/resources/
-│       ├── application.yml          # App configuration
-│       └── db/migration/            # Flyway migrations
-│
-├── src/app/                         # React TypeScript frontend
-│   ├── features/                    # Feature modules
-│   │   ├── LandingPage.tsx         # Public landing
-│   │   ├── Login.tsx               # Auth page
-│   │   ├── admin/AdminDashboard.tsx
-│   │   ├── server/ServerDashboard.tsx
-│   │   ├── kitchen/KitchenDashboard.tsx
-│   │   ├── cashier/CashierDashboard.tsx
-│   │   ├── host/HostDashboard.tsx
-│   │   └── manager/ManagerDashboard.tsx
-│   ├── components/                  # Reusable components
-│   │   ├── ui/                     # shadcn/ui components
-│   │   ├── Navbar.tsx              # Navigation
-│   │   ├── RootLayout.tsx          # Layout wrapper
-│   │   ├── ProtectedRoute.tsx      # Auth guard
-│   │   └── SessionManager.tsx      # Session handling
-│   ├── services/                    # API services
-│   │   ├── api.ts                  # Axios config
-│   │   ├── auth.service.ts         # Auth API
-│   │   ├── order.service.ts        # Order API
-│   │   ├── kitchen.service.ts      # Kitchen API
-│   │   ├── billing.service.ts      # Billing API
-│   │   ├── table.service.ts        # Table API
-│   │   ├── menu.service.ts         # Menu API
-│   │   ├── analytics.service.ts    # Analytics API
-│   │   ├── reservation.service.ts  # Reservation API
-│   │   ├── inventory.service.ts    # Inventory API
-│   │   └── audit.service.ts        # Audit log API
-│   │   └── websocket.service.ts    # WebSocket client
-│   ├── store/                       # State management
-│   │   └── RestaurantContext.tsx   # Global context
-│   ├── types/                       # TypeScript types
-│   │   └── index.ts                # Type definitions
-│   ├── utils/                       # Utilities
-│   │   └── mock-data.ts            # Mock data
-│   └── routes.tsx                   # Route configuration
-│
-├── src/styles/                      # Global styles
-│   ├── index.css                   # Entry point
-│   ├── tailwind.css                # Tailwind imports
-│   ├── theme.css                   # Theme variables
-│   └── fonts.css                   # Font imports
-│
-├── package.json                     # Frontend dependencies
-├── vite.config.ts                  # Vite configuration
-├── tsconfig.json                   # TypeScript config
-├── vitest.config.ts                # Frontend test config
-└── README.md                        # This file
-```
-
----
-
-## ✅ Test Status
-
-- Backend: `mvn test` -> **33 passed, 0 failed**
-- Frontend: `npm test` -> **22 passed, 0 failed**
-
----
-
-## 🎯 SOLID Compliance
-
-Hệ thống backend đạt **100% SOLID Compliance** với 37 domain services và comprehensive strategy patterns:
-
-### 1️⃣ Single Responsibility Principle (SRP)
-
-**✅ Implemented:**
-
-- Mỗi class chỉ có 1 trách nhiệm duy nhất
-- Domain services tách biệt logic: `OrderCalculator`, `BillCalculator`, `OrderValidator`
-- Mappers riêng: `OrderMapper`, `BillMapper`, `PaymentMapper`
-
-**Example:**
-
-```java
-// ❌ BEFORE: Entity có business logic
-public class Order {
-    public BigDecimal calculateTotal() { ... }
-    public void validate() { ... }
-}
-
-// ✅ AFTER: Tách thành domain services
-public class OrderCalculator {
-    public BigDecimal calculateTotal(Order order) { ... }
-}
-
-public class OrderValidator {
-    public void validate(Order order) { ... }
-}
-```
-
-### 2️⃣ Open/Closed Principle (OCP)
-
-**✅ Implemented:**
-
-- Strategy pattern cho payment: `CashPaymentProcessor`, `CardPaymentProcessor`, `EWalletPaymentProcessor`
-- Strategy pattern cho discount: `PercentageDiscountStrategy`, `FixedAmountDiscountStrategy`, `CouponDiscountStrategy`
-- Strategy pattern cho billing: `StandardBillCalculationStrategy`, `HappyHourBillCalculationStrategy`
-
-**Example:**
-
-```java
-// Interface cho strategy
-public interface PaymentProcessor {
-    PaymentResult processPayment(Payment payment);
-}
-
-// Concrete strategies
-public class CashPaymentProcessor implements PaymentProcessor { ... }
-public class CardPaymentProcessor implements PaymentProcessor { ... }
-
-// Factory để select strategy
-public class PaymentProcessorFactory {
-    public PaymentProcessor getProcessor(PaymentMethod method) { ... }
-}
-```
-
-### 3️⃣ Liskov Substitution Principle (LSP)
-
-**✅ Implemented:**
-
-- Interfaces với strict contracts
-- Tất cả implementations tuân thủ contract
-- No breaking changes trong subclasses
-
-**Example:**
-
-```java
-public interface BillCalculationStrategy {
-    BillCalculationResult calculate(BillCalculationContext context);
-}
-
-// Tất cả strategies đều implement đúng contract
-public class StandardBillCalculationStrategy implements BillCalculationStrategy {
-    @Override
-    public BillCalculationResult calculate(BillCalculationContext context) {
-        // Always returns valid BillCalculationResult
-    }
-}
-```
-
-### 4️⃣ Interface Segregation Principle (ISP)
-
-**✅ Implemented:**
-
-- CQRS pattern: `IOrderService`, `IKitchenService`, `IBillingService`
-- Specific interfaces cho từng use case
-- Không có "fat interfaces"
-
-**Example:**
-
-```java
-// ❌ BEFORE: Fat interface
-public interface OrderService {
-    Order createOrder(CreateOrderRequest request);
-    List<Order> getAllOrders();
-    Order updateOrderStatus(Long id, OrderStatus status);
-    void deleteOrder(Long id);
-    List<Order> searchOrders(String query);
-    // ... 20 more methods
-}
-
-// ✅ AFTER: Segregated interfaces
-public interface IOrderService {
-    Order createOrder(CreateOrderRequest request);
-    Order getOrderById(Long id);
-    List<Order> getAllOrders();
-    Order updateOrderStatus(Long id, OrderStatus status);
-}
-
-public interface IOrderSearchService {
-    List<Order> searchOrders(OrderSearchCriteria criteria);
-}
-```
-
-### 5️⃣ Dependency Inversion Principle (DIP)
-
-**✅ Implemented:**
-
-- DTOs hoàn toàn thay thế entities trong API responses
-- Dependencies inject qua interfaces
-- High-level modules không phụ thuộc low-level modules
-
-**Example:**
-
-```java
-// ❌ BEFORE: Controller trả về entity
-@GetMapping("/{id}")
-public Order getOrder(@PathVariable Long id) {
-    return orderRepository.findById(id);
-}
-
-// ✅ AFTER: Controller trả về DTO
-@GetMapping("/{id}")
-public OrderResponse getOrder(@PathVariable Long id) {
-    Order order = orderService.getOrderById(id);
-    return orderMapper.toResponse(order);
-}
-
-// Service depends on interface, not implementation
-public class OrderServiceImpl implements IOrderService {
-    private final OrderRepository orderRepository; // Interface
-    private final OrderMapper orderMapper;         // Interface
-
-    public OrderServiceImpl(OrderRepository orderRepository, OrderMapper orderMapper) {
-        this.orderRepository = orderRepository;
-        this.orderMapper = orderMapper;
-    }
-}
-```
-
-### 📊 SOLID Metrics
-
-| Principle | Compliance | Implementation                             |
-| --------- | ---------- | ------------------------------------------ |
-| SRP       | 100%       | 37 domain services, entities chỉ chứa data |
-| OCP       | 100%       | 15+ strategy patterns, factory patterns    |
-| LSP       | 100%       | All interfaces có strict contracts         |
-| ISP       | 100%       | CQRS pattern, specific interfaces          |
-| DIP       | 100%       | Full DTO usage, dependency injection       |
-
----
-
-## 📸 Screenshots
-
-### Landing Page
-
-<kbd>![Landing Page](https://via.placeholder.com/800x450/FF6B35/FFFFFF?text=Professional+Landing+Page)</kbd>
-
-### Login Page
-
-<kbd>![Login](https://via.placeholder.com/800x450/4A90E2/FFFFFF?text=Login+%26+Demo+Mode)</kbd>
-
-### Server Dashboard
-
-<kbd>![Server Dashboard](https://via.placeholder.com/800x450/50C878/FFFFFF?text=Server+Dashboard+-+Table+Management)</kbd>
-
-### Kitchen Display
-
-<kbd>![Kitchen Display](https://via.placeholder.com/800x450/FF8C00/FFFFFF?text=Kitchen+Display+System)</kbd>
-
-### Cashier Dashboard
-
-<kbd>![Cashier](https://via.placeholder.com/800x450/9B59B6/FFFFFF?text=Cashier+Dashboard+-+Billing)</kbd>
-
-### Manager Analytics
-
-<kbd>![Analytics](https://via.placeholder.com/800x450/E74C3C/FFFFFF?text=Manager+Analytics+Dashboard)</kbd>
-
----
-
-## 👥 Team
-
-**Project:** Intelligent Restaurant Management System (IRMS)  
-**Duration:** 4 weeks  
-**Team Size:** 6 members
-
-### Contributors
-
-| Role           | Responsibilities                            |
-| -------------- | ------------------------------------------- |
-| Backend Lead   | Architecture, SOLID refactoring, API design |
-| Frontend Lead  | UI/UX, React components, state management   |
-| Full-stack Dev | Feature implementation, integration         |
-| Database Admin | Schema design, migrations, optimization     |
-| QA Engineer    | Testing, bug fixes, documentation           |
-| DevOps         | Docker, deployment, CI/CD                   |
-
----
-
-## 📄 License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🔗 Links
-
-- **Backend API:** http://localhost:8080
-- **Frontend:** http://localhost:5173
-- **API Docs:** http://localhost:8080/swagger-ui.html
-- **Database:** PostgreSQL on localhost:5432
-
----
-
-## 🚧 Future Enhancements
-
-- [ ] Multi-restaurant support
-- [ ] Mobile app (React Native)
-- [ ] QR code ordering
-- [ ] Loyalty program
-- [ ] Inventory management with auto-reorder
-- [ ] Staff scheduling
-- [ ] Customer feedback system
-- [ ] Integration với delivery platforms (GrabFood, ShopeeFood)
-- [ ] AI-powered demand forecasting
-- [ ] Multi-language support
-
----
-
-## 📞 Support
-
-For issues, questions, or contributions:
-
-- Open an issue on GitHub
-- Email: support@irms.com
-- Documentation: [Wiki](https://github.com/your-repo/wiki)
-
----
-
-<div align="center">
-
-**Made with ❤️ by IRMS Team**
-
-⭐ Star us on GitHub — it helps!
-
-[Back to Top](#-intelligent-restaurant-management-system-irms)
-
-</div>
+Both commands were used as the primary verification path during MVP stabilization.
+
+## Assignment Coverage
+
+The project supports the assignment requirements as follows:
+
+- Context and requirements: described in `report.tex`.
+- Architecture style comparison and choice: layered modular monolith with internal events.
+- Module view: modules map to backend packages.
+- Component-and-connector view: React client, Spring REST API, internal events, PostgreSQL.
+- Allocation view: browser clients, backend server, database server.
+- UML/class relationships: included in `report.tex`.
+- SOLID application: documented and reflected in service/interface/factory/strategy structure.
+- Reflection and division of work: included in `report.tex`.
+
+## Known MVP Limitations
+
+- Payment processors simulate payment success/failure; no real bank gateway.
+- Kitchen ticket creation has both application-level event handling and a DB trigger safeguard.
+- Reservation is functional for host workflow but does not include external customer notifications.
+- Report export and advanced analytics are basic MVP-level features.
+
+## Team Responsibility Matrix
+
+| Member | Main Responsibility |
+| --- | --- |
+| Member 1 | Architecture, UML, report, interface/package conventions |
+| Member 2 | Order module |
+| Member 3 | Kitchen module |
+| Member 4 | Billing/payment module |
+| Member 5 | Frontend and integration |
+| Member 6 | Database, seed data, testing, documentation |

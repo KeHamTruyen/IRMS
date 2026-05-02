@@ -13,9 +13,6 @@ export const DASHBOARD_CONFIG = {
   [APP_ROLES.CHEF]: {
     nav: ['Tổng quan', 'Bếp', 'Hàng chờ', 'Khu chế biến'],
   },
-  [APP_ROLES.CASHIER]: {
-    nav: ['Tổng quan', 'Hóa đơn', 'Thanh toán', 'Ca làm'],
-  },
   [APP_ROLES.HOST]: {
     nav: ['Tổng quan', 'Hàng chờ', 'Bàn', 'Đặt chỗ'],
   },

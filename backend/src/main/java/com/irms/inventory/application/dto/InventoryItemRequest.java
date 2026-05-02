@@ -1,10 +1,12 @@
 package com.irms.inventory.application.dto;
 
 import com.irms.inventory.domain.entity.InventoryStatus;
-import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
+
+import java.math.BigDecimal;
 
 @Data
 public class InventoryItemRequest {
@@ -19,12 +21,12 @@ public class InventoryItemRequest {
     private String unit;
 
     @NotNull
-    @Min(0)
-    private Integer quantity;
+    @DecimalMin("0.00")
+    private BigDecimal quantity;
 
     @NotNull
-    @Min(0)
-    private Integer threshold;
+    @DecimalMin("0.00")
+    private BigDecimal threshold;
 
     @NotNull
     private InventoryStatus status;

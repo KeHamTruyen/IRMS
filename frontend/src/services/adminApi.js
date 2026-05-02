@@ -234,7 +234,7 @@ export const adminApi = {
       centralizedManagement: {
         menuCategories: [...new Set(menuItems.map((item) => item.category))],
         menuItems: mappedMenuItems,
-        staffRoles: ['ADMIN', 'MANAGER', 'SERVER', 'CHEF', 'CASHIER', 'HOST'],
+        staffRoles: ['ADMIN', 'MANAGER', 'SERVER', 'CHEF', 'HOST'],
         staffMembers: users,
         inventoryCategories: [...new Set(inventoryItems.map((item) => item.category))],
         inventoryItems,

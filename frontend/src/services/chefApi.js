@@ -134,6 +134,38 @@ const buildKitchenDisplay = ({ kitchenDisplayItems, orders, tables }) => {
   }
 }
 
+const buildKitchenHistory = ({ kitchenOrders, orders, tables, menuItems }) => {
+  const orderById = new Map(orders.map((order) => [order.id, order]))
+  const tableById = new Map(tables.map((table) => [table.id, table]))
+  const menuById = new Map(menuItems.map((item) => [item.id, item]))
+
+  return kitchenOrders
+    .filter((item) => item.status === 'READY' || item.status === 'SERVED')
+    .map((item) => {
+      const order = orderById.get(item.orderId)
+      const table = tableById.get(order?.tableId)
+      const menuItem = menuById.get(item.menuItemId)
+
+      return {
+        id: item.id,
+        orderId: item.orderId,
+        orderNumber: order?.orderNumber ?? `ORD-${item.orderId}`,
+        tableId: order?.tableId ?? -1,
+        tableNumber: table?.tableNumber ?? 'N/A',
+        itemName: item.itemName,
+        quantity: item.quantity,
+        station: mapStationByCategory(menuItem?.category),
+        status: item.status,
+        statusLabel: item.status === 'SERVED' ? 'Đã phục vụ' : 'Đã hoàn thành',
+        completedAt: item.completedAt,
+        receivedAt: item.receivedAt,
+      }
+    })
+    .sort((left, right) =>
+      new Date(right.completedAt ?? right.receivedAt ?? 0) - new Date(left.completedAt ?? left.receivedAt ?? 0)
+    )
+}
+
 const buildMenuManagement = (menuItems) => {
   const categories = ['Tất cả', ...new Set(menuItems.map((item) => item.category))]
 
@@ -169,9 +201,10 @@ const buildInventoryManagement = (inventoryItems) => {
 
 export const chefApi = {
   async getDashboard() {
-    const [kitchenDisplayResult, ordersResult, tablesResult, menuItemsResult, inventoryItemsResult] =
+    const [kitchenDisplayResult, kitchenOrdersResult, ordersResult, tablesResult, menuItemsResult, inventoryItemsResult] =
       await Promise.allSettled([
         api.get('/kitchen/display'),
+        api.get('/kitchen/orders'),
         api.get('/orders'),
         api.get('/tables'),
         api.get('/menu-items'),
@@ -180,12 +213,14 @@ export const chefApi = {
 
     const kitchenDisplayItems =
       kitchenDisplayResult.status === 'fulfilled' ? kitchenDisplayResult.value : []
+    const kitchenOrders = kitchenOrdersResult.status === 'fulfilled' ? kitchenOrdersResult.value : []
     const orders = ordersResult.status === 'fulfilled' ? ordersResult.value : []
     const tables = tablesResult.status === 'fulfilled' ? tablesResult.value : []
     const menuItems = menuItemsResult.status === 'fulfilled' ? menuItemsResult.value : []
     const inventoryItems = inventoryItemsResult.status === 'fulfilled' ? inventoryItemsResult.value : []
     const successfulRequests = [
       kitchenDisplayResult,
+      kitchenOrdersResult,
       ordersResult,
       tablesResult,
       menuItemsResult,
@@ -195,7 +230,7 @@ export const chefApi = {
     return {
       roleLabel: 'Bếp',
       sourceLabel:
-        successfulRequests === 5
+          successfulRequests === 6
           ? 'Dữ liệu thời gian thực từ backend'
           : 'Dữ liệu backend (một phần đang tạm gián đoạn)',
       snapshotTime: `Cập nhật lúc ${new Date().toLocaleTimeString('vi-VN', {
@@ -203,11 +238,14 @@ export const chefApi = {
         minute: '2-digit',
       })}`,
       footerNote:
-        successfulRequests === 5
+        successfulRequests === 6
           ? 'Đồng bộ từ bếp, menu và kho nguyên liệu'
           : 'Một số dịch vụ backend chưa phản hồi, dữ liệu đang hiển thị phần khả dụng',
       navigation: FALLBACK_NAVIGATION,
-      kitchenDisplay: buildKitchenDisplay({ kitchenDisplayItems, orders, tables }),
+      kitchenDisplay: {
+        ...buildKitchenDisplay({ kitchenDisplayItems, orders, tables }),
+        history: buildKitchenHistory({ kitchenOrders, orders, tables, menuItems }),
+      },
       menuManagement: buildMenuManagement(menuItems),
       inventoryManagement: buildInventoryManagement(inventoryItems),
     }

@@ -16,6 +16,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
 import java.util.List;
 
 @RestController
@@ -56,9 +57,9 @@ public class InventoryItemController {
                 .name(request.getName())
                 .category(request.getCategory())
                 .unit(request.getUnit())
-                .quantity(Math.max(0, request.getQuantity()))
-                .threshold(Math.max(0, request.getThreshold()))
-                .status(request.getQuantity() <= 0 ? InventoryStatus.OUT_OF_STOCK : request.getStatus())
+                .quantity(nonNegative(request.getQuantity()))
+                .threshold(nonNegative(request.getThreshold()))
+                .status(request.getStatus())
                 .build();
 
         InventoryItem created = inventoryItemRepository.save(item);
@@ -78,7 +79,7 @@ public class InventoryItemController {
         item.setName(request.getName());
         item.setCategory(request.getCategory());
         item.setUnit(request.getUnit());
-        item.setThreshold(Math.max(0, request.getThreshold()));
+        item.updateThreshold(request.getThreshold());
         item.updateQuantity(request.getQuantity());
         item.updateStatus(request.getStatus());
 
@@ -128,5 +129,12 @@ public class InventoryItemController {
         InventoryItem updated = inventoryItemRepository.save(item);
 
         return ResponseEntity.ok(ApiResponse.success(updated, "Cập nhật trạng thái nguyên liệu thành công"));
+    }
+
+    private BigDecimal nonNegative(BigDecimal value) {
+        if (value == null || value.compareTo(BigDecimal.ZERO) < 0) {
+            return BigDecimal.ZERO;
+        }
+        return value;
     }
 }

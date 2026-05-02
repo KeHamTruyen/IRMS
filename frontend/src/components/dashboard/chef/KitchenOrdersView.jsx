@@ -107,6 +107,7 @@ function KitchenOrderCard({ order, isSelected, onSelectTable, onCompleteItem }) 
 
 function KitchenOrdersView({ kitchenDisplay, selectedTableId, onSelectTable, onCompleteItem }) {
   const waitingTables = kitchenDisplay.tables
+  const servedHistory = kitchenDisplay.history ?? []
   const prioritizedOrders = useMemo(() => {
     if (!selectedTableId) return kitchenDisplay.orders
 
@@ -153,6 +154,43 @@ function KitchenOrdersView({ kitchenDisplay, selectedTableId, onSelectTable, onC
             onCompleteItem={onCompleteItem}
           />
         ))}
+      </section>
+
+      <section className="rounded-[28px] border border-[#e7edf2] bg-white p-6">
+        <div className="flex items-center justify-between gap-4">
+          <div>
+            <p className="text-xs font-bold uppercase tracking-[0.12em] text-[#0d9488]">
+              Lịch sử bếp
+            </p>
+            <h2 className="mt-2 text-[1.5rem] font-bold text-[#16202a]">Các món đã hoàn thành</h2>
+          </div>
+          <span className="rounded-full bg-[#f8fafc] px-4 py-2 text-sm font-semibold text-[#516072]">
+            {servedHistory.length} món
+          </span>
+        </div>
+
+        <div className="mt-5 divide-y divide-[#e7edf2]">
+          {servedHistory.length ? (
+            servedHistory.slice(0, 12).map((item) => (
+              <div key={item.id} className="grid gap-3 py-4 md:grid-cols-[120px_minmax(0,1fr)_130px] md:items-center">
+                <div className="text-sm font-bold text-[#16202a]">Bàn {item.tableNumber}</div>
+                <div>
+                  <div className="font-semibold text-[#16202a]">{item.itemName}</div>
+                  <div className="mt-1 text-sm text-[#62707f]">
+                    {item.orderNumber} • SL {item.quantity} • {item.station}
+                  </div>
+                </div>
+                <div className="text-left md:text-right">
+                  <span className="rounded-full bg-[#eef9f7] px-3 py-1 text-xs font-semibold text-[#2d7871]">
+                    {item.statusLabel}
+                  </span>
+                </div>
+              </div>
+            ))
+          ) : (
+            <div className="py-6 text-sm font-semibold text-[#62707f]">Chưa có món nào hoàn thành.</div>
+          )}
+        </div>
       </section>
     </section>
   )

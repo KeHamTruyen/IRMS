@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.5.1)  1 MAY 2026 16:02
+This is pdfTeX, Version 3.141592653-2.6-1.40.29 (MiKTeX 26.2) (preloaded format=pdflatex 2026.5.1)  2 MAY 2026 20:23
 entering extended mode
  restricted \write18 enabled.
  %&-line parsing enabled.
@@ -1042,8 +1042,10 @@ Package hyperref Info: Option `colorlinks' set `true' on input line 25.
 tex.def
 File: l3backend-pdftex.def 2026-02-18 L3 backend support: PDF output (pdfTeX)
 \l__color_backend_stack_int=\count336
+) (report.aux
+Package babel Info: 'vietnamese' activates 'vietnamese' shorthands.
+(babel)             Reported on input line 8.
 )
-No file report.aux.
 \openout1 = `report.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 36.
@@ -1066,8 +1068,7 @@ LaTeX Font Info:    Checking defaults for PD1/pdf/m/n on input line 36.
 LaTeX Font Info:    ... okay on input line 36.
 LaTeX Font Info:    Checking defaults for PU/pdf/m/n on input line 36.
 LaTeX Font Info:    ... okay on input line 36.
-Package babel Info: 'vietnamese' activates 'vietnamese' shorthands.
-(babel)             Reported on input line 36.
+
 *geometry* driver: auto-detecting
 *geometry* detected driver: pdftex
 *geometry* verbose mode - [ preamble ] result:
@@ -1129,6 +1130,7 @@ fg
 File: epstopdf-sys.cfg 2021/03/18 v2.0 Configuration of epstopdf for MiKTeX
 ))
 Package hyperref Info: Link coloring ON on input line 36.
+ (report.out) (report.out)
 \@outlinefile=\write4
 \openout4 = `report.out'.
 
@@ -1140,175 +1142,177 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 51.
  [1
 
-{C:/Users/Admin/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}]
-No file report.toc.
-\tf@toc=\write5
-\openout5 = `report.toc'.
-
-
+{C:/Users/Admin/AppData/Local/MiKTeX/fonts/map/pdftex/pdftex.map}] (report.toc
 pdfTeX warning (ext4): destination with the same identifier (name{page.1}) has 
 been already used, duplicate ignored
 <to be read again> 
                    \relax 
-l.76 \newpage
-              [1] [2] [3]
+l.72 ...áº¡m vi hiá»‡n thá»±c}{24}{subsection.3.1}
+                                                  % [1])
+\tf@toc=\write5
+\openout5 = `report.toc'.
+
+ [2] [3] [4]
 LaTeX Font Info:    Trying to load font information for T5+cmtt on input line 1
 59.
 
 (C:\Users\Admin\AppData\Local\Programs\MiKTeX\tex/latex/vntex\t5cmtt.fd
 File: t5cmtt.fd 1999/05/25 v2.5h Standard LaTeX font definitions
 )
-[4] [5] [6] [7] [8] [9]
-Underfull \hbox (badness 10000) in paragraph at lines 357--358
+[5] [6] [7] [8] [9] [10]
+Underfull \hbox (badness 10000) in paragraph at lines 360--361
 []|\T5/cmr/m/n/12 createOrder, up-da-te-Order, ad-dItem, re-moveItem,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 359--359
+Underfull \hbox (badness 10000) in paragraph at lines 362--362
 []|\T5/cmr/m/n/12 Chef/Kitchen
  []
 
-[10
+[11] [12
 pdfTeX warning (ext4): destination with the same identifier (name{table.1}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.382     \item \textbf
-                       {Analytics Module}]
-Overfull \hbox (22.77458pt too wide) in paragraph at lines 405--406
+l.399     \item \textbf
+                       {admin}]
+Overfull \hbox (22.77458pt too wide) in paragraph at lines 408--409
 []\T5/cmr/m/n/12 services: \T5/cmtt/m/n/12 IOrderService\T5/cmr/m/n/12 , \T5/cm
 tt/m/n/12 OrderServiceImpl\T5/cmr/m/n/12 , \T5/cmtt/m/n/12 OrderCalculator\T5/c
 mr/m/n/12 , \T5/cmtt/m/n/12 OrderValidator 
  []
 
 
-Overfull \hbox (23.07451pt too wide) in paragraph at lines 411--412
+Overfull \hbox (26.33759pt too wide) in paragraph at lines 414--415
 []\T5/cmr/m/n/12 services: \T5/cmtt/m/n/12 IKitchenService\T5/cmr/m/n/12 , \T5/
 cmtt/m/n/12 KitchenServiceImpl\T5/cmr/m/n/12 , \T5/cmtt/m/n/12 KitchenOrderTime
-outService 
+outService\T5/cmr/m/n/12 ,
  []
 
 
-Overfull \hbox (53.64204pt too wide) in paragraph at lines 418--419
+Overfull \hbox (53.64204pt too wide) in paragraph at lines 421--422
 []\T5/cmr/m/n/12 services: \T5/cmtt/m/n/12 IBillingService\T5/cmr/m/n/12 , \T5/
 cmtt/m/n/12 BillingServiceImpl\T5/cmr/m/n/12 , \T5/cmtt/m/n/12 BillCalculator\T
 5/cmr/m/n/12 , \T5/cmtt/m/n/12 PaymentProcessor 
  []
 
 
-Overfull \hbox (60.49455pt too wide) in paragraph at lines 419--420
+Overfull \hbox (60.49455pt too wide) in paragraph at lines 422--423
 []\T5/cmr/m/n/12 strategies: \T5/cmtt/m/n/12 CashPaymentProcessor\T5/cmr/m/n/12
  , \T5/cmtt/m/n/12 CardPaymentProcessor\T5/cmr/m/n/12 , \T5/cmtt/m/n/12 EWallet
 PaymentProcessor\T5/cmr/m/n/12 ,
  []
 
-[11] [12] [13] [14] [15]
-Overfull \hbox (62.22426pt too wide) in paragraph at lines 562--563
+[13] [14] [15] [16]
+Overfull \hbox (62.22426pt too wide) in paragraph at lines 570--571
 []\T5/cmtt/m/n/12 OrderServiceImpl \T5/cmr/m/n/12 phö thuëc v o \T5/cmtt/m/n/12
  OrderRepository\T5/cmr/m/n/12 , \T5/cmtt/m/n/12 MenuItemRepository\T5/cmr/m/n/
 12 , \T5/cmtt/m/n/12 TableRepository\T5/cmr/m/n/12 ,
  []
 
-[16]
-Overfull \hbox (14.35399pt too wide) in paragraph at lines 603--604
+[17]
+Overfull \hbox (14.35399pt too wide) in paragraph at lines 611--612
 []\T5/cmr/bx/n/12 SRP\T5/cmr/m/n/12 : \T5/cmtt/m/n/12 KitchenServiceImpl \T5/cm
 r/m/n/12 xû lþ work-flow b¸p; \T5/cmtt/m/n/12 KitchenOrderPlacedEventListener
  []
 
-[17]
-Overfull \hbox (29.73497pt too wide) in paragraph at lines 630--631
+[18]
+Overfull \hbox (29.73497pt too wide) in paragraph at lines 638--639
 []\T5/cmtt/m/n/12 NoDiscountStrategy\T5/cmr/m/n/12 , \T5/cmtt/m/n/12 Percentage
 DiscountStrategy\T5/cmr/m/n/12 , \T5/cmtt/m/n/12 FixedAmountDiscountStrategy\T5
 /cmr/m/n/12 ,
  []
 
-
-Overfull \hbox (7.78477pt too wide) in paragraph at lines 643--644
+[19]
+Overfull \hbox (7.78477pt too wide) in paragraph at lines 651--652
 []\T5/cmr/bx/n/12 LSP\T5/cmr/m/n/12 : \T5/cmtt/m/n/12 CashPaymentProcessor\T5/c
 mr/m/n/12 , \T5/cmtt/m/n/12 CardPaymentProcessor\T5/cmr/m/n/12 , \T5/cmtt/m/n/1
 2 EWalletPaymentProcessor
  []
 
-[18] [19] [20] [21]
-Overfull \hbox (29.73497pt too wide) in paragraph at lines 753--754
+[20] [21] [22]
+Overfull \hbox (29.73497pt too wide) in paragraph at lines 761--762
 []\T5/cmtt/m/n/12 NoDiscountStrategy\T5/cmr/m/n/12 , \T5/cmtt/m/n/12 Percentage
 DiscountStrategy\T5/cmr/m/n/12 , \T5/cmtt/m/n/12 FixedAmountDiscountStrategy\T5
 /cmr/m/n/12 ,
  []
 
 
-Overfull \hbox (71.03468pt too wide) in paragraph at lines 753--754
+Overfull \hbox (71.03468pt too wide) in paragraph at lines 761--762
 \T5/cmtt/m/n/12 CouponDiscountStrategy \T5/cmr/m/n/12 v  \T5/cmtt/m/n/12 Member
 shipDiscountStrategy \T5/cmr/m/n/12 câ thº thay th¸ \T5/cmtt/m/n/12 DiscountStr
 ategy\T5/cmr/m/n/12 . 
  []
 
 
-Overfull \hbox (18.18916pt too wide) in paragraph at lines 774--775
+Overfull \hbox (18.18916pt too wide) in paragraph at lines 782--783
 []\T5/cmr/m/n/12 Service phö thuëc v o \T5/cmtt/m/n/12 OrderRepository\T5/cmr/m
 /n/12 , \T5/cmtt/m/n/12 BillRepository\T5/cmr/m/n/12 , \T5/cmtt/m/n/12 KitchenO
 rderRepository\T5/cmr/m/n/12 ,
  []
 
-
-Overfull \hbox (7.75217pt too wide) in paragraph at lines 775--776
+[23]
+Overfull \hbox (7.75217pt too wide) in paragraph at lines 783--784
 []\T5/cmtt/m/n/12 BillingServiceImpl \T5/cmr/m/n/12 l§y \T5/cmtt/m/n/12 Payment
 Processor \T5/cmr/m/n/12 thæng qua \T5/cmtt/m/n/12 PaymentProcessorFactory\T5/c
 mr/m/n/12 . 
  []
 
-[22] [23] [24] [25] [26] [27] [28]
-Overfull \hbox (3.50905pt too wide) in paragraph at lines 1009--1009
+[24] [25] [26]
+Overfull \hbox (0.89482pt too wide) in paragraph at lines 904--905
+[]\T5/cmr/m/n/12 C¡c lîp nh÷ \T5/cmtt/m/n/12 KitchenOrderFactory\T5/cmr/m/n/12 
+, \T5/cmtt/m/n/12 TableServiceImpl \T5/cmr/m/n/12 v  \T5/cmtt/m/n/12 DemoResetS
+ervice \T5/cmr/m/n/12 t¡ch
+ []
+
+[27]
+Overfull \hbox (17.22pt too wide) in paragraph at lines 938--939
+[]\T5/cmtt/m/n/12 OrderServiceImpl \T5/cmr/m/n/12 ch¿ ph¡t \T5/cmtt/m/n/12 Orde
+rPlacedEvent\T5/cmr/m/n/12 ; \T5/cmtt/m/n/12 KitchenOrderPlacedEventListener
+ []
+
+[28] [29] [30]
+Overfull \hbox (3.50905pt too wide) in paragraph at lines 1031--1031
 []|\T5/cmr/bx/n/12 STT| 
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1013--1014
+Underfull \hbox (badness 10000) in paragraph at lines 1035--1036
 []|\T5/cmr/m/n/12 Order Mod-ule: en-tity, ser-vice,
  []
 
 
-Underfull \hbox (badness 10000) in paragraph at lines 1015--1016
+Underfull \hbox (badness 10000) in paragraph at lines 1037--1038
 []|\T5/cmr/m/n/12 Kitchen Mod-ule: kitchen or-
  []
 
 
-Underfull \hbox (badness 4899) in paragraph at lines 1015--1016
+Underfull \hbox (badness 4899) in paragraph at lines 1037--1038
 \T5/cmr/m/n/12 der/ticket, sta-tus flow, kitchen
  []
 
-[29
+[31] [32
 pdfTeX warning (ext4): destination with the same identifier (name{table.2}) has
  been already used, duplicate ignored
 <argument> ...shipout:D \box_use:N \l_shipout_box 
                                                   \__shipout_drop_firstpage_...
-l.1033     \item n
-                  Ã¢ng cao kháº£ nÄƒng báº£o trÃ¬,] [30] (report.aux)
+l.1061 
+       ] [33] (report.aux)
  ***********
 LaTeX2e <2025-11-01>
 L3 programming layer <2026-03-20>
  ***********
-
-
-LaTeX Warning: Label(s) may have changed. Rerun to get cross-references right.
-
-
-Package rerunfilecheck Warning: File `report.out' has changed.
-(rerunfilecheck)                Rerun to get outlines right
-(rerunfilecheck)                or use package `bookmark'.
-
-Package rerunfilecheck Info: Checksums for `report.out':
-(rerunfilecheck)             Before: <no file>
-(rerunfilecheck)             After:  D93F60E60CDE12F144E95F00F4E31A73;13398.
+Package rerunfilecheck Info: File `report.out' has not changed.
+(rerunfilecheck)             Checksum: 9D4B4E2E2F0FE9CA312C14E89B9012DD;13562.
  ) 
 Here is how much of TeX's memory you used:
- 23095 strings out of 467691
- 429671 string characters out of 5414988
- 840755 words of memory out of 5000000
- 51636 multiletter control sequences out of 15000+600000
+ 23180 strings out of 467691
+ 431172 string characters out of 5414988
+ 843907 words of memory out of 5000000
+ 51705 multiletter control sequences out of 15000+600000
  643650 words of font info for 64 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 84i,11n,94p,648b,677s stack positions out of 10000i,1000n,20000p,200000b,200000s
+ 84i,11n,94p,812b,667s stack positions out of 10000i,1000n,20000p,200000b,200000s
  <C:\Users\Admin\AppData\Local\MiKTeX\fonts/pk/ljfour/jknappen/ec/dpi600\tcrm
 1200.pk><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/public/amsfon
 ts/cm/cmsy10.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/vnte
@@ -1316,9 +1320,9 @@ x/vnr/vnbx12.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/vnte
 x/vnr/vnr12.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/vntex
 /vnr/vnti12.pfb><C:/Users/Admin/AppData/Local/Programs/MiKTeX/fonts/type1/vntex
 /vnr/vntt12.pfb>
-Output written on report.pdf (31 pages, 171383 bytes).
+Output written on report.pdf (34 pages, 216993 bytes).
 PDF statistics:
- 324 PDF objects out of 1000 (max. 8388607)
- 155 named destinations out of 1000 (max. 500000)
- 13 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 604 PDF objects out of 1000 (max. 8388607)
+ 163 named destinations out of 1000 (max. 500000)
+ 533 words of extra memory for PDF output out of 10000 (max. 10000000)
 

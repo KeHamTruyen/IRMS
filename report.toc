@@ -1,97 +1,98 @@
 \babel@toc {vietnamese}{}\relax 
-\contentsline {section}{\numberline {1}Giới thiệu}{2}{section.1}%
-\contentsline {section}{\numberline {2}Thiết kế kiến trúc hệ thống}{2}{section.2}%
-\contentsline {subsection}{\numberline {2.1}Phân tích yêu cầu}{2}{subsection.2.1}%
-\contentsline {subsubsection}{\numberline {2.1.1}Phạm vi dự án}{2}{subsubsection.2.1.1}%
-\contentsline {paragraph}{Các module chính}{3}{paragraph*.1}%
-\contentsline {paragraph}{Các nâng cấp trong tương lai}{3}{paragraph*.2}%
-\contentsline {paragraph}{Các yếu tố loại trừ}{3}{paragraph*.3}%
-\contentsline {subsubsection}{\numberline {2.1.2}Stakeholders}{4}{subsubsection.2.1.2}%
-\contentsline {paragraph}{Stakeholders chính}{4}{paragraph*.4}%
-\contentsline {paragraph}{Stakeholders phụ}{4}{paragraph*.5}%
-\contentsline {subsubsection}{\numberline {2.1.3}Yêu cầu chức năng}{4}{subsubsection.2.1.3}%
-\contentsline {paragraph}{1. Quản lý bàn}{4}{paragraph*.6}%
-\contentsline {paragraph}{2. Quản lý menu}{5}{paragraph*.7}%
-\contentsline {paragraph}{3. Quản lý order}{5}{paragraph*.8}%
-\contentsline {paragraph}{4. Kitchen Workflow}{5}{paragraph*.9}%
-\contentsline {paragraph}{5. Billing \& Payment}{5}{paragraph*.10}%
-\contentsline {paragraph}{6. Quản trị và phân quyền}{6}{paragraph*.11}%
-\contentsline {subsubsection}{\numberline {2.1.4}Yêu cầu phi chức năng}{6}{subsubsection.2.1.4}%
-\contentsline {subsubsection}{\numberline {2.1.5}Ràng buộc}{6}{subsubsection.2.1.5}%
-\contentsline {subsection}{\numberline {2.2}Đặc trưng kiến trúc và tiêu chí thành công}{7}{subsection.2.2}%
-\contentsline {subsubsection}{\numberline {2.2.1}Các đặc trưng kiến trúc quan trọng}{7}{subsubsection.2.2.1}%
-\contentsline {subsubsection}{\numberline {2.2.2}Tiêu chí đánh giá sự thành công của hệ thống}{7}{subsubsection.2.2.2}%
-\contentsline {subsection}{\numberline {2.3}Chọn kiểu kiến trúc và mẫu kiến trúc}{8}{subsection.2.3}%
-\contentsline {subsubsection}{\numberline {2.3.1}So sánh và chọn kiểu kiến trúc}{8}{subsubsection.2.3.1}%
-\contentsline {paragraph}{1. Monolithic truyền thống}{8}{paragraph*.12}%
-\contentsline {paragraph}{2. Microservices}{8}{paragraph*.13}%
-\contentsline {paragraph}{3. Layered Modular Monolith}{9}{paragraph*.14}%
-\contentsline {subsubsection}{\numberline {2.3.2}Chọn mẫu kiến trúc}{9}{subsubsection.2.3.2}%
-\contentsline {subsubsection}{\numberline {2.3.3}Kết luận lựa chọn}{10}{subsubsection.2.3.3}%
-\contentsline {subsection}{\numberline {2.4}Thiết kế kiến trúc hệ thống}{10}{subsection.2.4}%
-\contentsline {subsubsection}{\numberline {2.4.1}Xác định các actors và actions}{10}{subsubsection.2.4.1}%
-\contentsline {subsubsection}{\numberline {2.4.2}Xác định các components chính}{10}{subsubsection.2.4.2}%
-\contentsline {subsubsection}{\numberline {2.4.3}Package Diagram (Module View)}{11}{subsubsection.2.4.3}%
-\contentsline {paragraph}{Quan hệ phụ thuộc chính}{12}{paragraph*.15}%
-\contentsline {subsubsection}{\numberline {2.4.4}Component Diagram (C\&C View)}{13}{subsubsection.2.4.4}%
-\contentsline {paragraph}{Luồng xử lý chính}{13}{paragraph*.16}%
-\contentsline {subsubsection}{\numberline {2.4.5}Deployment Diagram (Allocation View)}{14}{subsubsection.2.4.5}%
-\contentsline {subsection}{\numberline {2.5}Các quyết định kiến trúc và nguyên tắc thiết kế}{14}{subsection.2.5}%
-\contentsline {subsubsection}{\numberline {2.5.1}Các quyết định kiến trúc chính}{14}{subsubsection.2.5.1}%
-\contentsline {subsubsection}{\numberline {2.5.2}Các nguyên tắc thiết kế được áp dụng}{15}{subsubsection.2.5.2}%
-\contentsline {subsection}{\numberline {2.6}Lược đồ lớp UML}{15}{subsection.2.6}%
-\contentsline {subsubsection}{\numberline {2.6.1}Order Module}{15}{subsubsection.2.6.1}%
-\contentsline {paragraph}{Class Diagram}{15}{paragraph*.17}%
-\contentsline {paragraph}{Quan hệ chính}{16}{paragraph*.18}%
-\contentsline {paragraph}{Nguyên tắc SOLID trong lược đồ}{16}{paragraph*.19}%
-\contentsline {paragraph}{Khả năng mở rộng}{16}{paragraph*.20}%
-\contentsline {subsubsection}{\numberline {2.6.2}Kitchen Module}{17}{subsubsection.2.6.2}%
-\contentsline {paragraph}{Class Diagram}{17}{paragraph*.21}%
-\contentsline {paragraph}{Nguyên tắc SOLID trong lược đồ}{17}{paragraph*.22}%
-\contentsline {paragraph}{Khả năng mở rộng}{17}{paragraph*.23}%
-\contentsline {subsubsection}{\numberline {2.6.3}Billing Module}{18}{subsubsection.2.6.3}%
-\contentsline {paragraph}{Class Diagram}{18}{paragraph*.24}%
-\contentsline {paragraph}{Nguyên tắc SOLID trong lược đồ}{18}{paragraph*.25}%
-\contentsline {paragraph}{Khả năng mở rộng}{19}{paragraph*.26}%
-\contentsline {subsubsection}{\numberline {2.6.4}Table Module}{19}{subsubsection.2.6.4}%
-\contentsline {paragraph}{Class Diagram}{19}{paragraph*.27}%
-\contentsline {paragraph}{Nguyên tắc SOLID trong lược đồ}{19}{paragraph*.28}%
-\contentsline {paragraph}{Khả năng mở rộng}{20}{paragraph*.29}%
-\contentsline {subsubsection}{\numberline {2.6.5}Admin \& Access Module}{20}{subsubsection.2.6.5}%
-\contentsline {paragraph}{Class Diagram}{20}{paragraph*.30}%
-\contentsline {paragraph}{Nguyên tắc SOLID trong lược đồ}{20}{paragraph*.31}%
-\contentsline {paragraph}{Khả năng mở rộng}{21}{paragraph*.32}%
-\contentsline {subsection}{\numberline {2.7}Áp dụng SOLID Principles vào thiết kế}{21}{subsection.2.7}%
-\contentsline {subsubsection}{\numberline {2.7.1}Single Responsibility Principle (SRP)}{21}{subsubsection.2.7.1}%
-\contentsline {subsubsection}{\numberline {2.7.2}Open/Closed Principle (OCP)}{21}{subsubsection.2.7.2}%
-\contentsline {subsubsection}{\numberline {2.7.3}Liskov Substitution Principle (LSP)}{22}{subsubsection.2.7.3}%
-\contentsline {subsubsection}{\numberline {2.7.4}Interface Segregation Principle (ISP)}{22}{subsubsection.2.7.4}%
-\contentsline {subsubsection}{\numberline {2.7.5}Dependency Inversion Principle (DIP)}{22}{subsubsection.2.7.5}%
-\contentsline {subsection}{\numberline {2.8}Khả năng mở rộng trong tương lai}{23}{subsection.2.8}%
-\contentsline {section}{\numberline {3}Hiện thực hệ thống}{23}{section.3}%
-\contentsline {subsection}{\numberline {3.1}Phạm vi hiện thực}{23}{subsection.3.1}%
-\contentsline {subsubsection}{\numberline {3.1.1}Các module được hiện thực}{23}{subsubsection.3.1.1}%
-\contentsline {subsubsection}{\numberline {3.1.2}Luồng nghiệp vụ end-to-end được demo}{24}{subsubsection.3.1.2}%
-\contentsline {subsection}{\numberline {3.2}Công nghệ sử dụng}{24}{subsection.3.2}%
-\contentsline {subsection}{\numberline {3.3}Cấu trúc thư mục}{24}{subsection.3.3}%
-\contentsline {subsection}{\numberline {3.4}Tính SOLID trong mã nguồn}{25}{subsection.3.4}%
-\contentsline {subsubsection}{\numberline {3.4.1}Single Responsibility Principle (SRP)}{25}{subsubsection.3.4.1}%
-\contentsline {subsubsection}{\numberline {3.4.2}Open/Closed Principle (OCP)}{26}{subsubsection.3.4.2}%
-\contentsline {subsubsection}{\numberline {3.4.3}Liskov Substitution Principle (LSP)}{26}{subsubsection.3.4.3}%
-\contentsline {subsubsection}{\numberline {3.4.4}Interface Segregation Principle (ISP)}{26}{subsubsection.3.4.4}%
-\contentsline {subsubsection}{\numberline {3.4.5}Dependency Inversion Principle (DIP)}{26}{subsubsection.3.4.5}%
-\contentsline {subsection}{\numberline {3.5}Kết quả hiện thực}{26}{subsection.3.5}%
-\contentsline {subsubsection}{\numberline {3.5.1}Màn hình đăng nhập và phân quyền}{26}{subsubsection.3.5.1}%
-\contentsline {subsubsection}{\numberline {3.5.2}Màn hình quản lý bàn}{27}{subsubsection.3.5.2}%
-\contentsline {subsubsection}{\numberline {3.5.3}Màn hình gọi món}{27}{subsubsection.3.5.3}%
-\contentsline {subsubsection}{\numberline {3.5.4}Màn hình bếp}{27}{subsubsection.3.5.4}%
-\contentsline {subsubsection}{\numberline {3.5.5}Màn hình lập bill và thanh toán}{27}{subsubsection.3.5.5}%
-\contentsline {subsubsection}{\numberline {3.5.6}Luồng demo end-to-end}{27}{subsubsection.3.5.6}%
-\contentsline {subsection}{\numberline {3.6}Đóng gói và triển khai}{28}{subsection.3.6}%
-\contentsline {section}{\numberline {4}Báo cáo phản ánh}{28}{section.4}%
-\contentsline {subsection}{\numberline {4.1}Lợi ích của việc áp dụng SOLID}{28}{subsection.4.1}%
-\contentsline {subsection}{\numberline {4.2}Khó khăn gặp phải}{28}{subsection.4.2}%
-\contentsline {subsection}{\numberline {4.3}Bài học rút ra}{29}{subsection.4.3}%
-\contentsline {section}{\numberline {5}Phân chia công việc}{29}{section.5}%
-\contentsline {section}{\numberline {6}Tổng kết}{29}{section.6}%
-\contentsline {section}{\numberline {7}Tài liệu tham khảo}{30}{section.7}%
+\contentsline {section}{\numberline {1}Giới thiệu}{3}{section.1}%
+\contentsline {section}{\numberline {2}Thiết kế kiến trúc hệ thống}{3}{section.2}%
+\contentsline {subsection}{\numberline {2.1}Phân tích yêu cầu}{3}{subsection.2.1}%
+\contentsline {subsubsection}{\numberline {2.1.1}Phạm vi dự án}{3}{subsubsection.2.1.1}%
+\contentsline {paragraph}{Các module chính}{4}{paragraph*.1}%
+\contentsline {paragraph}{Các nâng cấp trong tương lai}{4}{paragraph*.2}%
+\contentsline {paragraph}{Các yếu tố loại trừ}{4}{paragraph*.3}%
+\contentsline {subsubsection}{\numberline {2.1.2}Stakeholders}{5}{subsubsection.2.1.2}%
+\contentsline {paragraph}{Stakeholders chính}{5}{paragraph*.4}%
+\contentsline {paragraph}{Stakeholders phụ}{5}{paragraph*.5}%
+\contentsline {subsubsection}{\numberline {2.1.3}Yêu cầu chức năng}{5}{subsubsection.2.1.3}%
+\contentsline {paragraph}{1. Quản lý bàn}{5}{paragraph*.6}%
+\contentsline {paragraph}{2. Quản lý menu}{6}{paragraph*.7}%
+\contentsline {paragraph}{3. Quản lý order}{6}{paragraph*.8}%
+\contentsline {paragraph}{4. Kitchen Workflow}{6}{paragraph*.9}%
+\contentsline {paragraph}{5. Billing \& Payment}{6}{paragraph*.10}%
+\contentsline {paragraph}{6. Quản trị và phân quyền}{7}{paragraph*.11}%
+\contentsline {subsubsection}{\numberline {2.1.4}Yêu cầu phi chức năng}{7}{subsubsection.2.1.4}%
+\contentsline {subsubsection}{\numberline {2.1.5}Ràng buộc}{7}{subsubsection.2.1.5}%
+\contentsline {subsection}{\numberline {2.2}Đặc trưng kiến trúc và tiêu chí thành công}{8}{subsection.2.2}%
+\contentsline {subsubsection}{\numberline {2.2.1}Các đặc trưng kiến trúc quan trọng}{8}{subsubsection.2.2.1}%
+\contentsline {subsubsection}{\numberline {2.2.2}Tiêu chí đánh giá sự thành công của hệ thống}{8}{subsubsection.2.2.2}%
+\contentsline {subsection}{\numberline {2.3}Chọn kiểu kiến trúc và mẫu kiến trúc}{9}{subsection.2.3}%
+\contentsline {subsubsection}{\numberline {2.3.1}So sánh và chọn kiểu kiến trúc}{9}{subsubsection.2.3.1}%
+\contentsline {paragraph}{1. Monolithic truyền thống}{9}{paragraph*.12}%
+\contentsline {paragraph}{2. Microservices}{10}{paragraph*.13}%
+\contentsline {paragraph}{3. Layered Modular Monolith}{10}{paragraph*.14}%
+\contentsline {subsubsection}{\numberline {2.3.2}Chọn mẫu kiến trúc}{11}{subsubsection.2.3.2}%
+\contentsline {subsubsection}{\numberline {2.3.3}Kết luận lựa chọn}{11}{subsubsection.2.3.3}%
+\contentsline {subsection}{\numberline {2.4}Thiết kế kiến trúc hệ thống}{11}{subsection.2.4}%
+\contentsline {subsubsection}{\numberline {2.4.1}Xác định các actors và actions}{11}{subsubsection.2.4.1}%
+\contentsline {subsubsection}{\numberline {2.4.2}Xác định các components chính}{12}{subsubsection.2.4.2}%
+\contentsline {subsubsection}{\numberline {2.4.3}Package Diagram (Module View)}{13}{subsubsection.2.4.3}%
+\contentsline {paragraph}{Quan hệ phụ thuộc chính}{14}{paragraph*.15}%
+\contentsline {subsubsection}{\numberline {2.4.4}Component Diagram (C\&C View)}{14}{subsubsection.2.4.4}%
+\contentsline {paragraph}{Luồng xử lý chính}{15}{paragraph*.16}%
+\contentsline {subsubsection}{\numberline {2.4.5}Deployment Diagram (Allocation View)}{15}{subsubsection.2.4.5}%
+\contentsline {subsection}{\numberline {2.5}Các quyết định kiến trúc và nguyên tắc thiết kế}{16}{subsection.2.5}%
+\contentsline {subsubsection}{\numberline {2.5.1}Các quyết định kiến trúc chính}{16}{subsubsection.2.5.1}%
+\contentsline {subsubsection}{\numberline {2.5.2}Các nguyên tắc thiết kế được áp dụng}{16}{subsubsection.2.5.2}%
+\contentsline {subsection}{\numberline {2.6}Lược đồ lớp UML}{17}{subsection.2.6}%
+\contentsline {subsubsection}{\numberline {2.6.1}Order Module}{17}{subsubsection.2.6.1}%
+\contentsline {paragraph}{Class Diagram}{17}{paragraph*.17}%
+\contentsline {paragraph}{Quan hệ chính}{17}{paragraph*.18}%
+\contentsline {paragraph}{Nguyên tắc SOLID trong lược đồ}{18}{paragraph*.19}%
+\contentsline {paragraph}{Khả năng mở rộng}{18}{paragraph*.20}%
+\contentsline {subsubsection}{\numberline {2.6.2}Kitchen Module}{18}{subsubsection.2.6.2}%
+\contentsline {paragraph}{Class Diagram}{18}{paragraph*.21}%
+\contentsline {paragraph}{Nguyên tắc SOLID trong lược đồ}{19}{paragraph*.22}%
+\contentsline {paragraph}{Khả năng mở rộng}{19}{paragraph*.23}%
+\contentsline {subsubsection}{\numberline {2.6.3}Billing Module}{19}{subsubsection.2.6.3}%
+\contentsline {paragraph}{Class Diagram}{19}{paragraph*.24}%
+\contentsline {paragraph}{Nguyên tắc SOLID trong lược đồ}{20}{paragraph*.25}%
+\contentsline {paragraph}{Khả năng mở rộng}{20}{paragraph*.26}%
+\contentsline {subsubsection}{\numberline {2.6.4}Table Module}{20}{subsubsection.2.6.4}%
+\contentsline {paragraph}{Class Diagram}{20}{paragraph*.27}%
+\contentsline {paragraph}{Nguyên tắc SOLID trong lược đồ}{21}{paragraph*.28}%
+\contentsline {paragraph}{Khả năng mở rộng}{21}{paragraph*.29}%
+\contentsline {subsubsection}{\numberline {2.6.5}Admin \& Access Module}{21}{subsubsection.2.6.5}%
+\contentsline {paragraph}{Class Diagram}{21}{paragraph*.30}%
+\contentsline {paragraph}{Nguyên tắc SOLID trong lược đồ}{22}{paragraph*.31}%
+\contentsline {paragraph}{Khả năng mở rộng}{22}{paragraph*.32}%
+\contentsline {subsection}{\numberline {2.7}Áp dụng SOLID Principles vào thiết kế}{22}{subsection.2.7}%
+\contentsline {subsubsection}{\numberline {2.7.1}Single Responsibility Principle (SRP)}{22}{subsubsection.2.7.1}%
+\contentsline {subsubsection}{\numberline {2.7.2}Open/Closed Principle (OCP)}{23}{subsubsection.2.7.2}%
+\contentsline {subsubsection}{\numberline {2.7.3}Liskov Substitution Principle (LSP)}{23}{subsubsection.2.7.3}%
+\contentsline {subsubsection}{\numberline {2.7.4}Interface Segregation Principle (ISP)}{23}{subsubsection.2.7.4}%
+\contentsline {subsubsection}{\numberline {2.7.5}Dependency Inversion Principle (DIP)}{24}{subsubsection.2.7.5}%
+\contentsline {subsection}{\numberline {2.8}Khả năng mở rộng trong tương lai}{24}{subsection.2.8}%
+\contentsline {section}{\numberline {3}Hiện thực hệ thống}{24}{section.3}%
+\contentsline {subsection}{\numberline {3.1}Phạm vi hiện thực}{24}{subsection.3.1}%
+\contentsline {subsubsection}{\numberline {3.1.1}Các module được hiện thực}{24}{subsubsection.3.1.1}%
+\contentsline {subsubsection}{\numberline {3.1.2}Luồng nghiệp vụ end-to-end được demo}{25}{subsubsection.3.1.2}%
+\contentsline {subsection}{\numberline {3.2}Công nghệ sử dụng}{26}{subsection.3.2}%
+\contentsline {subsection}{\numberline {3.3}Cấu trúc thư mục}{26}{subsection.3.3}%
+\contentsline {subsection}{\numberline {3.4}Tính SOLID trong mã nguồn}{27}{subsection.3.4}%
+\contentsline {subsubsection}{\numberline {3.4.1}Single Responsibility Principle (SRP)}{27}{subsubsection.3.4.1}%
+\contentsline {subsubsection}{\numberline {3.4.2}Open/Closed Principle (OCP)}{27}{subsubsection.3.4.2}%
+\contentsline {subsubsection}{\numberline {3.4.3}Liskov Substitution Principle (LSP)}{27}{subsubsection.3.4.3}%
+\contentsline {subsubsection}{\numberline {3.4.4}Interface Segregation Principle (ISP)}{28}{subsubsection.3.4.4}%
+\contentsline {subsubsection}{\numberline {3.4.5}Dependency Inversion Principle (DIP)}{28}{subsubsection.3.4.5}%
+\contentsline {subsection}{\numberline {3.5}Kết quả hiện thực}{28}{subsection.3.5}%
+\contentsline {subsubsection}{\numberline {3.5.1}Màn hình đăng nhập và phân quyền}{28}{subsubsection.3.5.1}%
+\contentsline {subsubsection}{\numberline {3.5.2}Màn hình quản lý bàn}{28}{subsubsection.3.5.2}%
+\contentsline {subsubsection}{\numberline {3.5.3}Màn hình lễ tân}{29}{subsubsection.3.5.3}%
+\contentsline {subsubsection}{\numberline {3.5.4}Màn hình gọi món}{29}{subsubsection.3.5.4}%
+\contentsline {subsubsection}{\numberline {3.5.5}Màn hình bếp}{29}{subsubsection.3.5.5}%
+\contentsline {subsubsection}{\numberline {3.5.6}Màn hình lập bill và thanh toán}{29}{subsubsection.3.5.6}%
+\contentsline {subsubsection}{\numberline {3.5.7}Luồng demo end-to-end}{29}{subsubsection.3.5.7}%
+\contentsline {subsection}{\numberline {3.6}Đóng gói và triển khai}{30}{subsection.3.6}%
+\contentsline {section}{\numberline {4}Báo cáo phản ánh}{31}{section.4}%
+\contentsline {subsection}{\numberline {4.1}Lợi ích của việc áp dụng SOLID}{31}{subsection.4.1}%
+\contentsline {subsection}{\numberline {4.2}Khó khăn gặp phải}{31}{subsection.4.2}%
+\contentsline {subsection}{\numberline {4.3}Bài học rút ra}{31}{subsection.4.3}%
+\contentsline {section}{\numberline {5}Phân chia công việc}{32}{section.5}%
+\contentsline {section}{\numberline {6}Tổng kết}{32}{section.6}%
+\contentsline {section}{\numberline {7}Tài liệu tham khảo}{33}{section.7}%

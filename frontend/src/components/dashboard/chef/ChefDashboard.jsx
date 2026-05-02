@@ -23,6 +23,31 @@ function ChefDashboard({ dashboard, onSignOut }) {
     setActionError('')
   }, [dashboard])
 
+  useEffect(() => {
+    let isMounted = true
+
+    const refreshDashboard = async () => {
+      try {
+        const nextDashboard = await chefApi.getDashboard()
+        if (!isMounted) return
+
+        setKitchenDisplay(nextDashboard.kitchenDisplay)
+        setInventoryManagement(nextDashboard.inventoryManagement)
+        setMenuManagement(nextDashboard.menuManagement)
+      } catch (error) {
+        if (isMounted) {
+          setActionError(error.message ?? 'Không thể tải dữ liệu bếp mới nhất.')
+        }
+      }
+    }
+
+    const intervalId = window.setInterval(refreshDashboard, 5000)
+    return () => {
+      isMounted = false
+      window.clearInterval(intervalId)
+    }
+  }, [])
+
   const waitingTables = useMemo(
     () =>
       kitchenDisplay.tables.filter((table) =>

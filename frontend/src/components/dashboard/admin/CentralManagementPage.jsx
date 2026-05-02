@@ -918,6 +918,7 @@ function CentralManagementPage({
                   <input
                     type="number"
                     min="0"
+                    step="0.01"
                     value={inventoryForm.quantity}
                     onChange={(event) => onInventoryFormChange('quantity', event.target.value)}
                     className="min-h-11 w-full rounded-2xl border border-[#d8e0e7] px-4 outline-none focus:border-[#0d9488]"
@@ -929,6 +930,7 @@ function CentralManagementPage({
                   <input
                     type="number"
                     min="0"
+                    step="0.01"
                     value={inventoryForm.threshold}
                     onChange={(event) => onInventoryFormChange('threshold', event.target.value)}
                     className="min-h-11 w-full rounded-2xl border border-[#d8e0e7] px-4 outline-none focus:border-[#0d9488]"

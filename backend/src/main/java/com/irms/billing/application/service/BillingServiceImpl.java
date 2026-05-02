@@ -18,6 +18,7 @@ import com.irms.common.exception.ResourceNotFoundException;
 import com.irms.order.domain.entity.Order;
 import com.irms.order.domain.entity.OrderStatus;
 import com.irms.order.domain.repository.OrderRepository;
+import com.irms.order.domain.service.OrderCalculator;
 import com.irms.order.domain.service.OrderStatusTransitionValidator;
 import com.irms.table.domain.entity.TableStatus;
 import com.irms.table.domain.repository.TableRepository;
@@ -53,6 +54,7 @@ public class BillingServiceImpl implements IBillingService {
     private final BillNumberGenerator billNumberGenerator;
     private final PaymentStatusCalculator paymentStatusCalculator;
     private final OrderStatusTransitionValidator orderStatusTransitionValidator;
+    private final OrderCalculator orderCalculator;
     private final IAuditLogService auditLogService;
 
     @Value("${app.tax-rate}")
@@ -62,16 +64,19 @@ public class BillingServiceImpl implements IBillingService {
     private BigDecimal serviceChargeRate;
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public List<Bill> getAllBills() {
-        return billRepository.findAll();
+        return billRepository.findAll().stream()
+                .map(this::repairBillTotalIfNeeded)
+                .toList();
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Bill getBillById(Long billId) {
-        return billRepository.findById(billId)
+        Bill bill = billRepository.findById(billId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bill", billId));
+        return repairBillTotalIfNeeded(bill);
     }
 
     @Override
@@ -97,8 +102,10 @@ public class BillingServiceImpl implements IBillingService {
         String billNumber = billNumberGenerator.generate();
 
         // ✅ SRP: Calculate bill via domain service
+        BigDecimal subtotal = resolveBillableSubtotal(order);
+
         BillCalculator.BillCalculationInput input = BillCalculator.BillCalculationInput.builder()
-                .subtotal(order.getTotalAmount())
+                .subtotal(subtotal)
                 .taxRate(taxRate)
                 .serviceChargeRate(serviceChargeRate)
                 .discount(request.getDiscount() != null ? request.getDiscount() : BigDecimal.ZERO)
@@ -129,10 +136,11 @@ public class BillingServiceImpl implements IBillingService {
     }
 
     @Override
-    @Transactional(readOnly = true)
+    @Transactional
     public Bill getBillByOrderId(Long orderId) {
-        return billRepository.findByOrderId(orderId)
+        Bill bill = billRepository.findByOrderId(orderId)
                 .orElseThrow(() -> new ResourceNotFoundException("Bill not found for order: " + orderId));
+        return repairBillTotalIfNeeded(bill);
     }
 
     @Override
@@ -316,5 +324,49 @@ public class BillingServiceImpl implements IBillingService {
                         bill.getTax(),
                         bill.getServiceCharge(),
                         bill.getDiscount().subtract(tipAmount)));
+    }
+
+    private BigDecimal resolveBillableSubtotal(Order order) {
+        BigDecimal subtotal = order.getTotalAmount();
+
+        if (subtotal == null || subtotal.compareTo(BigDecimal.ZERO) <= 0) {
+            subtotal = orderCalculator.calculateTotal(order.getItems());
+            if (subtotal.compareTo(BigDecimal.ZERO) > 0) {
+                order.setTotalAmount(subtotal);
+                orderRepository.save(order);
+            }
+        }
+
+        if (subtotal == null || subtotal.compareTo(BigDecimal.ZERO) <= 0) {
+            throw new BusinessException("Cannot create bill for an order without billable items");
+        }
+
+        return subtotal;
+    }
+
+    private Bill repairBillTotalIfNeeded(Bill bill) {
+        if (bill.getTotalAmount() != null && bill.getTotalAmount().compareTo(BigDecimal.ZERO) > 0) {
+            return bill;
+        }
+
+        Order order = orderRepository.findById(bill.getOrderId())
+                .orElseThrow(() -> new ResourceNotFoundException("Order", bill.getOrderId()));
+        BigDecimal subtotal = resolveBillableSubtotal(order);
+
+        BillCalculator.BillCalculationResult result = billCalculator.calculate(
+                BillCalculator.BillCalculationInput.builder()
+                        .subtotal(subtotal)
+                        .taxRate(taxRate)
+                        .serviceChargeRate(serviceChargeRate)
+                        .discount(bill.getDiscount() != null ? bill.getDiscount() : BigDecimal.ZERO)
+                        .build());
+
+        bill.setSubtotal(result.getSubtotal());
+        bill.setTax(result.getTax());
+        bill.setServiceCharge(result.getServiceCharge());
+        bill.setTotalAmount(result.getTotalAmount().add(
+                bill.getTipAmount() != null ? bill.getTipAmount() : BigDecimal.ZERO));
+
+        return billRepository.save(bill);
     }
 }

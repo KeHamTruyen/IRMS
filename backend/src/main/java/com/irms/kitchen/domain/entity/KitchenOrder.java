@@ -55,6 +55,10 @@ public class KitchenOrder {
     private LocalDateTime completedAt;
     
     private Integer estimatedPrepTime; // in minutes
+
+    @Column(nullable = false)
+    @Builder.Default
+    private Boolean inventoryDeducted = false;
     
     @PrePersist
     protected void onCreate() {

@@ -6,6 +6,7 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.math.BigDecimal;
 import java.time.LocalDateTime;
 
 @Entity
@@ -29,11 +30,11 @@ public class InventoryItem {
     @Column(nullable = false, length = 20)
     private String unit;
 
-    @Column(nullable = false)
-    private Integer quantity;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal quantity;
 
-    @Column(nullable = false)
-    private Integer threshold;
+    @Column(nullable = false, precision = 10, scale = 2)
+    private BigDecimal threshold;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
@@ -47,9 +48,7 @@ public class InventoryItem {
         if (updatedAt == null) {
             updatedAt = LocalDateTime.now();
         }
-        if (status == null) {
-            status = quantity != null && quantity <= 0 ? InventoryStatus.OUT_OF_STOCK : InventoryStatus.IN_STOCK;
-        }
+        status = normalizeStatus(status);
     }
 
     @PreUpdate
@@ -57,20 +56,43 @@ public class InventoryItem {
         updatedAt = LocalDateTime.now();
     }
 
-    public void updateQuantity(Integer nextQuantity) {
-        this.quantity = Math.max(0, nextQuantity == null ? 0 : nextQuantity);
-        if (this.quantity <= 0) {
-            this.status = InventoryStatus.OUT_OF_STOCK;
-        } else if (this.threshold != null && this.quantity <= this.threshold) {
-            this.status = InventoryStatus.RESTOCKING;
-        } else {
-            this.status = InventoryStatus.IN_STOCK;
-        }
+    public void updateQuantity(BigDecimal nextQuantity) {
+        this.quantity = nonNegative(nextQuantity);
+        this.status = normalizeStatus(null);
+    }
+
+    public void updateThreshold(BigDecimal nextThreshold) {
+        this.threshold = nonNegative(nextThreshold);
+        this.status = normalizeStatus(null);
     }
 
     public void updateStatus(InventoryStatus nextStatus) {
-        if (nextStatus != null) {
-            this.status = nextStatus;
+        this.status = normalizeStatus(nextStatus);
+    }
+
+    private InventoryStatus normalizeStatus(InventoryStatus requestedStatus) {
+        BigDecimal currentQuantity = nonNegative(quantity);
+        BigDecimal currentThreshold = nonNegative(threshold);
+
+        if (currentQuantity.compareTo(BigDecimal.ZERO) <= 0) {
+            return InventoryStatus.OUT_OF_STOCK;
         }
+
+        if (currentQuantity.compareTo(currentThreshold) <= 0) {
+            return InventoryStatus.RESTOCKING;
+        }
+
+        if (requestedStatus == InventoryStatus.RESTOCKING) {
+            return InventoryStatus.RESTOCKING;
+        }
+
+        return InventoryStatus.IN_STOCK;
+    }
+
+    private BigDecimal nonNegative(BigDecimal value) {
+        if (value == null || value.compareTo(BigDecimal.ZERO) < 0) {
+            return BigDecimal.ZERO;
+        }
+        return value;
     }
 }

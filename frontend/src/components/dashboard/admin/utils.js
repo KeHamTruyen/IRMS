@@ -50,8 +50,6 @@ export const getRoleLabel = (role) => {
       return 'Phục vụ'
     case 'CHEF':
       return 'Bếp'
-    case 'CASHIER':
-      return 'Thu ngân'
     case 'HOST':
       return 'Lễ tân'
     default:

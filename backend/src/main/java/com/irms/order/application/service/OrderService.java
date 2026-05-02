@@ -22,8 +22,6 @@ import java.math.BigDecimal;
 
 import lombok.RequiredArgsConstructor;
 
-@Service
-
 @RequiredArgsConstructor
 public class OrderService implements IOrderService {
 
@@ -79,6 +77,12 @@ public class OrderService implements IOrderService {
                 .build());
         
         return savedOrder;
+    }
+
+    @Override
+    @Transactional
+    public Order addItems(Long orderId, List<com.irms.order.application.dto.OrderItemRequest> items, String notes) {
+        throw new UnsupportedOperationException("Legacy OrderService is not registered as an application service");
     }
 
     @Override

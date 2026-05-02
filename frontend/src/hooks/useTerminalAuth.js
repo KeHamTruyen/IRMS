@@ -5,6 +5,8 @@ import { authApi } from '../services/authApi'
 import { adminApi } from '../services/adminApi'
 import { chefApi } from '../services/chefApi'
 import { serverApi } from '../services/serverApi'
+import { managerApi } from '../services/managerApi'
+import { hostApi } from '../services/hostApi'
 
 export function useTerminalAuth() {
   const [authMode, setAuthMode] = useState('employee')
@@ -32,6 +34,18 @@ export function useTerminalAuth() {
       return {
         success: true,
         data: await adminApi.getDashboard(),
+      }
+    }
+    if (role === 'MANAGER') {
+      return {
+        success: true,
+        data: await managerApi.getDashboard(),
+      }
+    }
+    if (role === 'HOST') {
+      return {
+        success: true,
+        data: await hostApi.getDashboard(),
       }
     }
     if (role === 'SERVER') {

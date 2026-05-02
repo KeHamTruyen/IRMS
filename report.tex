@@ -77,14 +77,14 @@ INTELLIGENT RESTAURANT \\ MANAGEMENT SYSTEM (IRMS)
 
 \section{Giới thiệu}
 
-Hệ thống \textbf{Intelligent Restaurant Management System (IRMS)} là một giải pháp phần mềm nhằm số hóa và tối ưu hóa các hoạt động cốt lõi trong nhà hàng, bao gồm tiếp nhận order, điều phối bếp, quản lý bàn, lập hóa đơn và thanh toán. Hệ thống đóng vai trò như một nền tảng trung tâm giúp đồng bộ thông tin giữa nhân viên phục vụ, nhân viên bếp, thu ngân và quản lý, từ đó giảm sai sót, rút ngắn thời gian phục vụ và nâng cao trải nghiệm khách hàng.
+Hệ thống \textbf{Intelligent Restaurant Management System (IRMS)} là một giải pháp phần mềm nhằm số hóa và tối ưu hóa các hoạt động cốt lõi trong nhà hàng, bao gồm tiếp nhận order, điều phối bếp, quản lý bàn, lập hóa đơn và thanh toán. Hệ thống đóng vai trò như một nền tảng trung tâm giúp đồng bộ thông tin giữa nhân viên phục vụ, nhân viên bếp, lễ tân và quản lý, từ đó giảm sai sót, rút ngắn thời gian phục vụ và nâng cao trải nghiệm khách hàng.
 
 Trong bối cảnh vận hành nhà hàng hiện đại, việc phối hợp giữa khu vực phục vụ và khu vực bếp thường phát sinh nhiều vấn đề như ghi sai món, chậm cập nhật trạng thái món ăn, thất lạc yêu cầu đặc biệt của khách hàng hoặc chậm trễ trong thanh toán. IRMS được xây dựng để giải quyết các bất cập đó thông qua một hệ thống thống nhất, hỗ trợ xử lý nghiệp vụ theo thời gian thực, đồng thời cung cấp nền tảng mở rộng cho các chức năng quản trị và phân tích vận hành.
 
 Mục tiêu của dự án gồm các nội dung chính sau:
 \begin{itemize}
     \item Tăng hiệu quả vận hành của nhà hàng bằng cách tự động hóa luồng gọi món, chế biến và thanh toán.
-    \item Cải thiện khả năng phối hợp giữa nhân viên phục vụ, nhân viên bếp và thu ngân thông qua dữ liệu đồng bộ theo thời gian thực.
+    \item Cải thiện khả năng phối hợp giữa nhân viên phục vụ, nhân viên bếp và lễ tân thông qua dữ liệu đồng bộ theo thời gian thực.
     \item Thiết kế hệ thống có cấu trúc mô-đun, dễ bảo trì, dễ mở rộng và phù hợp với các nguyên lý SOLID.
     \item Xây dựng một kiến trúc đủ rõ ràng để mô tả qua nhiều góc nhìn như \textit{module view}, \textit{component-and-connector view} và \textit{allocation view}.
     \item Hiện thực các chức năng cốt lõi nhằm chứng minh tính khả thi của thiết kế kiến trúc đề xuất.
@@ -104,9 +104,10 @@ Phạm vi của dự án IRMS tập trung vào các luồng nghiệp vụ cốt 
 \begin{itemize}
     \item \textbf{Order Management}: tạo order cho bàn, thêm/xóa món, cập nhật số lượng, thêm ghi chú đặc biệt và theo dõi trạng thái order.
     \item \textbf{Kitchen Workflow}: tiếp nhận order từ khu vực phục vụ, tạo kitchen ticket, cập nhật trạng thái chế biến và phản hồi món đã sẵn sàng.
-    \item \textbf{Billing \& Payment}: tạo hóa đơn từ order, tính tổng tiền, áp dụng khuyến mãi đơn giản và xử lý thanh toán.
+    \item \textbf{Billing \& Payment}: tạo hóa đơn từ order, tính tổng tiền, tip, thanh toán toàn bộ hoặc chia bill theo từng phần.
     \item \textbf{Menu Management}: quản lý danh sách món ăn, giá bán, danh mục món và trạng thái còn bán/hết món.
     \item \textbf{Table Management}: quản lý trạng thái bàn, gán order cho bàn và giải phóng bàn sau khi thanh toán.
+    \item \textbf{Reservation \& Host}: tiếp nhận đặt bàn, giữ bàn, cho khách đặt trước vào bàn và xử lý khách walk-in chưa đặt trước.
     \item \textbf{User \& Access Control}: quản lý tài khoản, vai trò, xác thực và phân quyền.
     \item \textbf{Inventory Monitoring}: theo dõi tồn kho và cảnh báo thiếu hụt.
     \item \textbf{Analytics \& Reports}: thống kê doanh thu, đơn hàng và báo cáo vận hành.
@@ -114,7 +115,7 @@ Phạm vi của dự án IRMS tập trung vào các luồng nghiệp vụ cốt 
 
 \paragraph{Các nâng cấp trong tương lai}
 \begin{itemize}
-    \item Reservation Management
+    \item Reservation nâng cao theo khung giờ, nhắc lịch và danh sách chờ
     \item Employee Scheduling
     \item Loyalty Program
     \item Multi-branch support
@@ -138,9 +139,8 @@ Các bên liên quan của hệ thống được chia thành hai nhóm chính: s
 \begin{itemize}
     \item \textbf{Server/Waiter}: tiếp nhận order, theo dõi trạng thái món, hỗ trợ khách hàng và phối hợp với bếp.
     \item \textbf{Chef/Kitchen Staff}: xem danh sách món cần chế biến, cập nhật trạng thái chuẩn bị và hoàn thành món.
-    \item \textbf{Cashier}: tạo bill, xử lý thanh toán và in hoặc xác nhận hóa đơn.
     \item \textbf{Manager}: quản lý menu, theo dõi hoạt động vận hành, cập nhật giá và xem báo cáo cơ bản.
-    \item \textbf{Host}: điều phối khách, quản lý khu vực bàn và hỗ trợ phân bổ bàn; reservation là hướng mở rộng.
+    \item \textbf{Host}: điều phối khách, quản lý khu vực bàn, tiếp nhận đặt bàn, giữ bàn và cho khách walk-in vào bàn.
     \item \textbf{Customer}: là đối tượng nhận dịch vụ ăn tại chỗ, gọi món và thanh toán.
 \end{itemize}
 
@@ -156,7 +156,8 @@ Các bên liên quan của hệ thống được chia thành hai nhóm chính: s
 \paragraph{1. Quản lý bàn}
 \begin{itemize}
     \item Hệ thống phải cho phép xem danh sách bàn và trạng thái hiện tại của từng bàn.
-    \item Mỗi bàn có thể ở một trong các trạng thái: \texttt{Available}, \texttt{Occupied}, \texttt{Reserved}, \texttt{WaitingForPayment}, \texttt{Dirty}.
+    \item Trạng thái lưu ở backend gồm \texttt{AVAILABLE}, \texttt{OCCUPIED}, \texttt{RESERVED} và \texttt{CLEANING}; giao diện phục vụ suy diễn thêm các trạng thái nghiệp vụ như chờ món, chờ phục vụ hoặc đã phục vụ dựa trên order/kitchen ticket đang mở.
+    \item Lễ tân có thể giữ bàn cho khách đặt trước hoặc cho khách walk-in vào bàn; thay đổi này phải được phản ánh trên màn hình nhân viên phục vụ.
     \item Khi khách ngồi vào bàn, nhân viên phục vụ có thể tạo order mới gắn với bàn tương ứng.
     \item Một bàn có thể có nhiều order theo thời gian, nhưng chỉ có một order đang hoạt động tại một thời điểm.
 \end{itemize}
@@ -182,20 +183,22 @@ Các bên liên quan của hệ thống được chia thành hai nhóm chính: s
     \item Khi order được xác nhận, hệ thống phải tạo \textit{kitchen ticket} để chuyển thông tin sang khu vực bếp.
     \item Nhân viên bếp có thể xem các món cần chế biến theo thứ tự hoặc theo nhóm danh mục món.
     \item Hệ thống phải cho phép cập nhật trạng thái từng món như \texttt{Queued}, \texttt{Preparing}, \texttt{Ready}.
+    \item Màn hình bếp cần có danh sách các món đang chờ xử lý và lịch sử các món đã hoàn thành/đã phục vụ để nhân viên kiểm tra lại khi cần.
     \item Khi toàn bộ món trong order đã hoàn thành, hệ thống cập nhật trạng thái order tương ứng để phục vụ mang món ra bàn.
 \end{itemize}
 
 \paragraph{5. Billing \& Payment}
 \begin{itemize}
-    \item Thu ngân hoặc nhân viên phục vụ có thể tạo bill từ order đang hoạt động.
+    \item Nhân viên phục vụ có thể tạo bill từ order đang hoạt động và xử lý thanh toán tại bàn.
     \item Hệ thống phải tính được \textit{subtotal}, phí dịch vụ, giảm giá và tổng tiền thanh toán.
     \item Hệ thống hỗ trợ ít nhất các phương thức thanh toán: tiền mặt, thẻ và ví điện tử.
+    \item Hệ thống hỗ trợ thanh toán toàn bộ phần còn lại hoặc split bill theo số tiền từng lần thanh toán.
     \item Sau khi thanh toán thành công, order được đóng và bàn được chuyển về trạng thái phù hợp để tiếp tục phục vụ.
 \end{itemize}
 
 \paragraph{6. Quản trị và phân quyền}
 \begin{itemize}
-    \item Hệ thống phải hỗ trợ các vai trò: \texttt{Admin}, \texttt{Manager}, \texttt{Server}, \texttt{Chef}, \texttt{Cashier}, \texttt{Host}.
+    \item Hệ thống phải hỗ trợ các vai trò đang dùng trong demo: \texttt{Admin}, \texttt{Manager}, \texttt{Server}, \texttt{Chef}, \texttt{Host}. Chức năng thu tiền được gộp vào vai trò \texttt{Server} trong MVP.
     \item Mỗi vai trò chỉ được truy cập các chức năng phù hợp với trách nhiệm nghiệp vụ.
     \item Hệ thống cần ghi nhận các hành động quan trọng như hủy order, cập nhật giá món hoặc hoàn tất thanh toán để hỗ trợ kiểm tra về sau.
 \end{itemize}
@@ -208,7 +211,7 @@ Các bên liên quan của hệ thống được chia thành hai nhóm chính: s
     \item \textbf{Tính sẵn sàng}: hệ thống cần hoạt động ổn định trong giờ cao điểm của nhà hàng.
     \item \textbf{Khả năng sử dụng}: giao diện phải đủ trực quan để nhân viên mới có thể làm quen nhanh.
     \item \textbf{Khả năng bảo trì}: mã nguồn cần có cấu trúc rõ ràng, dễ test, dễ thay đổi và tuân thủ các nguyên lý SOLID.
-    \item \textbf{Khả năng mở rộng}: dễ dàng bổ sung các module như Reservation, Employee Scheduling hoặc Loyalty Program trong tương lai.
+    \item \textbf{Khả năng mở rộng}: dễ dàng bổ sung các module như Employee Scheduling, Loyalty Program hoặc reservation nâng cao trong tương lai.
     \item \textbf{Bảo mật}: người dùng phải đăng nhập trước khi sử dụng hệ thống và chỉ truy cập được các chức năng được phân quyền.
     \item \textbf{Khả năng kiểm toán}: các thao tác nghiệp vụ quan trọng cần được ghi nhận để hỗ trợ tra cứu khi cần.
 \end{itemize}
@@ -231,7 +234,7 @@ Từ yêu cầu nghiệp vụ và các ràng buộc thực tế, nhóm xác đ�
 
 \begin{itemize}
     \item \textbf{Maintainability}: hệ thống phải dễ sửa đổi khi thay đổi nghiệp vụ, ví dụ điều chỉnh luồng order, thêm rule giảm giá hoặc thay đổi cách xử lý trạng thái món.
-    \item \textbf{Extensibility}: kiến trúc cần cho phép thêm các module như Reservation, Loyalty hoặc Employee Scheduling mà không phá vỡ cấu trúc lõi.
+    \item \textbf{Extensibility}: kiến trúc cần cho phép thêm các module như Loyalty, Employee Scheduling hoặc reservation nâng cao mà không phá vỡ cấu trúc lõi.
     \item \textbf{Consistency}: trạng thái của order, bill và table phải nhất quán để tránh sai lệch dữ liệu vận hành.
     \item \textbf{Performance}: các thao tác trực tiếp phục vụ nhân viên như xem menu, tạo order, cập nhật trạng thái món phải phản hồi nhanh.
     \item \textbf{Usability}: giao diện và workflow cần đơn giản để phù hợp với môi trường phục vụ tốc độ cao.
@@ -255,7 +258,7 @@ IRMS được xem là thành công nếu đáp ứng được các tiêu chí sa
 Dựa trên yêu cầu chức năng, yêu cầu phi chức năng và các ràng buộc thực tế của nhóm, có thể xác định một số đặc trưng kiến trúc quan trọng đối với IRMS như sau:
 \begin{itemize}
     \item \textbf{Maintainability}: hệ thống phải dễ sửa đổi và dễ bảo trì vì nhiều nghiệp vụ có thể thay đổi trong quá trình phát triển.
-    \item \textbf{Extensibility}: hệ thống cần hỗ trợ mở rộng các module như Reservation, Employee Scheduling hoặc Loyalty Program trong tương lai.
+    \item \textbf{Extensibility}: hệ thống cần hỗ trợ mở rộng các module như Employee Scheduling, Loyalty Program hoặc reservation nâng cao trong tương lai.
     \item \textbf{Consistency}: dữ liệu giữa order, kitchen, billing và table phải đồng bộ.
     \item \textbf{Usability}: giao diện và luồng xử lý cần đơn giản cho người dùng cuối.
     \item \textbf{Performance}: các thao tác nghiệp vụ chính cần có phản hồi nhanh.
@@ -358,11 +361,9 @@ Server/Waiter & createOrder, updateOrder, addItem, removeItem, viewOrderStatus, 
 \hline
 Chef/Kitchen Staff & viewKitchenTickets, startPreparation, markItemReady, updateKitchenStatus \\
 \hline
-Cashier & generateBill, processPayment, printReceipt, closeOrder \\
-\hline
 Manager & manageMenu, updatePrice, viewOperations, viewBasicReports, manageUsers \\
 \hline
-Host & assignTable, manageReservations (planned) \\
+Host & assignTable, manageReservations, updateReservationStatus, seatWalkInGuest \\
 \hline
 System & publishOrderPlaced, generateKitchenTicket, updateTableStatus \\
 \hline
@@ -378,13 +379,15 @@ Từ các actor và actions đã xác định, hệ thống được chia thành
     \item \textbf{Kitchen Module}
     \item \textbf{Billing Module}
     \item \textbf{Table Module}
+    \item \textbf{Reservation Module}
     \item \textbf{Inventory Module}
     \item \textbf{Analytics Module}
+    \item \textbf{Audit Module}
     \item \textbf{Notification Module}
     \item \textbf{Common \& Configuration Module}
 \end{itemize}
 
-Trong phiên bản hiện tại, Inventory và Analytics đã có backend cơ bản; Reservation và Audit Log vẫn nằm trong kế hoạch mở rộng.
+Trong phiên bản hiện tại, các module Order, Kitchen, Billing, Table, Menu, Reservation/Host và Access Control tạo thành luồng demo chính; Inventory, Analytics và Audit Log hỗ trợ vận hành ở mức backend cơ bản.
 
 Mỗi module có ranh giới trách nhiệm tương đối độc lập, đồng thời giao tiếp với nhau thông qua abstraction hoặc domain event.
 
@@ -408,7 +411,7 @@ Mỗi module có ranh giới trách nhiệm tương đối độc lập, đồng
     \item \textbf{kitchen}
     \begin{itemize}
         \item entities: \texttt{KitchenOrder}, \texttt{KitchenOrderStatus}
-        \item services: \texttt{IKitchenService}, \texttt{KitchenServiceImpl}, \texttt{KitchenOrderTimeoutService}
+        \item services: \texttt{IKitchenService}, \texttt{KitchenServiceImpl}, \texttt{KitchenOrderTimeoutService}, \texttt{KitchenOrderFactory}
         \item event listener: \texttt{KitchenOrderPlacedEventListener}
         \item repositories: \texttt{KitchenOrderRepository}
     \end{itemize}
@@ -422,8 +425,14 @@ Mỗi module có ranh giới trách nhiệm tương đối độc lập, đồng
     \item \textbf{table}
     \begin{itemize}
         \item entities: \texttt{Table}, \texttt{TableStatus}
+        \item services: \texttt{ITableService}, \texttt{TableServiceImpl}, \texttt{DemoResetService}
         \item controller: \texttt{TableController}
         \item repositories: \texttt{TableRepository}
+    \end{itemize}
+    \item \textbf{reservation}
+    \begin{itemize}
+        \item entities và repositories cho đặt bàn
+        \item API phục vụ host tạo, cập nhật, giữ bàn, cho khách đặt trước vào bàn và xử lý khách walk-in
     \end{itemize}
     \item \textbf{notification}
     \begin{itemize}
@@ -463,7 +472,6 @@ Mỗi module có ranh giới trách nhiệm tương đối độc lập, đồng
     \item \textbf{Admin UI}
     \item \textbf{Server UI}
     \item \textbf{Kitchen Display UI}
-    \item \textbf{Cashier UI}
     \item \textbf{Host UI}
     \item \textbf{Manager UI}
     \item \textbf{Backend Application}
@@ -488,7 +496,7 @@ Mỗi module có ranh giới trách nhiệm tương đối độc lập, đồng
     \item Kitchen Component nhận sự kiện và tạo kitchen ticket.
     \item Kitchen Display UI cập nhật trạng thái món trong quá trình chế biến.
     \item Billing Component tạo bill từ order.
-    \item Cashier UI thực hiện thanh toán.
+    \item Server UI thực hiện thanh toán tại bàn.
     \item Khi thanh toán thành công, hệ thống phát \texttt{PaymentCompleted}.
     \item Table Component cập nhật trạng thái bàn tương ứng.
 \end{enumerate}
@@ -499,7 +507,7 @@ Mỗi module có ranh giới trách nhiệm tương đối độc lập, đồng
 \begin{itemize}
     \item \textbf{Client Node 1}: Tablet hoặc trình duyệt cho nhân viên phục vụ.
     \item \textbf{Client Node 2}: Màn hình hiển thị bếp.
-    \item \textbf{Client Node 3}: Terminal cho thu ngân.
+    \item \textbf{Client Node 3}: Terminal cho lễ tân hoặc quản lý.
     \item \textbf{Client Node 4}: Dashboard cho quản lý.
     \item \textbf{Application Server}: chạy ứng dụng backend theo kiến trúc modular monolith.
     \item \textbf{Database Server}: PostgreSQL, quản lý schema và seed data bằng Flyway migration.
@@ -648,8 +656,8 @@ Billing Module là nơi thể hiện rõ nhiều nguyên lý SOLID, đặc biệ
 \paragraph{Khả năng mở rộng}
 Billing Module có thể mở rộng để hỗ trợ:
 \begin{itemize}
-    \item split bill,
-    \item tính tip,
+    \item split bill theo từng món hoặc từng khách,
+    \item rule tính tip nâng cao,
     \item loyalty discount,
     \item voucher hoặc campaign theo thời gian,
     \item tích hợp payment gateway thật.
@@ -782,7 +790,7 @@ Nhờ đó, hệ thống dễ kiểm thử hơn, dễ thay thế implementation 
 
 Kiến trúc hiện tại cho phép mở rộng theo nhiều hướng mà không phá vỡ cấu trúc lõi:
 \begin{itemize}
-    \item Thêm \textbf{Reservation Module} để quản lý đặt chỗ trước.
+    \item Mở rộng \textbf{Reservation Module} với nhắc lịch, danh sách chờ và tối ưu bàn theo khung giờ.
     \item Thêm \textbf{Employee Scheduling Module} để quản lý ca làm việc và phân công nhân sự.
     \item Thêm \textbf{Loyalty Module} để tích điểm và chăm sóc khách hàng thân thiết.
     \item Tích hợp payment gateway thực tế.
@@ -790,7 +798,7 @@ Kiến trúc hiện tại cho phép mở rộng theo nhiều hướng mà không
     \item Tách dần một số module thành microservice nếu quy mô hệ thống tăng mạnh trong tương lai.
 \end{itemize}
 
-Ví dụ, \texttt{Reservation Module} có thể kết nối với \texttt{Table Module} để tối ưu phân bổ bàn theo khung giờ, trong khi \texttt{Loyalty Module} có thể lấy dữ liệu từ Bill và Order để tính điểm thưởng mà không làm ảnh hưởng trực tiếp tới các module lõi hiện tại.
+Ví dụ, phần reservation nâng cao có thể kết nối với \texttt{Table Module} để tối ưu phân bổ bàn theo khung giờ, trong khi \texttt{Loyalty Module} có thể lấy dữ liệu từ Bill và Order để tính điểm thưởng mà không làm ảnh hưởng trực tiếp tới các module lõi hiện tại.
 
 \section{Hiện thực hệ thống}
 
@@ -806,26 +814,30 @@ Ví dụ, \texttt{Reservation Module} có thể kết nối với \texttt{Table 
     \item \textbf{Table Module}
     \item \textbf{Admin \& Access Module}
     \item \textbf{Menu Management}
+    \item \textbf{Reservation/Host Module}
 \end{itemize}
 
 Ngoài ra, hệ thống có hiện thực backend cơ bản cho:
 \begin{itemize}
     \item \textbf{Inventory Module}
     \item \textbf{Analytics Module}
+    \item \textbf{Audit Log Module}
 \end{itemize}
 
-Các module Reservation, Employee Scheduling, Loyalty và Audit Log vẫn ở mức thiết kế hoặc kế hoạch mở rộng, chưa có module riêng hoàn chỉnh trong mã nguồn hiện tại.
+Các module Employee Scheduling, Loyalty, multi-branch và reservation nâng cao vẫn ở mức thiết kế hoặc kế hoạch mở rộng, chưa nằm trong phạm vi MVP.
 
 \subsubsection{Luồng nghiệp vụ end-to-end được demo}
 
 Nhóm tập trung hiện thực một vertical slice xuyên suốt toàn bộ hệ thống như sau:
 \begin{enumerate}
-    \item Nhân viên phục vụ chọn bàn.
+    \item Lễ tân giữ bàn cho khách đặt trước hoặc cho khách walk-in vào bàn.
+    \item Nhân viên phục vụ chọn bàn đang có khách.
     \item Tạo order và thêm món.
     \item Hệ thống sinh kitchen ticket cho bếp.
     \item Nhân viên bếp cập nhật trạng thái món.
-    \item Thu ngân tạo bill.
-    \item Xử lý thanh toán.
+    \item Nhân viên phục vụ có thể tiếp tục thêm món lần hai trước khi thanh toán.
+    \item Nhân viên phục vụ tạo bill.
+    \item Xử lý thanh toán toàn bộ hoặc split bill.
     \item Hệ thống đóng order và giải phóng bàn.
 \end{enumerate}
 
@@ -836,7 +848,7 @@ Luồng này phản ánh rõ giá trị cốt lõi của IRMS và là cơ sở c
 Stack công nghệ được sử dụng trong phiên bản hiện thực gồm:
 \begin{itemize}
     \item \textbf{Backend}: Java 17, Spring Boot, Spring Security, Spring Data JPA, WebSocket.
-    \item \textbf{Frontend}: ReactJS, TypeScript, Vite, Axios.
+    \item \textbf{Frontend}: ReactJS, JavaScript, Vite, Axios.
     \item \textbf{Database}: PostgreSQL.
     \item \textbf{ORM}: Spring Data JPA / Hibernate.
     \item \textbf{Migration}: Flyway.
@@ -848,13 +860,9 @@ Việc sử dụng Spring Boot đặc biệt phù hợp với kiến trúc modul
 
 \subsection{Cấu trúc thư mục}
 
-Ví dụ cấu trúc thư mục cho backend IRMS như sau:
+Ví dụ cấu trúc thư mục chính của IRMS như sau:
 
 \begin{verbatim}
-|-- src/
-|   |-- app/
-|   |-- styles/
-|   `-- main.tsx
 |-- backend/
 |   |-- src/main/java/com/irms/
 |   |   |-- admin/
@@ -862,15 +870,17 @@ Ví dụ cấu trúc thư mục cho backend IRMS như sau:
 |   |   |-- kitchen/
 |   |   |-- billing/
 |   |   |-- table/
+|   |   |-- reservation/
 |   |   |-- inventory/
 |   |   |-- analytics/
+|   |   |-- audit/
 |   |   |-- notification/
 |   |   |-- common/
 |   |   `-- config/
 |   |-- src/main/resources/
 |   |   `-- db/migration/
 |   `-- pom.xml
-|-- frontend/ (giao dien phu/legacy)
+|-- frontend/
 |   |-- src/
 |   |   |-- components/
 |   |   |-- services/
@@ -891,6 +901,7 @@ Trong mã nguồn, SRP được thể hiện thông qua việc:
     \item Controller chỉ nhận request và trả response.
     \item Service chỉ xử lý logic nghiệp vụ.
     \item Repository chỉ thực hiện truy cập dữ liệu.
+    \item Các lớp như \texttt{KitchenOrderFactory}, \texttt{TableServiceImpl} và \texttt{DemoResetService} tách riêng trách nhiệm tạo ticket bếp, điều phối nghiệp vụ bàn và reset dữ liệu demo.
     \item Mapper và Validator có thể được tách riêng nếu hệ thống phát triển lớn hơn.
 \end{itemize}
 
@@ -900,6 +911,7 @@ OCP trong mã nguồn được thể hiện rõ nhất ở:
 \begin{itemize}
     \item Việc bổ sung lớp \texttt{MomoPaymentProcessor} hoặc \texttt{BankTransferPaymentProcessor} thông qua interface \texttt{PaymentProcessor}.
     \item Việc bổ sung chiến lược giảm giá mới thông qua interface \texttt{DiscountStrategy}.
+    \item Việc bổ sung cách tạo kitchen ticket mới có thể đặt vào factory hoặc service chuyên trách thay vì thay đổi controller/order service.
 \end{itemize}
 
 \subsubsection{Liskov Substitution Principle (LSP)}
@@ -913,6 +925,7 @@ ISP được thể hiện qua việc tránh sử dụng interface quá lớn. C�
     \item \texttt{IOrderService} cho các use case order.
     \item \texttt{IKitchenService} cho workflow bếp.
     \item \texttt{IBillingService} cho nghiệp vụ bill và payment.
+    \item \texttt{ITableService} cho nghiệp vụ bàn thay vì để controller thao tác trực tiếp repository.
     \item Interface riêng cho xử lý payment và discount strategy.
 \end{itemize}
 
@@ -922,6 +935,7 @@ DIP được áp dụng bằng cách:
 \begin{itemize}
     \item Service inject repository interface.
     \item Controller inject service interface.
+    \item \texttt{OrderServiceImpl} chỉ phát \texttt{OrderPlacedEvent}; \texttt{KitchenOrderPlacedEventListener} thuộc Kitchen Module lắng nghe sự kiện để giảm phụ thuộc trực tiếp từ Order sang Kitchen.
     \item Dễ dàng mock abstraction trong unit test hoặc integration test.
 \end{itemize}
 
@@ -933,29 +947,35 @@ Hệ thống cung cấp màn hình đăng nhập cho người dùng theo từng 
 
 \subsubsection{Màn hình quản lý bàn}
 
-Màn hình quản lý bàn hiển thị trạng thái hiện tại của từng bàn, cho phép nhân viên phục vụ hoặc host chọn bàn phù hợp trước khi tạo order. Các trạng thái như Available, Occupied hoặc WaitingForPayment được thể hiện rõ ràng để hỗ trợ quyết định nhanh trong môi trường phục vụ thực tế.
+Màn hình quản lý bàn hiển thị trạng thái hiện tại của từng bàn, cho phép nhân viên phục vụ hoặc host chọn bàn phù hợp trước khi tạo order. Backend lưu các trạng thái bàn ổn định như \texttt{AVAILABLE}, \texttt{OCCUPIED}, \texttt{RESERVED} và \texttt{CLEANING}; frontend suy diễn thêm trạng thái nghiệp vụ như có khách chưa gọi món, chờ món, chờ phục vụ hoặc đã phục vụ để hỗ trợ quyết định nhanh trong môi trường phục vụ thực tế.
+
+\subsubsection{Màn hình lễ tân}
+
+Màn hình lễ tân hỗ trợ hai luồng đón khách: khách đã đặt trước và khách walk-in. Với khách đặt trước, lễ tân có thể tạo reservation, xác nhận, gán bàn để chuyển bàn sang trạng thái \texttt{RESERVED}, sau đó cho khách vào bàn để chuyển sang \texttt{OCCUPIED}. Với khách walk-in, lễ tân chọn trực tiếp một bàn trống và cho khách vào bàn mà không cần tạo reservation giả. Trạng thái bàn sau các thao tác này được đồng bộ sang màn hình nhân viên phục vụ.
 
 \subsubsection{Màn hình gọi món}
 
-Màn hình gọi món cho phép nhân viên phục vụ chọn món từ menu, thêm số lượng, nhập ghi chú và gửi order đến hệ thống. Sau khi order được xác nhận, dữ liệu được lưu lại và chuyển tiếp đến Kitchen Module.
+Màn hình gọi món cho phép nhân viên phục vụ chọn món từ menu, thêm số lượng, nhập ghi chú và gửi order đến hệ thống. Một bàn có thể gọi thêm món nhiều lần trước khi thanh toán; các lần gọi mới được gắn vào order đang mở và tiếp tục phát sinh ticket cho bếp.
 
 \subsubsection{Màn hình bếp}
 
-Màn hình bếp hiển thị danh sách kitchen ticket đang chờ xử lý. Nhân viên bếp có thể cập nhật trạng thái từng món hoặc từng ticket, từ đó hệ thống phản ánh lại trạng thái order cho khu vực phục vụ.
+Màn hình bếp hiển thị danh sách kitchen ticket đang chờ xử lý và danh sách các món đã hoàn thành/đã phục vụ. Nhân viên bếp có thể cập nhật trạng thái từng món hoặc từng ticket, từ đó hệ thống phản ánh lại trạng thái order cho khu vực phục vụ.
 
 \subsubsection{Màn hình lập bill và thanh toán}
 
-Màn hình bill hỗ trợ tổng hợp món đã gọi, tính subtotal, service fee, discount và total. Thu ngân có thể lựa chọn phương thức thanh toán phù hợp và xác nhận giao dịch. Sau khi thanh toán thành công, trạng thái bill và order được cập nhật đồng bộ.
+Màn hình bill hỗ trợ tổng hợp món đã gọi, tính subtotal, service fee, tip, discount và total. Trong phạm vi demo hiện tại, nhân viên phục vụ đảm nhiệm luôn thao tác thanh toán tại bàn, bao gồm thanh toán toàn bộ phần còn lại hoặc split bill theo số tiền từng lần thanh toán. Sau khi thanh toán đủ, trạng thái bill, order và bàn được cập nhật đồng bộ.
 
 \subsubsection{Luồng demo end-to-end}
 
 Với phạm vi hiện thực ưu tiên một \textit{vertical slice} hoàn chỉnh, hệ thống tập trung vào luồng demo chính sau:
 \begin{enumerate}
-    \item Nhân viên phục vụ chọn bàn.
+    \item Lễ tân giữ bàn cho khách đặt trước hoặc cho khách walk-in vào bàn.
+    \item Nhân viên phục vụ chọn bàn đang có khách.
     \item Tạo order và thêm món.
     \item Hệ thống phát sinh kitchen ticket.
     \item Nhân viên bếp cập nhật món đã sẵn sàng.
-    \item Thu ngân tạo bill và xử lý thanh toán.
+    \item Nhân viên phục vụ đánh dấu món đã phục vụ và có thể thêm lần gọi món tiếp theo nếu khách gọi thêm.
+    \item Nhân viên phục vụ tạo bill và xử lý thanh toán toàn bộ hoặc split bill.
     \item Bàn được giải phóng sau khi thanh toán hoàn tất.
 \end{enumerate}
 
@@ -963,8 +983,10 @@ Các màn hình minh họa có thể bao gồm:
 \begin{itemize}
     \item Màn hình đăng nhập
     \item Màn hình quản lý bàn
+    \item Màn hình lễ tân cho đặt bàn, giữ bàn và khách walk-in
     \item Màn hình gọi món của nhân viên phục vụ
     \item Màn hình bếp hiển thị ticket
+    \item Màn hình bếp hiển thị lịch sử món đã hoàn thành
     \item Màn hình lập bill và thanh toán
     \item Màn hình cập nhật trạng thái bàn sau thanh toán
 \end{itemize}
@@ -993,7 +1015,7 @@ Việc áp dụng SOLID giúp nhóm xây dựng hệ thống với cấu trúc r
 
 \subsection{Khó khăn gặp phải}
 
-Khó khăn lớn nhất của nhóm là xác định ranh giới module sao cho vừa đúng với domain, vừa không bị dàn trải. Ban đầu, một số trách nhiệm như quản lý bàn, order và billing có xu hướng bị gộp vào chung một service, làm tăng độ phức tạp. Ngoài ra, việc áp dụng DIP và ISP khiến thiết kế ban đầu mất nhiều thời gian hơn vì nhóm phải suy nghĩ kỹ về abstraction thay vì code trực tiếp.
+Khó khăn lớn nhất của nhóm là xác định ranh giới module sao cho vừa đúng với domain, vừa không bị dàn trải. Ban đầu, một số trách nhiệm như quản lý bàn, order và billing có xu hướng bị gộp vào chung một service, làm tăng độ phức tạp. Luồng order sang bếp cũng cần xử lý cẩn thận để tránh mất kitchen ticket khi khách gọi món thêm nhiều lần; vì vậy hệ thống dùng event ở tầng ứng dụng và bổ sung ràng buộc/migration ở tầng dữ liệu như một lớp bảo vệ nhất quán. Ngoài ra, việc áp dụng DIP và ISP khiến thiết kế ban đầu mất nhiều thời gian hơn vì nhóm phải suy nghĩ kỹ về abstraction thay vì code trực tiếp.
 
 \subsection{Bài học rút ra}
 
@@ -1016,7 +1038,7 @@ Qua quá trình thiết kế và hiện thực IRMS, nhóm nhận ra rằng SOLI
 \hline
 4 & Phạm Đình Chương & 2210400 & Billing/Payment Module: bill, calculator, payment processor strategy; nhận dữ liệu từ Order Module \\
 \hline
-5 & Trần Minh Đăng & 2310735 & Frontend và integration: màn hình demo cho server, kitchen, cashier; tích hợp API của các module chính \\
+5 & Trần Minh Đăng & 2310735 & Frontend và integration: màn hình demo cho server, kitchen, host và manager; tích hợp API của các module chính \\
 \hline
 6 & Hà Đình Vinh & 2313907 & Database, testing và docs: schema, seed data, test cases, demo script và kiểm soát dữ liệu demo \\
 \hline
