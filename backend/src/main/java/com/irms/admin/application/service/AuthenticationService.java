@@ -32,7 +32,7 @@ public class AuthenticationService {
     public AuthResponse authenticate(AuthRequest request) {
         AuthMethod authMethod = request.getAuthMethod();
         if (authMethod == null) {
-            throw new BusinessException("Authentication method is required");
+            authMethod = isBlank(request.getUsername()) ? AuthMethod.PIN : AuthMethod.PASSWORD;
         }
 
         User user = switch (authMethod) {
@@ -60,15 +60,22 @@ public class AuthenticationService {
             throw new BusinessException("Username and password are required");
         }
 
+        User user = userRepository.findByUsername(request.getUsername())
+                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
+
+        if (user.getAuthMethod() == AuthMethod.PIN) {
+            if (user.getPinHash() != null && passwordEncoder.matches(request.getPassword(), user.getPinHash())) {
+                return user;
+            }
+            throw new BadCredentialsException("Invalid username or password");
+        }
+
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
                         request.getUsername(),
                         request.getPassword()
                 )
         );
-
-        User user = userRepository.findByUsername(request.getUsername())
-                .orElseThrow(() -> new UsernameNotFoundException("User not found"));
 
         if (user.getAuthMethod() != AuthMethod.PASSWORD) {
             throw new BadCredentialsException("This account does not support password login");
