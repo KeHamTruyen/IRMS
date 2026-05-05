@@ -4,6 +4,7 @@ import { User } from '../types';
 
 // Backend DTOs
 interface AuthRequest {
+  authMethod: 'PASSWORD';
   username: string;
   password: string;
 }
@@ -32,7 +33,7 @@ const mapRole = (backendRole: string): User['role'] => {
 export const authService = {
   // Login
   async login(username: string, password: string): Promise<User> {
-    const request: AuthRequest = { username, password };
+    const request: AuthRequest = { authMethod: 'PASSWORD', username, password };
     const response = await api.post<AuthResponse>('/auth/login', request);
     
     // Extract data from ApiResponse wrapper
