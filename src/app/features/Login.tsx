@@ -43,7 +43,7 @@ const roleDescriptions = {
 // Validation schema
 const loginSchema = z.object({
   username: z.string().min(3, 'Username must be at least 3 characters'),
-  password: z.string().min(6, 'Password must be at least 6 characters'),
+  password: z.string().min(3, 'Password must be at least 3 characters'),
   rememberMe: z.boolean().optional(),
 });
 
@@ -319,7 +319,7 @@ export const Login: React.FC = () => {
                     <div className="grid grid-cols-2 gap-2 text-xs">
                       <div className="bg-gray-50 rounded p-2">
                         <p className="font-medium text-gray-700">Admin</p>
-                        <p className="text-gray-600">admin / password123</p>
+                        <p className="text-gray-600">admin / same PIN as server</p>
                       </div>
                       <div className="bg-gray-50 rounded p-2">
                         <p className="font-medium text-gray-700">Server</p>
