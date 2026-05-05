@@ -7,6 +7,7 @@ import { chefApi } from '../services/chefApi'
 import { serverApi } from '../services/serverApi'
 import { managerApi } from '../services/managerApi'
 import { hostApi } from '../services/hostApi'
+import { cashierApi } from '../services/cashierApi'
 
 export function useTerminalAuth() {
   const [authMode, setAuthMode] = useState('employee')
@@ -46,6 +47,12 @@ export function useTerminalAuth() {
       return {
         success: true,
         data: await hostApi.getDashboard(),
+      }
+    }
+    if (role === 'CASHIER') {
+      return {
+        success: true,
+        data: await cashierApi.getDashboard(),
       }
     }
     if (role === 'SERVER') {
