@@ -142,11 +142,11 @@ Seed data provides role accounts. In the UI, use the terminal/login screen for t
 
 Common roles:
 
-- `ADMIN`
-- `MANAGER`
-- `SERVER`
-- `CHEF`
-- `HOST`
+- `ADMIN`   Password:1234
+- `MANAGER` Pin:1234
+- `SERVER`  Pin:1234
+- `CHEF`    Pin:1234
+- `HOST`    Pin:1234
 
 If local seed credentials differ, check `backend/src/main/resources/db/migration/V7__Insert_seed_data.sql`.
 
