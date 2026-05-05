@@ -3,6 +3,7 @@ export const APP_ROLES = {
   MANAGER: 'MANAGER',
   SERVER: 'SERVER',
   CHEF: 'CHEF',
+  CASHIER: 'CASHIER',
   HOST: 'HOST',
 }
 
@@ -16,6 +17,11 @@ export const EMPLOYEE_ROLES = [
     id: APP_ROLES.CHEF,
     label: 'Bếp',
     subtitle: 'Khu bếp',
+  },
+  {
+    id: APP_ROLES.CASHIER,
+    label: 'Cashier',
+    subtitle: 'Payments',
   },
   {
     id: APP_ROLES.HOST,
@@ -49,6 +55,11 @@ export const ROLE_META = {
     title: 'Bếp',
     dashboardTitle: 'Dashboard bếp',
     dashboardSubtitle: 'Hàng chờ chế biến, trạng thái món và tải tại quầy',
+  },
+  CASHIER: {
+    title: 'Cashier',
+    dashboardTitle: 'Cashier dashboard',
+    dashboardSubtitle: 'Bills, payments, and receipts',
   },
   HOST: {
     title: 'Lễ tân',
