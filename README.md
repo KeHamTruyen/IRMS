@@ -83,6 +83,28 @@ Frontend:
 
 ## Run Locally
 
+### Option A. Docker Compose
+
+From the repository root:
+
+```bash
+docker compose up --build
+```
+
+Services:
+
+```text
+Frontend: http://localhost:5173
+Backend:  http://localhost:3000
+Database: localhost:5432
+```
+
+The root `docker-compose.yml` starts PostgreSQL, builds the Spring Boot backend from `backend/Dockerfile`, and builds the React/Vite frontend from `frontend/Dockerfile`. The frontend container serves static assets with Nginx and proxies `/api` requests to the backend container.
+
+For a backend-only Docker run, `backend/docker-compose.yml` starts PostgreSQL and the backend service from inside the `backend/` directory.
+
+### Option B. Manual Run
+
 ### 1. Database
 
 Create a PostgreSQL database and configure `backend/.env`.

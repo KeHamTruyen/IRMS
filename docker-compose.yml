@@ -18,7 +18,7 @@ services:
 
   backend:
     build:
-      context: .
+      context: ./backend
       dockerfile: Dockerfile
     container_name: irms-backend
     depends_on:
@@ -32,7 +32,7 @@ services:
       DB_PASSWORD: irms_pass
       SERVER_PORT: 3000
       JWT_SECRET: change-this-secret-key-in-production-minimum-256-bits-required
-      CORS_ORIGINS: http://localhost:3000,http://localhost:5173
+      CORS_ORIGINS: http://localhost:5173,http://frontend
     ports:
       - "3000:3000"
     healthcheck:
@@ -41,6 +41,19 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        VITE_API_URL: /api
+    container_name: irms-frontend
+    depends_on:
+      backend:
+        condition: service_healthy
+    ports:
+      - "5173:80"
 
 volumes:
   postgres-data:

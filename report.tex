@@ -60,7 +60,7 @@ INTELLIGENT RESTAURANT \\ MANAGEMENT SYSTEM (IRMS)
 
 \begin{tabular}{>{\raggedleft\bfseries}p{4.2cm} p{8cm}}
 \fontsize{12}{14}\selectfont GV: & \fontsize{12}{14}\selectfont Trần Trương Tuấn Phát \\[5mm]
-\fontsize{12}{14}\selectfont SVTH: & \fontsize{12}{14}\selectfont Nguyễn Nhật Tiến (2213059) \\[4mm]
+\fontsize{12}{14}\selectfont SVTH: & \fontsize{12}{14}\selectfont Nguyễn Nhật Tân (2213059) \\[4mm]
               & \fontsize{12}{14}\selectfont Lê Bảo Linh (2311849) \\[4mm]
               & \fontsize{12}{14}\selectfont Trần Phú (1952924) \\[4mm]
               & \fontsize{12}{14}\selectfont Phạm Đình Chương (2210400) \\[4mm]
@@ -74,6 +74,30 @@ INTELLIGENT RESTAURANT \\ MANAGEMENT SYSTEM (IRMS)
 
 \tableofcontents
 \newpage
+
+\section{Phân chia công việc}
+
+\begin{table}[H]
+\centering
+\caption{Phân chia công việc giữa các thành viên}
+\begin{tabular}{|p{0.8cm}|p{4.2cm}|p{2.2cm}|p{6.3cm}|}
+\hline
+\textbf{STT} & \textbf{Họ và tên} & \textbf{MSSV} & \textbf{Công việc chính} \\
+\hline
+1 & Nguyễn Nhật Tân & 2213059 & Table Module, Architecture lead và report\\
+\hline
+2 & Lê Bảo Linh & 2311849 & Order Module \\
+\hline
+3 & Trần Phú & 1952924 & Billing/Payment Module \\
+\hline
+4 & Phạm Đình Chương & 2210400 & Testing và doc\\
+\hline
+5 & Trần Minh Đăng & 2310735 & Kitchen Module \\
+\hline
+6 & Hà Đình Vinh & 2313907 & Frontend và integration\\
+\hline
+\end{tabular}
+\end{table}
 
 \section{Giới thiệu}
 
@@ -216,15 +240,7 @@ Các bên liên quan của hệ thống được chia thành hai nhóm chính: s
     \item \textbf{Khả năng kiểm toán}: các thao tác nghiệp vụ quan trọng cần được ghi nhận để hỗ trợ tra cứu khi cần.
 \end{itemize}
 
-\subsubsection{Ràng buộc}
 
-\begin{itemize}
-    \item Thời gian thực hiện dự án khoảng 1 tháng.
-    \item Nhóm thực hiện gồm 6 thành viên.
-    \item Hạ tầng triển khai và thời gian cấu hình có giới hạn, nên không phù hợp với kiến trúc phân tán phức tạp.
-    \item Demo cần hoạt động ổn định, dễ trình bày và bám sát luồng nghiệp vụ thực tế của nhà hàng.
-    \item Phần hiện thực không bắt buộc bao phủ toàn bộ phạm vi lý thuyết, mà ưu tiên một luồng end-to-end hoàn chỉnh.
-\end{itemize}
 
 \subsection{Đặc trưng kiến trúc và tiêu chí thành công}
 
@@ -853,14 +869,14 @@ Stack công nghệ được sử dụng trong phiên bản hiện thực gồm:
     \item \textbf{ORM}: Spring Data JPA / Hibernate.
     \item \textbf{Migration}: Flyway.
     \item \textbf{Authentication}: JWT
-    \item \textbf{Containerization}: Docker Compose cho backend và database.
+    \item \textbf{Containerization}: Docker Compose cho frontend, backend và PostgreSQL.
 \end{itemize}
 
 Việc sử dụng Spring Boot đặc biệt phù hợp với kiến trúc modular monolith vì framework này hỗ trợ tốt Dependency Injection, layered architecture, interface-based design và kiểm thử theo module.
 
 \subsection{Cấu trúc thư mục}
 
-Ví dụ cấu trúc thư mục chính của IRMS như sau:
+Cấu trúc thư mục chính của IRMS như sau:
 
 \begin{verbatim}
 |-- backend/
@@ -879,65 +895,25 @@ Ví dụ cấu trúc thư mục chính của IRMS như sau:
 |   |   `-- config/
 |   |-- src/main/resources/
 |   |   `-- db/migration/
+|   |-- Dockerfile
 |   `-- pom.xml
 |-- frontend/
 |   |-- src/
 |   |   |-- components/
-|   |   |-- services/
+|   |   |-- constants/
 |   |   |-- hooks/
-|   |   `-- pages/
+|   |   |-- pages/
+|   |   `-- services/
+|   |-- Dockerfile
+|   |-- nginx.conf
 |   `-- package.json
+|-- docker-compose.yml
+|-- assignment.md
+|-- grading_criteria.md
 `-- report.tex
 \end{verbatim}
 
 Cấu trúc này phản ánh cách chia theo module nghiệp vụ thay vì chia thành nhiều service độc lập. Nhờ đó, hệ thống vẫn giữ được tính mô-đun nhưng dễ hiện thực và dễ triển khai hơn.
-
-\subsection{Tính SOLID trong mã nguồn}
-
-\subsubsection{Single Responsibility Principle (SRP)}
-
-Trong mã nguồn, SRP được thể hiện thông qua việc:
-\begin{itemize}
-    \item Controller chỉ nhận request và trả response.
-    \item Service chỉ xử lý logic nghiệp vụ.
-    \item Repository chỉ thực hiện truy cập dữ liệu.
-    \item Các lớp như \texttt{KitchenOrderFactory}, \texttt{TableServiceImpl} và \texttt{DemoResetService} tách riêng trách nhiệm tạo ticket bếp, điều phối nghiệp vụ bàn và reset dữ liệu demo.
-    \item Mapper và Validator có thể được tách riêng nếu hệ thống phát triển lớn hơn.
-\end{itemize}
-
-\subsubsection{Open/Closed Principle (OCP)}
-
-OCP trong mã nguồn được thể hiện rõ nhất ở:
-\begin{itemize}
-    \item Việc bổ sung lớp \texttt{MomoPaymentProcessor} hoặc \texttt{BankTransferPaymentProcessor} thông qua interface \texttt{PaymentProcessor}.
-    \item Việc bổ sung chiến lược giảm giá mới thông qua interface \texttt{DiscountStrategy}.
-    \item Việc bổ sung cách tạo kitchen ticket mới có thể đặt vào factory hoặc service chuyên trách thay vì thay đổi controller/order service.
-\end{itemize}
-
-\subsubsection{Liskov Substitution Principle (LSP)}
-
-LSP trong mã nguồn yêu cầu mọi lớp con hoặc implementation mới phải giữ nguyên hợp đồng hành vi của abstraction. Chẳng hạn, mọi lớp triển khai \texttt{PaymentProcessor} đều phải xử lý thanh toán theo giao diện thống nhất và có thể được dùng thay thế lẫn nhau trong cùng một ngữ cảnh.
-
-\subsubsection{Interface Segregation Principle (ISP)}
-
-ISP được thể hiện qua việc tránh sử dụng interface quá lớn. Các interface được tách theo use case:
-\begin{itemize}
-    \item \texttt{IOrderService} cho các use case order.
-    \item \texttt{IKitchenService} cho workflow bếp.
-    \item \texttt{IBillingService} cho nghiệp vụ bill và payment.
-    \item \texttt{ITableService} cho nghiệp vụ bàn thay vì để controller thao tác trực tiếp repository.
-    \item Interface riêng cho xử lý payment và discount strategy.
-\end{itemize}
-
-\subsubsection{Dependency Inversion Principle (DIP)}
-
-DIP được áp dụng bằng cách:
-\begin{itemize}
-    \item Service inject repository interface.
-    \item Controller inject service interface.
-    \item \texttt{OrderServiceImpl} chỉ phát \texttt{OrderPlacedEvent}; \texttt{KitchenOrderPlacedEventListener} thuộc Kitchen Module lắng nghe sự kiện để giảm phụ thuộc trực tiếp từ Order sang Kitchen.
-    \item Dễ dàng mock abstraction trong unit test hoặc integration test.
-\end{itemize}
 
 \subsection{Kết quả hiện thực}
 
@@ -945,25 +921,143 @@ DIP được áp dụng bằng cách:
 
 Hệ thống cung cấp màn hình đăng nhập cho người dùng theo từng vai trò. Sau khi xác thực thành công, người dùng được điều hướng đến đúng giao diện tương ứng với vai trò của họ. Điều này giúp bảo vệ chức năng khỏi truy cập trái phép và phản ánh đúng yêu cầu RBAC trong thiết kế.
 
-\subsubsection{Màn hình quản lý bàn}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/login1.png}
+    \caption{Màn hình đăng nhập}
+\end{figure}
 
-Màn hình quản lý bàn hiển thị trạng thái hiện tại của từng bàn, cho phép nhân viên phục vụ hoặc host chọn bàn phù hợp trước khi tạo order. Backend lưu các trạng thái bàn ổn định như \texttt{AVAILABLE}, \texttt{OCCUPIED}, \texttt{RESERVED} và \texttt{CLEANING}; frontend suy diễn thêm trạng thái nghiệp vụ như có khách chưa gọi món, chờ món, chờ phục vụ hoặc đã phục vụ để hỗ trợ quyết định nhanh trong môi trường phục vụ thực tế.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/login2.png}
+    \caption{Màn hình đăng nhập của quản trị viên}
+\end{figure}
+
+\subsubsection{Màn hình quản lý}
+
+Màn hình quản lý đóng vai trò như một bảng điều khiển tổng quan dành cho quản lý nhà hàng. Tại đây, người dùng có thể theo dõi các thống kê chung như doanh thu theo ngày hoặc theo ca, danh sách các món bán chạy và các đơn hàng vừa hoàn tất để nắm nhanh tình hình vận hành. Giao diện này giúp nhà quản lý quan sát hiệu quả kinh doanh, nhận diện xu hướng tiêu thụ món ăn và kiểm tra các giao dịch mới nhất mà không cần đi sâu vào từng module nghiệp vụ riêng lẻ.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/manager.png}
+    \caption{Màn hình quản lý}
+\end{figure}
+
+\subsubsection{Màn hình quản trị}
+
+Màn hình quản trị dành cho quản trị viên hoặc quản lý cấp cao, đóng vai trò là khu vực điều hành tập trung của toàn hệ thống. Tại đây, người dùng có thể truy cập các chức năng tổng quan, phân tích doanh thu và quản lý tập trung nhiều nhóm dữ liệu quan trọng như nhân sự, menu, nguyên liệu, bàn và đơn hàng. Giao diện này giúp theo dõi hoạt động toàn cục, kiểm soát dữ liệu vận hành cốt lõi và hỗ trợ các quyết định quản trị dựa trên số liệu thay vì chỉ thao tác ở từng nghiệp vụ riêng lẻ.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/admin1.png}
+    \caption{Màn hình quản trị với chức năng tổng quan}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/admin2.png}
+    \caption{Màn hình quản trị với chức năng phân tích doanh thu}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/admin3.png}
+    \caption{Màn hình quản trị cho quản lý tập trung menu}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/admin4.png}
+    \caption{Màn hình quản trị cho quản lý tập trung nhân sự}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/admin5.png}
+    \caption{Màn hình quản trị cho quản lý nguyên liệu}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/admin6.png}
+    \caption{Màn hình quản trị cho quản lý bàn}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/admin7.png}
+    \caption{Màn hình quản trị cho quản lý đơn hàng}
+\end{figure}
 
 \subsubsection{Màn hình lễ tân}
 
 Màn hình lễ tân hỗ trợ hai luồng đón khách: khách đã đặt trước và khách walk-in. Với khách đặt trước, lễ tân có thể tạo reservation, xác nhận, gán bàn để chuyển bàn sang trạng thái \texttt{RESERVED}, sau đó cho khách vào bàn để chuyển sang \texttt{OCCUPIED}. Với khách walk-in, lễ tân chọn trực tiếp một bàn trống và cho khách vào bàn mà không cần tạo reservation giả. Trạng thái bàn sau các thao tác này được đồng bộ sang màn hình nhân viên phục vụ.
 
-\subsubsection{Màn hình gọi món}
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/reception1.png}
+    \caption{Màn hình lễ tân cho đặt bàn và giữ bàn}
+\end{figure}
 
-Màn hình gọi món cho phép nhân viên phục vụ chọn món từ menu, thêm số lượng, nhập ghi chú và gửi order đến hệ thống. Một bàn có thể gọi thêm món nhiều lần trước khi thanh toán; các lần gọi mới được gắn vào order đang mở và tiếp tục phát sinh ticket cho bếp.
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/reception2.png}
+    \caption{Màn hình lễ tân cho xử lý khách walk-in}
+\end{figure}
 
-\subsubsection{Màn hình bếp}
+\subsubsection{Màn hình phục vụ bàn}
 
-Màn hình bếp hiển thị danh sách kitchen ticket đang chờ xử lý và danh sách các món đã hoàn thành/đã phục vụ. Nhân viên bếp có thể cập nhật trạng thái từng món hoặc từng ticket, từ đó hệ thống phản ánh lại trạng thái order cho khu vực phục vụ.
+Màn hình phục vụ bàn hỗ trợ nhân viên phục vụ thao tác trực tiếp trên từng bàn đang có khách. Ở tầng backend, trạng thái bàn được lưu ổn định dưới các giá trị \texttt{AVAILABLE}, \texttt{OCCUPIED}, \texttt{RESERVED} và \texttt{CLEANING}. Tại đây, người dùng có thể xem tình trạng bàn, theo dõi order đang mở, duyệt menu để chọn món, thêm số lượng, nhập ghi chú và gửi yêu cầu xuống hệ thống. Giao diện này tập trung các thao tác cần thiết trong quá trình phục vụ tại bàn, đồng thời cho phép gọi thêm món nhiều lần trước khi thanh toán; các lần gọi mới tiếp tục được gắn vào order đang mở và phát sinh ticket tương ứng cho bếp.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/server1.png}
+    \caption{Màn hình phục vụ bàn với theo dõi tình trạng bàn}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/server2.png}
+    \caption{Màn hình phục vụ bàn với thao tác gọi món}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/server4.png}
+    \caption{Màn hình duyệt menu}
+\end{figure}
+
+\subsubsection{Màn hình quản lý bếp và kho}
+
+Màn hình quản lý bếp và kho hỗ trợ nhân viên theo dõi các ticket chế biến đang chờ xử lý, tình trạng món đang chuẩn bị và lịch sử các món đã hoàn thành. Bên cạnh đó, giao diện này còn cho phép cập nhật tình trạng nguyên liệu trong kho, ghi nhận nguyên liệu sắp hết hoặc đã hết để phối hợp giữa khu vực bếp và bộ phận quản lý. Việc kết hợp quản lý bếp với kho giúp hệ thống phản ánh tốt hơn năng lực phục vụ thực tế và hỗ trợ điều chỉnh menu hoặc kế hoạch chế biến kịp thời.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/chef1.png}
+    \caption{Màn hình quản lý các món đang chờ chế biến}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/chef2.png}
+    \caption{Màn hình quản lý kho}
+\end{figure}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/chef3.png}
+    \caption{Màn hình tình trạng thực đơn}
+\end{figure}
 
 \subsubsection{Màn hình lập bill và thanh toán}
 
 Màn hình bill hỗ trợ tổng hợp món đã gọi, tính subtotal, service fee, tip, discount và total. Trong phạm vi demo hiện tại, nhân viên phục vụ đảm nhiệm luôn thao tác thanh toán tại bàn, bao gồm thanh toán toàn bộ phần còn lại hoặc split bill theo số tiền từng lần thanh toán. Sau khi thanh toán đủ, trạng thái bill, order và bàn được cập nhật đồng bộ.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[width=0.82\textwidth]{frontend_img/server3.png}
+    \caption{Màn hình lập bill và thanh toán}
+\end{figure}
 
 \subsubsection{Luồng demo end-to-end}
 
@@ -982,68 +1076,36 @@ Với phạm vi hiện thực ưu tiên một \textit{vertical slice} hoàn ch�
 Các màn hình minh họa có thể bao gồm:
 \begin{itemize}
     \item Màn hình đăng nhập
-    \item Màn hình quản lý bàn
+    \item Màn hình quản lý với thống kê tổng quan
+    \item Màn hình quản trị với quản lý tập trung và phân tích doanh thu
     \item Màn hình lễ tân cho đặt bàn, giữ bàn và khách walk-in
-    \item Màn hình gọi món của nhân viên phục vụ
-    \item Màn hình bếp hiển thị ticket
-    \item Màn hình bếp hiển thị lịch sử món đã hoàn thành
+    \item Màn hình phục vụ bàn của nhân viên phục vụ
+    \item Màn hình quản lý bếp và kho với ticket chế biến
+    \item Màn hình quản lý bếp và kho với cập nhật tình trạng nguyên liệu
     \item Màn hình lập bill và thanh toán
     \item Màn hình cập nhật trạng thái bàn sau thanh toán
 \end{itemize}
 
 \subsection{Đóng gói và triển khai}
 
+Mã nguồn của dự án được quản lý tại \href{https://github.com/KeHamTruyen/IRMS}{repository GitHub IRMS}. Repository này phục vụ cho việc theo dõi tiến độ, cộng tác giữa các thành viên và đối chiếu với phần hiện thực được mô tả trong báo cáo.
+
 Hệ thống có thể được đóng gói bằng Docker để đơn giản hóa quá trình triển khai và demo:
 \begin{itemize}
-    \item Backend được đóng gói thành một Docker image.
-    \item Database được chạy bằng Docker Compose.
+    \item Backend được đóng gói bằng \texttt{backend/Dockerfile}: Maven build tạo file \texttt{jar}, sau đó chạy bằng Java runtime image.
+    \item Frontend được đóng gói bằng \texttt{frontend/Dockerfile}: Vite build tạo static assets và Nginx phục vụ giao diện.
+    \item PostgreSQL, backend và frontend được điều phối bằng \texttt{docker-compose.yml} ở thư mục gốc dự án.
+    \item Nginx trong frontend proxy các request \texttt{/api} đến backend container, giúp demo truy cập qua \texttt{localhost:5173}.
     \item Flyway migration tạo schema và seed dữ liệu mẫu cho tài khoản, bàn, menu, order, bill và kitchen order.
 \end{itemize}
 
 Ví dụ cấu hình chạy:
 \begin{itemize}
+    \item Lệnh chạy: \texttt{docker compose up --build}
     \item Backend: \texttt{localhost:3000}
     \item Frontend: \texttt{localhost:5173}
-    \item Database: PostgreSQL container
+    \item Database: PostgreSQL container, mapped ra \texttt{localhost:5432}
 \end{itemize}
-
-\section{Báo cáo phản ánh}
-
-\subsection{Lợi ích của việc áp dụng SOLID}
-
-Việc áp dụng SOLID giúp nhóm xây dựng hệ thống với cấu trúc rõ ràng hơn, dễ bảo trì hơn và thuận lợi hơn khi chia việc giữa các thành viên. Nhờ SRP và DIP, các service và repository được tách biệt hợp lý, giúp giảm coupling và tăng khả năng kiểm thử. OCP đặc biệt hữu ích trong các phần như payment và discount, nơi nhu cầu mở rộng là rất rõ ràng.
-
-\subsection{Khó khăn gặp phải}
-
-Khó khăn lớn nhất của nhóm là xác định ranh giới module sao cho vừa đúng với domain, vừa không bị dàn trải. Ban đầu, một số trách nhiệm như quản lý bàn, order và billing có xu hướng bị gộp vào chung một service, làm tăng độ phức tạp. Luồng order sang bếp cũng cần xử lý cẩn thận để tránh mất kitchen ticket khi khách gọi món thêm nhiều lần; vì vậy hệ thống dùng event ở tầng ứng dụng và bổ sung ràng buộc/migration ở tầng dữ liệu như một lớp bảo vệ nhất quán. Ngoài ra, việc áp dụng DIP và ISP khiến thiết kế ban đầu mất nhiều thời gian hơn vì nhóm phải suy nghĩ kỹ về abstraction thay vì code trực tiếp.
-
-\subsection{Bài học rút ra}
-
-Qua quá trình thiết kế và hiện thực IRMS, nhóm nhận ra rằng SOLID không chỉ là các nguyên lý lý thuyết mà thực sự giúp tăng chất lượng thiết kế nếu được áp dụng đúng chỗ. Nhóm cũng rút ra bài học rằng với đồ án thời gian ngắn, việc chọn kiến trúc phù hợp với bối cảnh triển khai quan trọng hơn việc chạy theo một kiến trúc ``hiện đại'' nhưng vượt quá khả năng thực hiện.
-
-\section{Phân chia công việc}
-
-\begin{table}[H]
-\centering
-\caption{Phân chia công việc giữa các thành viên}
-\begin{tabular}{|p{0.8cm}|p{4.2cm}|p{2.2cm}|p{6.3cm}|}
-\hline
-\textbf{STT} & \textbf{Họ và tên} & \textbf{MSSV} & \textbf{Công việc chính} \\
-\hline
-1 & Nguyễn Nhật Tiến & 2213059 & Architecture lead và report: phân tích yêu cầu, thiết kế kiến trúc, UML, chuẩn interface, tổng hợp báo cáo \\
-\hline
-2 & Lê Bảo Linh & 2311849 & Order Module: entity, service, repository, API order; phối hợp với Menu và Table \\
-\hline
-3 & Trần Phú & 1952924 & Kitchen Module: kitchen order/ticket, status flow, kitchen API/UI; bám sự kiện từ Order Module \\
-\hline
-4 & Phạm Đình Chương & 2210400 & Billing/Payment Module: bill, calculator, payment processor strategy; nhận dữ liệu từ Order Module \\
-\hline
-5 & Trần Minh Đăng & 2310735 & Frontend và integration: màn hình demo cho server, kitchen, host và manager; tích hợp API của các module chính \\
-\hline
-6 & Hà Đình Vinh & 2313907 & Database, testing và docs: schema, seed data, test cases, demo script và kiểm soát dữ liệu demo \\
-\hline
-\end{tabular}
-\end{table}
 
 \section{Tổng kết}
 
